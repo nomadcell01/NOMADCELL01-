@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOMAD GAME — Prototype 0.1</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h1>NOMAD GAME</h1><span>Prototype Terre · offline-first</span></header>
+<main>
+<section id="world">
+  <div id="terrain">
+    <div class="water"></div>
+    <div class="hub"><b>HUB NOMAD</b><small>visiter · habiter · travailler</small></div>
+    <div class="module" id="module"><b>Module NOMAD</b><small>habitation</small></div>
+    <div class="park"><b>PARC</b><small>jouer → gagner des pièces</small></div>
+    <div class="factory"><b>USINE</b><small>production</small></div>
+    <div id="player">●</div>
+  </div>
+</section>
+<aside>
+  <h2>Construction</h2>
+  <button data-build="module">Construire un module (50)</button>
+  <button data-build="road">Tracer une route (20)</button>
+  <button id="parkGame">Jouer au parc (+15)</button>
+  <button id="workGame">Mini-jeu usine (+10)</button>
+  <hr>
+  <p>💰 Pièces : <strong id="coins">100</strong></p>
+  <p>🧱 Matériaux : <strong id="materials">100</strong></p>
+  <p>📍 Position : <strong id="pos">HUB</strong></p>
+  <button id="voice">🎙️ Petite voix</button>
+  <p id="message">Bienvenue dans NOMAD. Le monde est à vous.</p>
+</aside>
+</main>
+<script src="game.js"></script>
+</body>
+</html>
