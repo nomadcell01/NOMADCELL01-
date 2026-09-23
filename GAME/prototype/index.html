@@ -1,42 +1,30 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NOMAD GAME — Construction vivante</title><link rel="stylesheet" href="style.css"></head>
+<title>NOMAD — Sims 100% Nomade</title><link rel="stylesheet" href="style.css"></head>
 <body>
-<header><h1>NOMAD GAME</h1><span>Prototype — personnage → terrain → construction → maison → vie</span></header>
-<div id="creation" class="overlay"><div class="creator">
-<h1>🌌 Bienvenue dans NOMAD</h1><p>NOMAD existe déjà. Vous arrivez dans un quartier vivant et vous construisez votre propre maison.</p>
-<h2>👤 Votre avatar</h2><input id="avatarName" placeholder="Nom ou pseudonyme" maxlength="24"><div class="choices" id="avatarChoices"></div>
-<h2>🤖 Votre humanoïde</h2><input id="botName" placeholder="Nom de votre humanoïde" maxlength="24"><div class="choices" id="botChoices"></div>
-<button id="startGame" class="primary">🚀 Entrer dans NOMAD</button></div></div>
-
-<main><section id="world">
-<div id="scene">
-<div class="city-background"><div class="skyline">🏢　🏠　🏢　🌳　🏫　🏢　🏠</div><div class="street">RUE NOMAD · QUARTIER 01</div>
-<div class="neighbor n1">🏠</div><div class="neighbor n2">🏢</div><div class="neighbor n3">🏠</div><div class="tree t1">🌳</div><div class="tree t2">🌳</div>
-<div class="road"><span>🚗</span><span>🚌</span></div><div class="sidewalk"></div>
+<header><strong>🌍 NOMAD</strong><span>Le monde est continu. Vous vivez dedans.</span></header>
+<div id="creator" class="overlay"><div class="card">
+<h1>Bienvenue dans NOMAD</h1><p>NOMAD existe déjà. Créez votre personnage et votre humanoïde, puis entrez directement dans un monde vivant.</p>
+<label>Votre nom<input id="avatarName" maxlength="24" placeholder="Nom ou pseudonyme"></label>
+<label>Votre humanoïde<input id="botName" maxlength="24" placeholder="Nom"></label>
+<button id="start" class="primary">🚀 Entrer dans NOMAD</button></div></div>
+<main>
+<section class="game">
+<canvas id="world" aria-label="Monde continu NOMAD"></canvas>
+<div id="hint">Déplacez-vous dans le monde. Votre terrain est à proximité de NOMAD.</div>
+<div id="buildBar" class="panel hidden">
+<strong>🏗️ CONSTRUCTION</strong>
+<button data-build="room">🧱 Pièce</button><button data-build="house">🏠 Maison de base</button><button data-build="buy">💰 Acheter une maison</button>
+<button data-build="basement">⬇️ Sous-sol</button><button data-build="floor">⬆️ Étage</button><button data-build="furniture">🛋️ Meuble</button><button id="finish">✅ Terminer</button>
 </div>
-<div id="personalPlot" aria-label="Votre terrain personnel">
-<div class="plot-label">VOTRE TERRAIN · VIDE</div><div id="plotGrid"></div>
-</div>
-<div id="character" class="character">👤</div><div id="humanoid" class="character bot">🤖</div>
-<div id="liveHint">Vous êtes devant votre terrain. Rien n'est construit ici.</div>
-<div id="buildMode" class="build-mode hidden">
-<div class="build-head"><strong>🔨 MODE CONSTRUCTION</strong><button id="exitBuild">✅ Terminer la construction</button></div>
-<div class="build-tools"><button data-buildtool="room" class="active">▣ Dessiner une pièce</button><button data-buildtool="door">🚪 Porte</button><button data-buildtool="window">🪟 Fenêtre</button><button data-buildtool="erase">🧹 Supprimer</button></div>
-<p id="buildHelp">Faites glisser sur le terrain pour dessiner votre première pièce.</p>
-</div>
-<div id="lifeMode" class="hidden"><button id="enterBuild">🔨 Construire / modifier</button><button id="enterHome">🚪 Entrer chez moi</button></div>
-</div>
-<div id="interiorWorld" class="hidden">
-<div class="interior-top"><button id="exitHome">⬅️ Retour dehors</button><strong>🏠 MA MAISON</strong><span id="roomName">Aucune pièce</span></div>
-<div id="interiorFloor"></div><div id="homeCharacter">👤</div><div id="homeHumanoid">🤖</div>
-<div class="home-actions"><button data-life="rest">🛏️ Se reposer</button><button data-life="eat">🍽️ Manger</button><button data-life="work">💻 Travailler</button><button id="furnish">🛋️ Meubler</button></div>
-<p id="homeMessage">Bienvenue chez vous.</p></div>
+<div id="mobile" class="mobile"><button data-move="up">▲</button><div><button data-move="left">◀</button><button data-move="down">▼</button><button data-move="right">▶</button></div></div>
 </section>
-
-<aside><h2>Votre équipe</h2><p>👤 <strong id="avatarLabel">—</strong></p><p>🤖 <strong id="botLabel">—</strong></p><button id="editAvatar">✏️ Modifier</button>
-<hr><h2>🌍 Mondes</h2><button data-world="earth">🌍 Terre</button><button data-world="sea">🌊 Mer / Océan</button><button data-world="space">🛰️ Orbite</button><button data-world="moon">🌙 Lune</button><button data-world="mars">🔴 Mars</button><p id="worldInfo">Terre : quartier NOMAD déjà habité.</p>
-<hr><h2>💰 Économie</h2><p><strong id="coins">1 000 000</strong> NOMAD</p><p>🧱 Matériaux : <strong id="materials">100</strong></p><small>Monnaie fictive du jeu.</small>
-<hr><h2>🎮 Vie</h2><button id="voice">🎙️ Petite voix</button><button id="rain">🌧️ Événement / catastrophe</button><p id="message">Bienvenue dans NOMAD.</p>
-<hr><button id="save">💾 Sauvegarder</button><button id="reset">↺ Nouvelle partie</button></aside>
-</main><script src="game.js"></script></body></html>
+<aside>
+<h2>👤 Vie NOMAD</h2><p>👤 <b id="avatarLabel">—</b></p><p>🤖 <b id="botLabel">—</b></p>
+<hr><h3>🏠 Habitation</h3><p id="houseInfo">Terrain vide</p>
+<button id="build">🏗️ Construire / modifier</button><button id="enter">🚪 Entrer chez moi</button>
+<hr><h3>💰 Économie</h3><p><b id="money">1 000 000</b> NOMAD</p><p>🧱 <b id="mat">100</b> matériaux</p>
+<button id="cheat">🧪 Codes de triche</button><div id="cheats" class="hidden">
+<button data-cheat="money">💰 +1 milliard</button><button data-cheat="materials">🧱 +9999 matériaux</button><button data-cheat="free">🏗️ Construction gratuite</button><button data-cheat="unlock">🎁 Tout débloquer</button></div>
+<hr><h3>🌍 Monde</h3><p id="worldInfo">NOMAD principal est déjà construit.</p><button id="voice">🎙️ Petite Voix</button><button id="save">💾 Sauvegarder</button><button id="reset">↺ Nouvelle partie</button>
+</aside></main><script src="game.js"></script></body></html>
