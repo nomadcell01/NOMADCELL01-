@@ -53,3 +53,11 @@
 #homeMessage{position:absolute;left:5%;bottom:78px;z-index:10;max-width:48%;padding:8px 10px;border-radius:9px;background:#182127eF;color:#fff;font-size:12px}
 .added-furniture{z-index:10}
 @media(max-width:800px){.interior-top strong{font-size:12px}.floor-plan{left:2%;right:2%;top:68px;bottom:105px}.home-actions{flex-wrap:wrap}.home-actions button{flex:1 1 45%;font-size:11px}.homeMessage{max-width:80%}#homeMessage{max-width:90%;bottom:112px}.buildHomePanel{right:3%;bottom:112px}.interior-top span{display:none}}
+
+/* V1.3 — la scène de vie passe devant l'ancien système de patchs */
+#spatialWorld{z-index:30;pointer-events:auto}
+#spatialWorld .house-player{z-index:35;pointer-events:auto}
+#spatialWorld .house-player .door{z-index:40;cursor:pointer;pointer-events:auto;padding:0;margin:0;color:#fff}
+#spatialWorld~#interiorWorld{z-index:60}
+#spatialWorld~#player{z-index:31}
+#spatialWorld~.build-preview{z-index:5!important}
