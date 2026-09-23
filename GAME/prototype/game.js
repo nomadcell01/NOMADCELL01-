@@ -97,3 +97,29 @@ terrain.addEventListener('click',e=>{
   const hit=nearestObject(e);
   if(mapTool==='select')selectObject(hit);
 });
+
+/* V1.0 — empreintes, grille et prévisualisation */
+const GRID=5;
+let previewEl=null;
+function snap(v){return Math.round(v/GRID)*GRID}
+function showPreview(e){
+  if(mapTool!=='build'||!selected||selected==='road')return;
+  const p=mapPosition(e),x=snap(p.x),y=snap(p.y);
+  if(!previewEl){previewEl=document.createElement('div');previewEl.className='build-preview';terrain.appendChild(previewEl)}
+  previewEl.textContent=label(selected);previewEl.style.left=x+'%';previewEl.style.top=y+'%';previewEl.style.display='block';
+  const blocked=state.objects.some(o=>o.world===state.world&&Math.abs(o.x-x)<6&&Math.abs(o.y-y)<6);
+  previewEl.classList.toggle('blocked',blocked);
+  previewEl.title=blocked?'Emplacement occupé':'Emplacement disponible';
+}
+function hidePreview(){if(previewEl)previewEl.style.display='none'}
+terrain.addEventListener('pointermove',e=>showPreview(e));
+terrain.addEventListener('pointerleave',hidePreview);
+const originalPlaceObject=placeObject;
+placeObject=function(e,type,quiet=false){
+  const p=mapPosition(e),x=snap(p.x),y=snap(p.y);
+  if(type!=='road'&&state.objects.some(o=>o.world===state.world&&Math.abs(o.x-x)<6&&Math.abs(o.y-y)<6)){
+    say('⚠️ Cet emplacement est déjà occupé. Choisissez un autre endroit.');return false;
+  }
+  const fake={clientX:terrain.getBoundingClientRect().left+terrain.getBoundingClientRect().width*x/100,clientY:terrain.getBoundingClientRect().top+terrain.getBoundingClientRect().height*y/100};
+  return originalPlaceObject(fake,type,quiet);
+};
