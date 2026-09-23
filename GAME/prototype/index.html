@@ -1,25 +1,13 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOMAD GAME — Simulation de vie</title><link rel="stylesheet" href="style.css"></head>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOMAD — Simulation de vie</title><link rel="stylesheet" href="style.css"></head>
 <body>
-<div id="app">
-<header><div><strong>NOMAD</strong><span> · Simulation de vie</span></div><div class="topstats">🌍 <b id="worldName">NOMAD TERRE</b> · 🕒 <span id="clock">08:00</span> · 💰 <span id="money">1 000</span> N$</div></header>
-<main>
-<section class="viewport"><canvas id="gameCanvas" aria-label="Ville NOMAD en 3D"></canvas><div class="loading" id="loading">Chargement de la ville NOMAD…</div>
-<div class="sceneHint">Clic/toucher le sol : se déplacer · Glisser : tourner la caméra</div>
-<div class="interaction" id="interaction"><b id="interactionTitle"></b><span id="interactionText"></span><button id="interactionAction" type="button"></button></div>
-<div class="bottomHud"><button type="button" id="catalogBtn">🛋️ Construire / meubler</button><button type="button" id="worldBtn">🌍 Changer de monde</button><button type="button" id="workBtn">💼 Travailler</button><button type="button" id="homeBtn">🏠 Chez moi</button></div>
-</section>
-<aside>
-<div class="identity"><div class="avatar">👤</div><div><b>Nomad</b><small>Résident de la communauté</small></div></div>
-<div class="companion"><span>🤖</span><div><b>T.H.E.O.</b><small>Humanoïde compagnon · autonomie respectée</small></div></div>
-<div class="lifeCard"><div><span>Humeur</span><strong id="mood">Bien</strong></div><div><span>Maison</span><strong id="homeStatus">À choisir</strong></div></div>
-<h3>Ta vie</h3>
-<p id="message">Bienvenue dans une ville NOMAD déjà construite. Tu peux choisir un logement ou un terrain libre.</p>
-<div class="skills"><h3>Compétences</h3><div>🔧 Bricolage <b>1</b></div><div>🤖 Robotique <b>1</b></div><div>💻 Technologie <b>1</b></div><div>🌱 Agriculture <b>1</b></div></div>
-<div class="hintbox">🏙️ <b>La ville existe déjà.</b><br>Tu n'es pas là pour construire la ville. Tu viens y vivre, puis tu construis et aménages ta propre vie.</div>
-<button class="reset" id="reset" type="button">↺ Recommencer</button>
-</aside>
-</main>
-<div class="modal hidden" id="catalog"><div class="modalBox"><button class="close" id="closeCatalog" type="button">✕</button><h2>🛋️ Mode Construction & Achat</h2><p>Comme dans les Sims : choisis un objet, paie son prix et place-le dans ton logement.</p><div class="items" id="items"></div></div></div>
-<div class="modal hidden" id="worlds"><div class="modalBox"><button class="close" id="closeWorlds" type="button">✕</button><h2>🌍 Choisir un monde</h2><p>Chaque monde possède déjà sa propre ville NOMAD.</p><div id="worldList"></div></div></div>
-</div><script type="module" src="game.js"></script></body></html>
+<div id="game">
+<header><div class="brand">NOMAD</div><div class="status"><span id="worldName">NOMAD TERRE</span><span>·</span><span id="clock">08:00</span><span>·</span><span>💰 <b id="money">1 000</b> N$</span></div></header>
+<main><canvas id="gameCanvas"></canvas><div id="loading">NOMAD se prépare…</div>
+<div id="context" class="hidden"><b id="contextTitle"></b><span id="contextText"></span><button id="contextAction"></button></div>
+<div id="message">Bienvenue. Tu arrives dans une ville NOMAD déjà construite.</div>
+<div id="controls"><span>WASD / flèches</span><span>•</span><span>glisser pour regarder</span><span>•</span><span>approche-toi des lieux</span></div>
+<div id="lifeMenu"><button id="workBtn">💼 Travail</button><button id="buyBtn">🛋️ Acheter</button><button id="worldBtn">🌍 Monde</button></div>
+<div id="worlds" class="panel hidden"><button class="close" id="closeWorlds">×</button><h2>Où veux-tu vivre ?</h2><p>Chaque monde possède déjà sa ville NOMAD.</p><div id="worldList"></div></div>
+<div id="catalog" class="panel hidden"><button class="close" id="closeCatalog">×</button><h2>🛋️ Acheter</h2><p>Achète des objets pour ton habitat.</p><div id="items"></div></div>
+</main></div><script type="module" src="game.js"></script></body></html>
