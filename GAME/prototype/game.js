@@ -178,3 +178,22 @@ placeObject=function(e,type,quiet=false){
   if(result&&type!=='road')networkMessage(type);
   return result;
 };
+
+/* V1.0 — bâtiments reliés aux réseaux */
+function infrastructureFor(o){
+  if(o.type==='road')return nearby(o,'road',11);
+  if(o.type==='canal')return nearby(o,'canal',11);
+  const road=nearby(o,'road',13),water=nearby(o,'canal',13),solar=nearby(o,'solar',13);
+  return {road,water,solar};
+}
+function updateObjectInfo(o){
+  if(!o){$('objectInfo').textContent='Touchez une construction pour voir ses options.';return}
+  const infra=infrastructureFor(o);
+  let extra='';
+  if(o.type==='module')extra=' · '+(infra.road?'🛣️ accès':'⚠️ sans route')+' · '+(infra.water?'🌊 eau':'⚠️ sans eau')+' · '+(infra.solar?'☀️ énergie':'⚠️ sans énergie');
+  if(o.type==='farm')extra=' · '+(infra.water?'🌊 irrigation':'⚠️ sans irrigation')+' · '+(infra.road?'🛣️ accès':'⚠️ sans accès');
+  if(o.type==='solar')extra=' · '+(infra.road?'🛣️ accès maintenance':'⚠️ accès difficile');
+  $('objectInfo').textContent=label(o.type)+' · '+Math.round(o.x)+'% / '+Math.round(o.y)+'%'+extra+(o.damaged?' · ⚠️ endommagé':'');
+}
+const oldSelectObject=selectObject;
+selectObject=function(hit){oldSelectObject(hit);if(hit)updateObjectInfo(hit.o)};
