@@ -21,19 +21,23 @@
     <button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
-<script>
-setTimeout(function(){
-  if(!window.THREE){
-    var s=document.createElement('script');
-    s.src='https://unpkg.com/three@0.180.0/build/three.min.js';
-    s.onload=function(){var g=document.createElement('script');g.src='game.js';document.body.appendChild(g)};
-    s.onerror=function(){document.getElementById('loading').textContent='Le moteur 3D n’a pas pu démarrer. Recharge la page.'};
-    document.body.appendChild(s);
-  } else {
-    var g=document.createElement('script');g.src='game.js';document.body.appendChild(g);
+<script type="module">
+(async () => {
+  const loading = document.getElementById('loading');
+  try {
+    loading.textContent = 'NOMAD — chargement du monde 3D…';
+    const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js');
+    window.THREE = THREE;
+    const script = document.createElement('script');
+    script.src = 'game.js';
+    script.onload = () => { loading.style.display = 'none'; };
+    script.onerror = () => { loading.textContent = 'Impossible de charger le monde NOMAD.'; };
+    document.body.appendChild(script);
+  } catch (e) {
+    console.error(e);
+    loading.textContent = 'Le moteur 3D n’a pas pu être chargé. Vérifie la connexion puis recharge.';
   }
-},50);
+})();
 </script>
 </body>
 </html>
