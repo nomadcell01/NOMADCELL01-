@@ -8,36 +8,11 @@
 </head>
 <body>
 <div id="loading">NOMAD — entrée dans le monde…</div>
-<div id="game">
-  <div id="hud"><span>NOMAD TERRE</span><span id="clock">08:00</span><span id="money">N$ 500</span></div>
-  <div id="hint">Bienvenue chez NOMAD. Vis ta vie.</div>
-  <div id="actions">
-    <button id="work">Travail</button>
-    <button id="home">Maison</button>
-    <button id="catalog">Acheter</button>
-  </div>
-  <div id="touch">
-    <button data-key="ArrowLeft">◀</button><button data-key="ArrowUp">▲</button>
-    <button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button>
-  </div>
-</div>
+<div id="game"><div id="hud"><span>NOMAD TERRE</span><span id="clock">08:00</span><span id="money">N$ 500</span></div><div id="hint">Bienvenue chez NOMAD. Vis ta vie.</div><div id="actions"><button id="work">Travail</button><button id="home">Maison</button><button id="catalog">Acheter</button></div><div id="touch"><button data-key="ArrowLeft">◀</button><button data-key="ArrowUp">▲</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button></div></div>
 <script type="module">
-(async () => {
-  const loading = document.getElementById('loading');
-  try {
-    loading.textContent = 'NOMAD — chargement du monde 3D…';
-    const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js');
-    window.THREE = THREE;
-    const script = document.createElement('script');
-    script.src = 'game.js';
-    script.onload = () => { loading.style.display = 'none'; };
-    script.onerror = () => { loading.textContent = 'Impossible de charger le monde NOMAD.'; };
-    document.body.appendChild(script);
-  } catch (e) {
-    console.error(e);
-    loading.textContent = 'Le moteur 3D n’a pas pu être chargé. Vérifie la connexion puis recharge.';
-  }
-})();
+const loading=document.getElementById('loading');
+async function loadThree(){const urls=['https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js','https://unpkg.com/three@0.180.0/build/three.module.js'];let last;for(const url of urls){try{return await import(url)}catch(e){last=e}}throw last||new Error('Three.js indisponible')}
+(async()=>{try{loading.textContent='NOMAD — chargement du monde 3D…';window.THREE=await loadThree();await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='game.js?v=20260923f';s.onload=resolve;s.onerror=()=>reject(new Error('game.js introuvable'));document.body.appendChild(s)})}catch(e){console.error(e);loading.textContent='Le monde NOMAD n’a pas pu démarrer.';loading.style.background='#111'}})();
 </script>
 </body>
 </html>
