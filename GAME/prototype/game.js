@@ -244,3 +244,15 @@ document.querySelectorAll('[data-furniture]').forEach(b=>b.onclick=()=>{
   $('homeMessage').textContent='✨ '+type+' ajouté dans la maison.';
   say('✨ Nouveau meuble installé.');
 });
+
+/* V1.3 — la porte est l'entrée, et la maison bloque les clics de construction */
+const houseDoor=$('houseDoor');
+if(houseDoor){
+  houseDoor.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();openHouse()});
+  houseDoor.addEventListener('click',e=>{e.stopPropagation();e.preventDefault();openHouse()});
+}
+const playerHouse=$('spatialWorld')?.querySelector('.house-player');
+if(playerHouse){
+  playerHouse.addEventListener('pointerdown',e=>{if(e.target.closest('.door'))return;e.stopPropagation()});
+  playerHouse.addEventListener('click',e=>{if(e.target.closest('.door'))return;e.stopPropagation()});
+}
