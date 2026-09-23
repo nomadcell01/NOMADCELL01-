@@ -146,3 +146,35 @@ placeObject=function(e,type,quiet=false){
   if(warning){say('🎙️ Petite voix : '+warning);return false}
   return previousPlaceObject(e,type,quiet);
 };
+
+/* V1.0 — réseaux : routes et canaux */
+function nearby(o,type,range=10){
+  return state.objects.some(q=>q.world===state.world&&q!==o&&q.type===type&&Math.hypot(q.x-o.x,q.y-o.y)<=range);
+}
+function networkStatus(o){
+  if(o.type!=='road'&&o.type!=='canal')return '';
+  const linked=nearby(o,o.type,11);
+  return linked?' · 🔗 réseau connecté':' · ◌ réseau isolé';
+}
+const oldRender=render;
+render=function(){
+  oldRender();
+  document.querySelectorAll('.placed').forEach(el=>{
+    const x=parseFloat(el.style.left),y=parseFloat(el.style.top);
+    const o=state.objects.find(q=>q.world===state.world&&Math.abs(q.x-x)<.2&&Math.abs(q.y-y)<.2);
+    if(o&&(o.type==='road'||o.type==='canal'))el.title=label(o.type)+networkStatus(o);
+  });
+};
+function networkMessage(type){
+  const list=state.objects.filter(o=>o.world===state.world&&o.type===type);
+  if(list.length<2)return;
+  let links=0;
+  list.forEach(o=>{if(nearby(o,type,11))links++});
+  if(links) say((type==='road'?'🛣️ Réseau routier':'🌊 Réseau hydraulique')+' : '+list.length+' éléments, connexion active.');
+}
+const oldPlaceObject=placeObject;
+placeObject=function(e,type,quiet=false){
+  const result=oldPlaceObject(e,type,quiet);
+  if(result&&type!=='road')networkMessage(type);
+  return result;
+};
