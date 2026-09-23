@@ -1,258 +1,33 @@
-let state=JSON.parse(localStorage.getItem('nomadGame'))||{coins:1000000,materials:100,x:50,y:50,world:'earth',objects:[],floods:0,avatar:null,humanoid:null,wallet:{cash:100000,bank:900000},transactions:[],vehicle:null};
-if(!state.wallet)state.wallet={cash:0,bank:state.coins||0}; if(state.wallet.cash===undefined)state.wallet.cash=0;if(state.wallet.bank===undefined)state.wallet.bank=state.coins||0;if(!state.transactions)state.transactions=[];if(!('vehicle'in state))state.vehicle=null;state.coins=state.wallet.cash+state.wallet.bank;
-let selected=null;const $=id=>document.getElementById(id);function save(){state.coins=state.wallet.cash+state.wallet.bank;localStorage.setItem('nomadGame',JSON.stringify(state))}function say(t){$('message').textContent=t}function cost(t){return{module:50,farm:35,solar:30,road:20,canal:15}[t]}function label(t){return{module:'🏠 HABITAT',farm:'🌱 AGRICULTURE',solar:'☀️ ÉNERGIE',road:'🛣️ LIAISON',canal:'🌊 EAU'}[t]}
-const vehicles={earth:[['🚶','À pied'],['🚗','Voiture classique'],['🔋','Voiture électrique'],['🏍️','Moto'],['🚲','Vélo'],['🛴','Trottinette'],['🛹','Skate'],['🛸','Hoverboard'],['🚕','Voiture autonome expérimentale'],['🚌','Bus'],['🚋','Tram'],['🚇','Métro'],['🚆','Train'],['✈️','Avion']],sea:[['🚶','À pied / passerelle'],['🚲','Vélo'],['🛴','Trottinette'],['🛹','Skate'],['🛸','Hoverboard'],['🏄','Planche de surf'],['⛵','Voilier'],['🚤','Bateau'],['🛥️','Bateau électrique'],['🤖','Bateau autonome expérimental']],space:[['🚶','À pied / station'],['🚈','Navette orbitale'],['🤖','Navette autonome expérimentale'],['🚆','Train orbital']],moon:[['🚶','À pied / combinaison'],['🚙','Rover lunaire'],['🤖','Rover autonome expérimental'],['🚈','Navette lunaire']],mars:[['🚶','À pied / combinaison'],['🚙','Rover martien'],['🤖','Rover autonome expérimental'],['🚈','Navette martienne']]};
-function renderVehicles(){let box=$('vehicleChoices');box.innerHTML='';(vehicles[state.world]||vehicles.earth).forEach(v=>{let b=document.createElement('button');b.type='button';b.textContent=v[0]+' '+v[1];b.className=state.vehicle===v[1]?'selected':'';b.onclick=()=>{state.vehicle=v[1];$('vehicleLabel').textContent=v[0]+' '+v[1];say('🚦 Transport choisi : '+v[1]+'.');save();render()};box.appendChild(b)});if(!state.vehicle||!(vehicles[state.world]||[]).some(v=>v[1]===state.vehicle)){state.vehicle=null;$('vehicleLabel').textContent='À pied'} }
-function render(){state.coins=state.wallet.cash+state.wallet.bank;$('coins').textContent=state.coins.toLocaleString('fr-FR');$('cash').textContent=state.wallet.cash.toLocaleString('fr-FR');$('bank').textContent=state.wallet.bank.toLocaleString('fr-FR');$('materials').textContent=state.materials;$('player').style.left=state.x+'%';$('player').style.top=state.y+'%';$('pos').textContent=state.world.toUpperCase();$('avatarLabel').textContent=state.avatar?.name||'—';$('botLabel').textContent=state.humanoid?.name||'—';let av=state.avatar?.symbol||'👤';let vv=(vehicles[state.world]||[]).find(v=>v[1]===state.vehicle);$('player').textContent=vv?vv[0]:av;$('player').className='avatar-player';$('vehicleLabel').textContent=vv?vv[0]+' '+vv[1]:'À pied';document.querySelectorAll('.placed').forEach(e=>e.remove());state.objects.filter(o=>o.world===state.world).forEach(o=>{let e=document.createElement('div');e.className='placed '+o.type+(o.damaged?' damaged':'');e.textContent=label(o.type);e.style.left=o.x+'%';e.style.top=o.y+'%';$('terrain').appendChild(e)});renderVehicles()}
-function spend(n){if(state.coins<n){say('🎙️ Petite voix : Votre compte est vide. La construction attendra.');return false}state.wallet.bank-=n;state.coins=state.wallet.cash+state.wallet.bank;state.transactions.unshift({type:'depense',amount:n,label:'Construction'});return true}function addMoney(n,labelTx){state.wallet.bank+=n;state.coins=state.wallet.cash+state.wallet.bank;state.transactions.unshift({type:'gain',amount:n,label:labelTx})}
-function setupCreator(){let ac=[['👤 Explorateur','👤'],['🧑‍🔧 Bâtisseur','🧑‍🔧'],['🧑‍🔬 Chercheur','🧑‍🔬'],['🧑‍🌾 Cultivateur','🧑‍🌾']];let bc=[['🤖 Humanoïde polyvalent','🤖'],['🦾 Constructeur','🦾'],['🧑‍🚀 Explorateur','🧑‍🚀'],['🛠️ Technicien','🛠️']];$('avatarChoices').innerHTML=ac.map((x,i)=>'<button data-a="'+i+'">'+x[0]+'</button>').join('');$('botChoices').innerHTML=bc.map((x,i)=>'<button data-b="'+i+'">'+x[0]+'</button>').join('');let av=0,bo=0;document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{av=+b.dataset.a;document.querySelectorAll('[data-a]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')});document.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{bo=+b.dataset.b;document.querySelectorAll('[data-b]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')});$('startGame').onclick=()=>{let n=$('avatarName').value.trim()||'Nomad';let h=$('botName').value.trim()||'Mon humanoïde';state.avatar={name:n,symbol:ac[av][1],style:ac[av][0]};state.humanoid={name:h,symbol:bc[bo][1],style:bc[bo][0]};save();$('creation').style.display='none';say('🚀 Bienvenue '+n+' ! '+h+' vous accompagne. Vous disposez de '+state.coins.toLocaleString('fr-FR')+' NOMAD.');render()}}
-if(!state.avatar||!state.humanoid)setupCreator();else $('creation').style.display='none';document.querySelectorAll('[data-place]').forEach(b=>b.onclick=()=>{selected=b.dataset.place;$('selection').textContent='Construction : '+label(selected)+' — touchez votre terrain.'});
-function buyCash(n){if(state.wallet.bank<n){say('💸 Fonds bancaires insuffisants.');return}state.wallet.bank-=n;state.wallet.cash+=n;state.transactions.unshift({type:'retrait',amount:n,label:'Retrait fictif'});say('🏧 Retrait de '+n.toLocaleString('fr-FR')+' NOMAD.');save();render()}function depositCash(n){if(state.wallet.cash<n){say('💵 Espèces insuffisantes.');return}state.wallet.cash-=n;state.wallet.bank+=n;state.transactions.unshift({type:'depot',amount:n,label:'Dépôt fictif'});say('🏦 Dépôt de '+n.toLocaleString('fr-FR')+' NOMAD.');save();render()}
-function switchWorld(w){state.world=w;state.x=50;state.y=50;state.vehicle=null;let info={earth:'🌍 Terre : ville NOMAD existante. Greffez votre plateforme ou partez construire ailleurs.',sea:'🌊 Mer / Océan : ville flottante NOMAD existante. Côte, haute mer et zones sous-marines.',space:'🛰️ Espace : ville orbitale NOMAD déjà habitée.',moon:'🌙 Lune : ville NOMAD déjà installée.',mars:'🔴 Mars : ville NOMAD déjà habitée.'};$('worldInfo').textContent=info[w];say('Vous arrivez dans '+w.toUpperCase()+'. Votre avatar et votre humanoïde vous accompagnent.');save();render()}
-$('earth').onclick=()=>switchWorld('earth');$('sea').onclick=()=>switchWorld('sea');$('space').onclick=()=>switchWorld('space');$('moon').onclick=()=>switchWorld('moon');$('mars').onclick=()=>switchWorld('mars');$('editAvatar').onclick=()=>{$('creation').style.display='grid';$('avatarName').value=state.avatar?.name||'';$('botName').value=state.humanoid?.name||''};$('rain').onclick=()=>{state.floods++;let d=0;state.objects=state.objects.map(o=>{if(o.world==='earth'&&(o.type==='module'||o.type==='farm')&&o.x>68&&Math.random()<.75){d++;return{...o,damaged:true}}return o});say(d?'🌧️ Inondation ! '+d+' construction(s) endommagée(s).':'🌧️ Forte pluie. Votre plateforme tient bon.');save();render()};$('storm').onclick=()=>{let t=state.objects.filter(o=>o.world==='sea');let d=t.length&&Math.random()<.6?t[Math.floor(Math.random()*t.length)]:null;if(d)d.damaged=true;say(d?'🌊 Tempête océanique : une installation est endommagée.':'🌊 Tempête : la ville NOMAD résiste.');save();render()};$('spaceEvent').onclick=()=>{say(Math.random()<.5?'☄️ Micrométéorite : réparation nécessaire.':'🛰️ Incident technique : maintenance en cours.');if(state.materials>=10)state.materials-=10;save();render()};$('moonEvent').onclick=()=>{say('🌙 Alerte lunaire : poussière et environnement hostile. Sécurisation en cours.');save();render()};$('marsEvent').onclick=()=>{say(Math.random()<.5?'🔴 Tempête de poussière martienne : énergie perturbée.':'🔴 Incident de ressource : production réorganisée.');if(state.materials>=10)state.materials-=10;save();render()};$('parkGame').onclick=()=>{addMoney(15,'Activité');say('🎯 Activité réussie : +15 NOMAD.');save();render()};$('workGame').onclick=()=>{if(state.materials>=10){state.materials-=10;addMoney(10,'Production');say('🏭 Production réussie : +10 NOMAD.')}else say('Plus assez de matériaux.');save();render()};$('withdraw').onclick=()=>{let n=Math.max(0,Number($('cashAmount').value)||0);if(n>0)buyCash(n)};$('deposit').onclick=()=>{let n=Math.max(0,Number($('cashAmount').value)||0);if(n>0)depositCash(n)};$('save').onclick=()=>{save();say('💾 Sauvegarde locale effectuée.')};$('reset').onclick=()=>{if(confirm('Réinitialiser la partie locale ?')){localStorage.removeItem('nomadGame');location.reload()}};$('voice').onclick=()=>say('🎙️ Petite voix : Je vous observe. Je ne décide pas à votre place.');document.addEventListener('keydown',e=>move(e.key));document.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>move({left:'ArrowLeft',right:'ArrowRight',up:'ArrowUp',down:'ArrowDown'}[b.dataset.move]));function move(k){let s=state.vehicle?6:4;if(k==='ArrowLeft')state.x=Math.max(2,state.x-s);if(k==='ArrowRight')state.x=Math.min(98,state.x+s);if(k==='ArrowUp')state.y=Math.max(2,state.y-s);if(k==='ArrowDown')state.y=Math.min(98,state.y+s);save();render()}save();render();
-/* V1.0 — carte au centre : construire, sélectionner, déplacer, détruire */
-let mapTool='select', movingObject=null, movingEl=null, roadDrawing=false;
-const terrain=$('terrain');
-
-function setMapTool(tool){
-  mapTool=tool; selected=null; movingObject=null; movingEl=null;
-  document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('selected',b.dataset.tool===tool));
-  $('selection').textContent='Outil : '+({select:'Sélection',move:'Déplacer',delete:'Détruire'}[tool]||'Construction');
-}
-document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setMapTool(b.dataset.tool));
-document.querySelectorAll('[data-place]').forEach(b=>b.onclick=()=>{
-  selected=b.dataset.place; mapTool='build';
-  document.querySelectorAll('[data-tool]').forEach(x=>x.classList.remove('selected'));
-  $('selection').textContent='Construction : '+label(selected)+' — touchez la carte pour placer.';
-  say('🛠️ '+label(selected)+' : choisissez un emplacement sur la carte.');
-});
-if($('cancelBuild'))$('cancelBuild').onclick=()=>{selected=null;mapTool='select';movingObject=null;movingEl=null;setMapTool('select');$('selection').textContent='Aucune construction sélectionnée.';say('Mode construction arrêté.')};
-
-function mapPosition(e){
-  const r=terrain.getBoundingClientRect();
-  return {x:Math.max(3,Math.min(97,(e.clientX-r.left)/r.width*100)),y:Math.max(3,Math.min(97,(e.clientY-r.top)/r.height*100))};
-}
-function nearestObject(e){
-  const p=mapPosition(e); let best=null,dist=6;
-  state.objects.forEach((o,i)=>{
-    if(o.world!==state.world)return;
-    const d=Math.hypot(o.x-p.x,o.y-p.y);
-    if(d<dist){dist=d;best={o,i}}
-  });
-  return best;
-}
-function objectElement(target){
-  return target?.closest?.('.placed')||null;
-}
-function selectObject(hit){
-  if(!hit){$('objectInfo').textContent='Aucune construction à proximité.';return}
-  const o=hit.o;
-  $('objectInfo').textContent=label(o.type)+' · position '+Math.round(o.x)+'% / '+Math.round(o.y)+'%'+(o.damaged?' · ⚠️ endommagé':'')+' · coût '+cost(o.type)+' NOMAD';
-  $('selection').textContent='Sélection : '+label(o.type);
-  say('👆 '+label(o.type)+' sélectionné.');
-}
-function placeObject(e,type,quiet=false){
-  const p=mapPosition(e);
-  if(type==='road' && state.objects.some(o=>o.world===state.world&&o.type==='road'&&Math.hypot(o.x-p.x,o.y-p.y)<2.5))return false;
-  if(!spend(cost(type)))return false;
-  state.objects.push({type,x:p.x,y:p.y,world:state.world});
-  if(!quiet){say(label(type)+' placé.');selected=null;mapTool='select';$('selection').textContent='Aucune construction sélectionnée.'}
-  save();render();return true;
-}
-terrain.addEventListener('pointerdown',e=>{
-  const el=objectElement(e.target);
-  if(mapTool==='build'&&selected){
-    if(selected==='road'){roadDrawing=true;terrain.setPointerCapture?.(e.pointerId)}
-    placeObject(e,selected,selected==='road');
-    return;
-  }
-  const hit=nearestObject(e);
-  if(mapTool==='move'&&hit){
-    movingObject=hit.i; movingEl=el||[...terrain.querySelectorAll('.placed')].find(x=>Math.abs(parseFloat(x.style.left)-hit.o.x)<.2&&Math.abs(parseFloat(x.style.top)-hit.o.y)<.2);
-    terrain.setPointerCapture?.(e.pointerId);
-    say('↔️ Déplacez '+label(hit.o.type)+' sur la carte.');
-  } else if(mapTool==='delete'&&hit){
-    state.objects.splice(hit.i,1);
-    state.materials+=Math.max(1,Math.floor((cost(hit.o.type)||10)*0.6));
-    say('🗑️ '+label(hit.o.type)+' détruit. Une partie des matériaux est récupérée.');
-    save();render();
-  } else if(mapTool==='select'){
-    selectObject(hit);
-  }
-});
-terrain.addEventListener('pointermove',e=>{
-  if(roadDrawing&&selected==='road'){placeObject(e,'road',true);return}
-  if(movingObject===null)return;
-  const o=state.objects[movingObject]; if(!o)return;
-  const p=mapPosition(e); o.x=p.x;o.y=p.y;
-  if(movingEl){movingEl.style.left=o.x+'%';movingEl.style.top=o.y+'%';}
-});
-terrain.addEventListener('pointerup',()=>{
-  if(roadDrawing){roadDrawing=false;selected=null;mapTool='select';$('selection').textContent='Aucune construction sélectionnée.';save();render();return}
-  if(movingObject!==null){movingObject=null;movingEl=null;save();say('📍 Construction déplacée.');render();}
-});
-terrain.addEventListener('pointercancel',()=>{roadDrawing=false;movingObject=null;movingEl=null;});
-terrain.addEventListener('click',e=>{
-  if(selected||mapTool==='build')return;
-  const hit=nearestObject(e);
-  if(mapTool==='select')selectObject(hit);
-});
-
-/* V1.0 — empreintes, grille et prévisualisation */
-const GRID=5;
-let previewEl=null;
-function snap(v){return Math.round(v/GRID)*GRID}
-function showPreview(e){
-  if(mapTool!=='build'||!selected||selected==='road')return;
-  const p=mapPosition(e),x=snap(p.x),y=snap(p.y);
-  if(!previewEl){previewEl=document.createElement('div');previewEl.className='build-preview';terrain.appendChild(previewEl)}
-  previewEl.textContent=label(selected);previewEl.style.left=x+'%';previewEl.style.top=y+'%';previewEl.style.display='block';
-  const blocked=state.objects.some(o=>o.world===state.world&&Math.abs(o.x-x)<6&&Math.abs(o.y-y)<6);
-  previewEl.classList.toggle('blocked',blocked);
-  previewEl.title=blocked?'Emplacement occupé':'Emplacement disponible';
-}
-function hidePreview(){if(previewEl)previewEl.style.display='none'}
-terrain.addEventListener('pointermove',e=>showPreview(e));
-terrain.addEventListener('pointerleave',hidePreview);
-const originalPlaceObject=placeObject;
-placeObject=function(e,type,quiet=false){
-  const p=mapPosition(e),x=snap(p.x),y=snap(p.y);
-  if(type!=='road'&&state.objects.some(o=>o.world===state.world&&Math.abs(o.x-x)<6&&Math.abs(o.y-y)<6)){
-    say('⚠️ Cet emplacement est déjà occupé. Choisissez un autre endroit.');return false;
-  }
-  const fake={clientX:terrain.getBoundingClientRect().left+terrain.getBoundingClientRect().width*x/100,clientY:terrain.getBoundingClientRect().top+terrain.getBoundingClientRect().height*y/100};
-  return originalPlaceObject(fake,type,quiet);
-};
-
-/* V1.0 — terrain et contraintes de construction */
-function terrainZone(x,y){
-  if(state.world==='sea') return y>72?'deepSea':(y>48?'water':'platform');
-  if(state.world==='space') return 'station';
-  if(state.world==='moon') return x<22?'crater':(x>78?'ridge':'base');
-  if(state.world==='mars') return y<25?'dust':(x>70?'rock':'plain');
-  return y>76?'water':(x<20?'forest':(x>78?'mountain':'plain'));
-}
-function canBuild(type,x,y){
-  const z=terrainZone(x,y);
-  if(state.world==='earth' && z==='water' && type!=='canal')return '🌊 Eau : une maison ne peut pas être posée ici.';
-  if(state.world==='earth' && z==='mountain' && type==='farm')return '⛰️ Terrain montagneux : cette ferme ne peut pas être installée ici.';
-  if(state.world==='sea' && z==='deepSea' && (type==='module'||type==='farm'))return '🌊 Haute mer : utilisez une structure flottante adaptée.';
-  if(state.world==='moon' && z==='crater' && type==='farm')return '🌙 Cratère : agriculture impossible ici.';
-  return '';
-}
-const previousPlaceObject=placeObject;
-placeObject=function(e,type,quiet=false){
-  const p=mapPosition(e),x=snap(p.x),y=snap(p.y),warning=canBuild(type,x,y);
-  if(warning){say('🎙️ Petite voix : '+warning);return false}
-  return previousPlaceObject(e,type,quiet);
-};
-
-/* V1.0 — réseaux : routes et canaux */
-function nearby(o,type,range=10){
-  return state.objects.some(q=>q.world===state.world&&q!==o&&q.type===type&&Math.hypot(q.x-o.x,q.y-o.y)<=range);
-}
-function networkStatus(o){
-  if(o.type!=='road'&&o.type!=='canal')return '';
-  const linked=nearby(o,o.type,11);
-  return linked?' · 🔗 réseau connecté':' · ◌ réseau isolé';
-}
-const oldRender=render;
-render=function(){
-  oldRender();
-  document.querySelectorAll('.placed').forEach(el=>{
-    const x=parseFloat(el.style.left),y=parseFloat(el.style.top);
-    const o=state.objects.find(q=>q.world===state.world&&Math.abs(q.x-x)<.2&&Math.abs(q.y-y)<.2);
-    if(o&&(o.type==='road'||o.type==='canal'))el.title=label(o.type)+networkStatus(o);
-  });
-};
-function networkMessage(type){
-  const list=state.objects.filter(o=>o.world===state.world&&o.type===type);
-  if(list.length<2)return;
-  let links=0;
-  list.forEach(o=>{if(nearby(o,type,11))links++});
-  if(links) say((type==='road'?'🛣️ Réseau routier':'🌊 Réseau hydraulique')+' : '+list.length+' éléments, connexion active.');
-}
-const oldPlaceObject=placeObject;
-placeObject=function(e,type,quiet=false){
-  const result=oldPlaceObject(e,type,quiet);
-  if(result&&type!=='road')networkMessage(type);
-  return result;
-};
-
-/* V1.0 — bâtiments reliés aux réseaux */
-function infrastructureFor(o){
-  if(o.type==='road')return nearby(o,'road',11);
-  if(o.type==='canal')return nearby(o,'canal',11);
-  const road=nearby(o,'road',13),water=nearby(o,'canal',13),solar=nearby(o,'solar',13);
-  return {road,water,solar};
-}
-function updateObjectInfo(o){
-  if(!o){$('objectInfo').textContent='Touchez une construction pour voir ses options.';return}
-  const infra=infrastructureFor(o);
-  let extra='';
-  if(o.type==='module')extra=' · '+(infra.road?'🛣️ accès':'⚠️ sans route')+' · '+(infra.water?'🌊 eau':'⚠️ sans eau')+' · '+(infra.solar?'☀️ énergie':'⚠️ sans énergie');
-  if(o.type==='farm')extra=' · '+(infra.water?'🌊 irrigation':'⚠️ sans irrigation')+' · '+(infra.road?'🛣️ accès':'⚠️ sans accès');
-  if(o.type==='solar')extra=' · '+(infra.road?'🛣️ accès maintenance':'⚠️ accès difficile');
-  $('objectInfo').textContent=label(o.type)+' · '+Math.round(o.x)+'% / '+Math.round(o.y)+'%'+extra+(o.damaged?' · ⚠️ endommagé':'');
-}
-const oldSelectObject=selectObject;
-selectObject=function(hit){oldSelectObject(hit);if(hit)updateObjectInfo(hit.o)};
-
-
-/* V1.2 — vraie première boucle Sims : entrer, vivre, aménager */
-let houseOpen=false;
-const interior=$('interiorWorld'), spatial=$('spatialWorld');
-function openHouse(){
-  houseOpen=true;
-  interior.classList.add('open');
-  spatial.classList.add('outside-dim');
-  $('homeMessage').textContent='🏠 Vous êtes chez vous. Touchez une pièce ou une action.';
-  say('🏠 Vous entrez dans votre maison. Ici, vous vivez réellement dans le monde.');
-}
-function closeHouse(){
-  houseOpen=false;
-  interior.classList.remove('open');
-  spatial.classList.remove('outside-dim');
-  say('🚪 Vous sortez de chez vous et retrouvez la rue NOMAD.');
-}
-$('exitHouse').onclick=closeHouse;
-document.querySelector('.house-player')?.addEventListener('click',openHouse);
-document.querySelectorAll('.room').forEach(r=>r.addEventListener('click',()=>{
-  $('roomName').textContent=r.dataset.room;
-  $('homeMessage').textContent='📍 Vous êtes dans : '+r.dataset.room+'. Les objets sont réellement dans cette pièce.';
-  document.querySelectorAll('.room').forEach(x=>x.classList.remove('active-room'));
-  r.classList.add('active-room');
-}));
-document.querySelectorAll('[data-life]').forEach(b=>b.onclick=()=>{
-  const a=b.dataset.life;
-  const msg={rest:'🛏️ Vous vous reposez quelques instants.',eat:'🍽️ Vous préparez un repas dans la cuisine.',work:'💻 Vous travaillez depuis votre maison NOMAD.',build:'🔨 Mode construction intérieure : choisissez un meuble à ajouter.'}[a];
-  $('homeMessage').textContent=msg;
-  if(a==='build')$('buildHomePanel').classList.add('show');
-  else $('buildHomePanel').classList.remove('show');
-  say(msg);
-});
-document.querySelectorAll('[data-furniture]').forEach(b=>b.onclick=()=>{
-  const type=b.dataset.furniture;
-  const icons={sofa:'🛋️',plant:'🌱',desk:'💻',bed:'🛏️'};
-  const el=document.createElement('div');
-  el.className='added-furniture furniture';
-  el.textContent=icons[type]||'🪑';
-  el.title='Objet NOMAD — déplacez-le ensuite';
-  el.style.left=(20+Math.random()*55)+'%';
-  el.style.top=(20+Math.random()*55)+'%';
-  document.querySelector('.floor-plan').appendChild(el);
-  $('homeMessage').textContent='✨ '+type+' ajouté dans la maison.';
-  say('✨ Nouveau meuble installé.');
-});
-
-/* V1.3 — la porte est l'entrée, et la maison bloque les clics de construction */
-const houseDoor=$('houseDoor');
-if(houseDoor){
-  houseDoor.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();openHouse()});
-  houseDoor.addEventListener('click',e=>{e.stopPropagation();e.preventDefault();openHouse()});
-}
-const playerHouse=$('spatialWorld')?.querySelector('.house-player');
-if(playerHouse){
-  playerHouse.addEventListener('pointerdown',e=>{if(e.target.closest('.door'))return;e.stopPropagation()});
-  playerHouse.addEventListener('click',e=>{if(e.target.closest('.door'))return;e.stopPropagation()});
-}
+const $=id=>document.getElementById(id);
+const saveKey='nomadGameV2';
+const defaults={avatar:null,humanoid:null,world:'earth',coins:1000000,materials:100,house:null};
+let state=JSON.parse(localStorage.getItem(saveKey)||'null')||structuredClone(defaults);
+const avatars=[['👤 Explorateur','👤'],['🧑‍🔧 Bâtisseur','🧑‍🔧'],['🧑‍🔬 Chercheur','🧑‍🔬'],['🧑‍🌾 Cultivateur','🧑‍🌾']];
+const bots=[['🤖 Polyvalent','🤖'],['🦾 Constructeur','🦾'],['🧑‍🚀 Explorateur','🧑‍🚀'],['🛠️ Technicien','🛠️']];
+function persist(){localStorage.setItem(saveKey,JSON.stringify(state))}
+function say(t){$('message').textContent=t}
+function setupCreator(){let ai=0,bi=0;$('avatarChoices').innerHTML=avatars.map((x,i)=>'<button data-a="'+i+'">'+x[0]+'</button>').join('');$('botChoices').innerHTML=bots.map((x,i)=>'<button data-b="'+i+'">'+x[0]+'</button>').join('');document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{ai=+b.dataset.a;document.querySelectorAll('[data-a]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')});document.querySelectorAll('[data-b]').forEach(b=>b.onclick=()=>{bi=+b.dataset.b;document.querySelectorAll('[data-b]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')});$('startGame').onclick=()=>{state.avatar={name:$('avatarName').value.trim()||'Nomad',symbol:avatars[ai][1]};state.humanoid={name:$('botName').value.trim()||'Mon humanoïde',symbol:bots[bi][1]};persist();$('creation').classList.add('hidden');render()}}
+if(!state.avatar||!state.humanoid)setupCreator();else $('creation').classList.add('hidden');
+function render(){ $('avatarLabel').textContent=state.avatar?.name||'—';$('botLabel').textContent=state.humanoid?.name||'—';$('coins').textContent=state.coins.toLocaleString('fr-FR');$('materials').textContent=state.materials;$('character').textContent=state.avatar?.symbol||'👤';$('humanoid').textContent=state.humanoid?.symbol||'🤖';let info={earth:'Terre : quartier NOMAD déjà habité.',sea:'Mer / Océan : communauté flottante déjà habitée.',space:'Orbite : station NOMAD déjà habitée.',moon:'Lune : ville NOMAD déjà habitée.',mars:'Mars : ville NOMAD déjà habitée.'};$('worldInfo').textContent=info[state.world];renderPlot();renderInterior()}
+function renderPlot(){const plot=$('personalPlot'),grid=$('plotGrid');grid.innerHTML='';if(!state.house){$('plotGrid').classList.add('plot-grid');$('personalPlot').querySelector('.plot-label').textContent='VOTRE TERRAIN · VIDE';$('lifeMode').classList.add('hidden');$('liveHint').textContent='Vous êtes devant votre terrain. Rien n’est construit ici.';return}$('plotGrid').classList.add('plot-grid');$('personalPlot').querySelector('.plot-label').textContent='VOTRE MAISON';$('lifeMode').classList.remove('hidden');$('liveHint').textContent='Votre maison existe maintenant. Vous pouvez y entrer ou la modifier.';state.house.rooms.forEach((r,i)=>{let floor=document.createElement('div');floor.className='room-floor';floor.style.left=r.x+'%';floor.style.top=r.y+'%';floor.style.width=r.w+'%';floor.style.height=r.h+'%';plot.appendChild(floor);let tag=document.createElement('div');tag.className='room-tag';tag.textContent='PIÈCE '+(i+1);tag.style.left=(r.x+1)+'%';tag.style.top=(r.y+2)+'%';plot.appendChild(tag);[['top',r.x,r.y,r.w,1],['bottom',r.x,r.y+r.h-1,r.w,1],['left',r.x,r.y,1,r.h],['right',r.x+r.w-1,r.y,1,r.h]].forEach(a=>{let w=document.createElement('div');w.className='wall';w.style.left=a[1]+'%';w.style.top=a[2]+'%';w.style.width=(a[0]=='left'||a[0]=='right'?1:a[3])+'%';w.style.height=(a[0]=='left'||a[0]=='right'?a[4]:1)+'%';w.dataset.room=i;w.dataset.side=a[0];plot.appendChild(w)})});if(state.house.door){let d=document.createElement('div');d.className='door';d.style.left=state.house.door.x+'%';d.style.top=state.house.door.y+'%';d.style.width=state.house.door.w+'%';d.style.height=state.house.door.h+'%';plot.appendChild(d)}if(state.house.window){state.house.window.forEach(q=>{let w=document.createElement('div');w.className='window';w.style.left=q.x+'%';w.style.top=q.y+'%';w.style.width=q.w+'%';w.style.height=q.h+'%';plot.appendChild(w)})}}
+function buildStart(){if(state.house)return;document.querySelectorAll('[data-buildtool]').forEach(x=>x.classList.remove('active'));document.querySelector('[data-buildtool="room"]').classList.add('active');$('buildMode').classList.remove('hidden');$('lifeMode').classList.add('hidden');$('liveHint').textContent='Mode construction : dessinez votre première pièce sur le terrain vide.'}
+let buildTool='room',drag=null,preview=null;
+document.querySelectorAll('[data-buildtool]').forEach(b=>b.onclick=()=>{buildTool=b.dataset.buildtool;document.querySelectorAll('[data-buildtool]').forEach(x=>x.classList.toggle('active',x===b));$('buildHelp').textContent={room:'Faites glisser sur le terrain pour dessiner une pièce.',door:'Touchez un mur pour y placer une porte.',window:'Touchez un mur pour y placer une fenêtre.',erase:'Touchez une pièce pour la supprimer.'}[buildTool]});
+function plotPoint(e){let r=$('personalPlot').getBoundingClientRect();return{x:Math.max(3,Math.min(97,(e.clientX-r.left)/r.width*100)),y:Math.max(3,Math.min(97,(e.clientY-r.top)/r.height*100))}}
+function drawPreview(a,b){if(!preview){preview=document.createElement('div');preview.className='room-preview';$('personalPlot').appendChild(preview)}let x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(a.x-b.x),h=Math.abs(a.y-b.y);preview.style.left=x+'%';preview.style.top=y+'%';preview.style.width=w+'%';preview.style.height=h+'%'}
+function removePreview(){preview?.remove();preview=null}
+$('personalPlot').addEventListener('pointerdown',e=>{if($('buildMode').classList.contains('hidden'))return;let p=plotPoint(e);if(buildTool==='room'){drag=p;$('personalPlot').setPointerCapture?.(e.pointerId);drawPreview(p,p);return}let target=e.target.closest('.wall,.room-floor');if(buildTool==='erase'&&target){let i=+target.dataset.room;if(!Number.isNaN(i)){state.house.rooms.splice(i,1);if(!state.house.rooms.length)state.house=null;persist();render();}return}if((buildTool==='door'||buildTool==='window')&&target?.classList.contains('wall')){let rect=$('personalPlot').getBoundingClientRect();let x=(e.clientX-rect.left)/rect.width*100,y=(e.clientY-rect.top)/rect.height*100;if(buildTool==='door')state.house.door={x:x-3,y:y-2,w:6,h:4};else{state.house.window=state.house.window||[];state.house.window.push({x:x-4,y:y-1,w:8,h:2})}persist();render()}});$('personalPlot').addEventListener('pointermove',e=>{if(drag)drawPreview(drag,plotPoint(e))});$('personalPlot').addEventListener('pointerup',e=>{if(!drag)return;let b=plotPoint(e),x=Math.min(drag.x,b.x),y=Math.min(drag.y,b.y),w=Math.abs(drag.x-b.x),h=Math.abs(drag.y-b.y);removePreview();drag=null;if(w<12||h<12){say('🎙️ Petite voix : Une pièce minuscule… même moi je n’y mettrais pas un canapé.');return}state.house=state.house||{rooms:[],door:null,window:[]};state.house.rooms.push({x,y,w,h});state.materials=Math.max(0,state.materials-5);persist();render();$('buildHelp').textContent='Pièce créée. Dessinez une autre pièce, puis ajoutez une porte.';say('🧱 Pièce construite. La maison commence réellement à prendre forme.');});
+$('enterBuild').onclick=()=>{$('buildMode').classList.remove('hidden');$('lifeMode').classList.add('hidden');buildTool='room';document.querySelectorAll('[data-buildtool]').forEach(x=>x.classList.toggle('active',x.dataset.buildtool==='room'));$('liveHint').textContent='Mode construction : vous pouvez agrandir votre maison.'};
+$('exitBuild').onclick=()=>{if(!state.house||!state.house.rooms.length){say('🎙️ Petite voix : Vous voulez vraiment appeler ça une maison ?');return}$('buildMode').classList.add('hidden');$('lifeMode').classList.remove('hidden');$('liveHint').textContent='Construction terminée. Ajoutez une porte si nécessaire, puis entrez chez vous.';persist();render()};
+$('enterHome').onclick=()=>{if(!state.house?.rooms.length){say('🎙️ Petite voix : Il n’y a toujours pas de maison. Construisez-la d’abord.');return}if(!state.house.door){say('🚪 Il faut d’abord ajouter une porte à un mur.');return}$('interiorWorld').classList.remove('hidden');$('liveHint').classList.add('hidden');renderInterior()};
+$('exitHome').onclick=()=>{$('interiorWorld').classList.add('hidden');$('liveHint').classList.remove('hidden')};
+function renderInterior(){if(!state.house)return;let f=$('interiorFloor');f.innerHTML='';state.house.rooms.forEach((r,i)=>{let q=document.createElement('div');q.className='interior-room';q.style.left=r.x+'%';q.style.top=r.y+'%';q.style.width=r.w+'%';q.style.height=r.h+'%';q.innerHTML='<b>PIÈCE '+(i+1)+'</b>';f.appendChild(q)});$('homeCharacter').className='home-char';$('homeCharacter').textContent=state.avatar?.symbol||'👤';$('homeCharacter').style.left='47%';$('homeCharacter').style.top='48%';$('homeHumanoid').textContent=state.humanoid?.symbol||'🤖'}
+document.querySelectorAll('[data-life]').forEach(b=>b.onclick=()=>{$('homeMessage').textContent={rest:'🛏️ Vous vous reposez.',eat:'🍽️ Vous préparez un repas.',work:'💻 Vous travaillez depuis chez vous.'}[b.dataset.life]||'Vous vivez votre quotidien dans NOMAD.'});
+$('furnish').onclick=()=>{let f=document.createElement('div');f.className='furniture';f.textContent='🛋️';f.style.left=(15+Math.random()*60)+'%';f.style.top=(15+Math.random()*55)+'%';$('interiorFloor').appendChild(f);$('homeMessage').textContent='🛋️ Meuble ajouté. La prochaine étape sera de pouvoir le déplacer librement.'};
+document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>{state.world=b.dataset.world;persist();say('🌍 Vous voyagez vers '+b.dataset.world.toUpperCase()+'. Le quartier NOMAD existe déjà ici.');render()});
+$('voice').onclick=()=>say('🎙️ Petite voix : Je vous observe. Je ne décide pas à votre place. Mais votre terrain est toujours vide.');
+$('rain').onclick=()=>{if(state.house&&Math.random()<.35){say('🌧️ Petite catastrophe : votre maison a pris un peu d’eau. Heureusement, rien n’est détruit dans ce prototype.')}else say('🌧️ Une grosse pluie traverse le quartier. NOMAD continue de vivre.')};
+$('save').onclick=()=>{persist();say('💾 Partie sauvegardée sur cet appareil.')};
+$('reset').onclick=()=>{if(confirm('Réinitialiser cette partie ?')){localStorage.removeItem(saveKey);location.reload()}};
+$('editAvatar').onclick=()=>{$('creation').classList.remove('hidden');$('avatarName').value=state.avatar?.name||'';$('botName').value=state.humanoid?.name||''};
+render();
