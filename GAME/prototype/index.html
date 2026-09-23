@@ -1,30 +1,99 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NOMAD — Sims 100% Nomade</title><link rel="stylesheet" href="style.css"></head>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NOMAD — Sims 100% Nomade</title>
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
-<header><strong>🌍 NOMAD</strong><span>Le monde est continu. Vous vivez dedans.</span></header>
-<div id="creator" class="overlay"><div class="card">
-<h1>Bienvenue dans NOMAD</h1><p>NOMAD existe déjà. Créez votre personnage et votre humanoïde, puis entrez directement dans un monde vivant.</p>
-<label>Votre nom<input id="avatarName" maxlength="24" placeholder="Nom ou pseudonyme"></label>
-<label>Votre humanoïde<input id="botName" maxlength="24" placeholder="Nom"></label>
-<button id="start" class="primary">🚀 Entrer dans NOMAD</button></div></div>
-<main>
-<section class="game">
-<canvas id="world" aria-label="Monde continu NOMAD"></canvas>
-<div id="hint">Déplacez-vous dans le monde. Votre terrain est à proximité de NOMAD.</div>
-<div id="buildBar" class="panel hidden">
-<strong>🏗️ CONSTRUCTION</strong>
-<button data-build="room">🧱 Pièce</button><button data-build="house">🏠 Maison de base</button><button data-build="buy">💰 Acheter une maison</button>
-<button data-build="basement">⬇️ Sous-sol</button><button data-build="floor">⬆️ Étage</button><button data-build="furniture">🛋️ Meuble</button><button id="finish">✅ Terminer</button>
+<header><strong>🌍 NOMAD</strong><span>Une vie à vivre, pas une carte à remplir.</span></header>
+
+<div id="creator" class="overlay">
+  <div class="card">
+    <div class="eyebrow">NOMAD • MODE VIE</div>
+    <h1>Bienvenue dans ton monde.</h1>
+    <p>Tu crées ton personnage, ton humanoïde, puis tu entres directement dans un vrai quartier NOMAD. Ici, tu vis, construis, travailles et explores.</p>
+    <label>Ton nom<input id="avatarName" maxlength="24" placeholder="Nom ou pseudonyme"></label>
+    <label>Nom de ton humanoïde<input id="botName" maxlength="24" placeholder="Nom"></label>
+    <button id="start" class="primary">🚀 Commencer ma vie NOMAD</button>
+  </div>
 </div>
-<div id="mobile" class="mobile"><button data-move="up">▲</button><div><button data-move="left">◀</button><button data-move="down">▼</button><button data-move="right">▶</button></div></div>
+
+<main>
+<section class="world">
+  <canvas id="world" aria-label="Monde 3D NOMAD"></canvas>
+
+  <div class="topbar">
+    <button id="build">🏗️ Construire</button>
+    <button id="business">🏪 Mon commerce</button>
+    <button id="home">🏠 Ma maison</button>
+    <button id="cheat">🧪 Triches</button>
+  </div>
+
+  <div id="buildPanel" class="floating hidden">
+    <strong>MODE CONSTRUCTION</strong>
+    <span>Construis dans le monde, pas sur une carte.</span>
+    <button data-build="room">🧱 Ajouter une pièce</button>
+    <button data-build="floor">⬆️ Ajouter un étage</button>
+    <button data-build="basement">⬇️ Creuser un sous-sol</button>
+    <button data-build="furniture">🛋️ Ajouter un meuble</button>
+    <button data-build="shop">🏪 Créer ma boutique</button>
+    <button id="closeBuild">✓ Retour au mode Vie</button>
+  </div>
+
+  <div id="businessPanel" class="floating hidden">
+    <strong>🏪 MON COMMERCE</strong>
+    <p id="businessInfo">Tu peux créer une boutique et y travailler.</p>
+    <button id="openShop">Ouvrir ma boutique</button>
+    <button id="hire">👥 Embaucher un employé</button>
+    <button id="closeBusiness">✓ Fermer</button>
+  </div>
+
+  <div id="cheatPanel" class="floating hidden">
+    <strong>🧪 CODES NOMAD</strong>
+    <button data-cheat="money">💰 +1 milliard</button>
+    <button data-cheat="materials">🧱 +9999 matériaux</button>
+    <button data-cheat="free">🏗️ Construction gratuite</button>
+    <button data-cheat="unlock">🎁 Tout débloquer</button>
+    <button data-cheat="needs">❤️ Besoins au maximum</button>
+  </div>
+
+  <div class="hud">
+    <div><b id="avatarLabel">Nomad</b><small id="status">Mode Vie</small></div>
+    <div>💰 <b id="money">1 000 000</b></div>
+    <div>🧱 <b id="mat">100</b></div>
+    <div>🤖 <b id="botLabel">Humanoïde</b></div>
+  </div>
+
+  <div id="hint">ZQSD / WASD / flèches pour marcher. Sur téléphone, utilise les commandes tactiles.</div>
+
+  <div class="touch">
+    <button data-move="up">▲</button>
+    <div><button data-move="left">◀</button><button data-move="down">▼</button><button data-move="right">▶</button></div>
+  </div>
 </section>
+
 <aside>
-<h2>👤 Vie NOMAD</h2><p>👤 <b id="avatarLabel">—</b></p><p>🤖 <b id="botLabel">—</b></p>
-<hr><h3>🏠 Habitation</h3><p id="houseInfo">Terrain vide</p>
-<button id="build">🏗️ Construire / modifier</button><button id="enter">🚪 Entrer chez moi</button>
-<hr><h3>💰 Économie</h3><p><b id="money">1 000 000</b> NOMAD</p><p>🧱 <b id="mat">100</b> matériaux</p>
-<button id="cheat">🧪 Codes de triche</button><div id="cheats" class="hidden">
-<button data-cheat="money">💰 +1 milliard</button><button data-cheat="materials">🧱 +9999 matériaux</button><button data-cheat="free">🏗️ Construction gratuite</button><button data-cheat="unlock">🎁 Tout débloquer</button></div>
-<hr><h3>🌍 Monde</h3><p id="worldInfo">NOMAD principal est déjà construit.</p><button id="voice">🎙️ Petite Voix</button><button id="save">💾 Sauvegarder</button><button id="reset">↺ Nouvelle partie</button>
-</aside></main><script src="game.js"></script></body></html>
+  <h2>👤 Vie NOMAD</h2>
+  <p>Ton personnage est dans le monde. La ville existe déjà autour de lui.</p>
+  <hr>
+  <h3>🏠 Habitation</h3>
+  <p id="houseInfo">Tu n'as pas encore construit ta maison.</p>
+  <button id="enter">🚪 Entrer / sortir de chez moi</button>
+  <button id="buyHouse">🏠 Acheter une maison existante</button>
+  <hr>
+  <h3>🏪 Vie professionnelle</h3>
+  <p id="jobInfo">Sans activité pour le moment.</p>
+  <button id="work">🧑‍🔧 Travailler maintenant</button>
+  <hr>
+  <h3>🌍 Quartier NOMAD</h3>
+  <p>Maison, commerces, école, clinique, atelier, parc, routes et transports sont déjà présents autour de toi.</p>
+  <button id="voice">🎙️ Petite Voix</button>
+  <button id="save">💾 Sauvegarder</button>
+  <button id="reset">↺ Nouvelle vie</button>
+</aside>
+</main>
+<script type="module" src="game.js"></script>
+</body>
+</html>
