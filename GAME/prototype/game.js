@@ -197,3 +197,50 @@ function updateObjectInfo(o){
 }
 const oldSelectObject=selectObject;
 selectObject=function(hit){oldSelectObject(hit);if(hit)updateObjectInfo(hit.o)};
+
+
+/* V1.2 — vraie première boucle Sims : entrer, vivre, aménager */
+let houseOpen=false;
+const interior=$('interiorWorld'), spatial=$('spatialWorld');
+function openHouse(){
+  houseOpen=true;
+  interior.classList.add('open');
+  spatial.classList.add('outside-dim');
+  $('homeMessage').textContent='🏠 Vous êtes chez vous. Touchez une pièce ou une action.';
+  say('🏠 Vous entrez dans votre maison. Ici, vous vivez réellement dans le monde.');
+}
+function closeHouse(){
+  houseOpen=false;
+  interior.classList.remove('open');
+  spatial.classList.remove('outside-dim');
+  say('🚪 Vous sortez de chez vous et retrouvez la rue NOMAD.');
+}
+$('exitHouse').onclick=closeHouse;
+document.querySelector('.house-player')?.addEventListener('click',openHouse);
+document.querySelectorAll('.room').forEach(r=>r.addEventListener('click',()=>{
+  $('roomName').textContent=r.dataset.room;
+  $('homeMessage').textContent='📍 Vous êtes dans : '+r.dataset.room+'. Les objets sont réellement dans cette pièce.';
+  document.querySelectorAll('.room').forEach(x=>x.classList.remove('active-room'));
+  r.classList.add('active-room');
+}));
+document.querySelectorAll('[data-life]').forEach(b=>b.onclick=()=>{
+  const a=b.dataset.life;
+  const msg={rest:'🛏️ Vous vous reposez quelques instants.',eat:'🍽️ Vous préparez un repas dans la cuisine.',work:'💻 Vous travaillez depuis votre maison NOMAD.',build:'🔨 Mode construction intérieure : choisissez un meuble à ajouter.'}[a];
+  $('homeMessage').textContent=msg;
+  if(a==='build')$('buildHomePanel').classList.add('show');
+  else $('buildHomePanel').classList.remove('show');
+  say(msg);
+});
+document.querySelectorAll('[data-furniture]').forEach(b=>b.onclick=()=>{
+  const type=b.dataset.furniture;
+  const icons={sofa:'🛋️',plant:'🌱',desk:'💻',bed:'🛏️'};
+  const el=document.createElement('div');
+  el.className='added-furniture furniture';
+  el.textContent=icons[type]||'🪑';
+  el.title='Objet NOMAD — déplacez-le ensuite';
+  el.style.left=(20+Math.random()*55)+'%';
+  el.style.top=(20+Math.random()*55)+'%';
+  document.querySelector('.floor-plan').appendChild(el);
+  $('homeMessage').textContent='✨ '+type+' ajouté dans la maison.';
+  say('✨ Nouveau meuble installé.');
+});
