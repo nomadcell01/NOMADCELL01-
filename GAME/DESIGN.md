@@ -13,6 +13,20 @@ Avant même de commencer sa partie, chaque joueur crée son identité dans NOMAD
 
 Séquence fondatrice : **NOMAD existe déjà → création de l'avatar → création de l'humanoïde → choix du monde → plateforme personnelle → connexion au réseau.**
 
+## Économie NOMAD — fondation dès le prototype
+L'économie est prévue dès le départ dans l'architecture du jeu afin de ne pas devoir reconstruire tout le système plus tard.
+
+- **1 000 000 NOMAD** de capital de départ pour le prototype.
+- Une même monnaie interne sert aux achats, constructions, activités, production, échanges et services.
+- Le portefeuille distingue **banque** et **espèces/billets**.
+- Les billets sont une représentation physique de la monnaie du jeu : retraits et dépôts sont déjà prévus comme opérations fictives.
+- Les gains et dépenses sont enregistrés dans un historique de transactions.
+- La monnaie est persistée dans la sauvegarde locale avec le reste de la partie.
+- Dans le prototype actuel, cette monnaie est explicitement **fictive et sans valeur réelle**.
+
+### Évolution prévue
+La possibilité d'un lien ultérieur avec une plateforme d'achat et de l'argent réel est volontairement séparée du moteur économique du jeu. Elle pourra être étudiée plus tard sans modifier les fondations de l'économie interne.
+
 ## Principe fondamental : NOMAD existe déjà
 Le joueur ne commence jamais dans un monde vide. Chaque grand environnement possède déjà une ville/implantation NOMAD vivante, habitée et fonctionnelle. Le joueur construit sa propre histoire et sa plateforme à l'intérieur de cet univers.
 
