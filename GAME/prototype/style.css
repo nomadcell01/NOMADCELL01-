@@ -23,3 +23,33 @@
 .scene-caption{position:absolute;z-index:10;left:16px;bottom:14px;max-width:330px;padding:10px 12px;border-radius:10px;background:#172026e8;border:1px solid #ffffff55;color:#fff;font-size:12px;box-shadow:0 5px 15px #0005}.scene-caption span{opacity:.78}
 #spatialWorld~#player{z-index:11}
 @media(max-width:800px){.house-player{left:5%;width:47%;min-width:150px}.house .wall{height:105px}.house .garden{height:35px}.house-neighbor{right:2%;width:28%}.scene-caption{max-width:250px;font-size:11px}.skyline{top:5%}}
+
+
+/* V1.2 — intérieur habitable : la maison n'est plus une décoration */
+#spatialWorld{transition:filter .2s,opacity .2s}
+#spatialWorld.outside-dim{filter:brightness(.45)}
+.house-player{cursor:pointer}
+.house-player:hover{transform:scale(1.025);filter:brightness(1.08)}
+#interiorWorld{display:none;position:absolute;inset:0;z-index:50;background:#d9d1c4;color:#202428}
+#interiorWorld.open{display:block}
+.interior-top{height:58px;padding:10px 14px;background:#222b30;color:#fff;display:flex;align-items:center;gap:12px;position:relative;z-index:5}
+.interior-top button{width:auto;margin:0;padding:8px 12px}.interior-top strong{font-size:14px}.interior-top span{margin-left:auto;opacity:.75;font-size:12px}
+.floor-plan{position:absolute;left:4%;right:4%;top:74px;bottom:82px;border:8px solid #5a5148;background:#b9aa98;box-shadow:0 8px 24px #0005;overflow:hidden}
+.room{position:absolute;border:5px solid #554c45;background:#eee4d5;cursor:pointer;transition:.15s;overflow:hidden}
+.room:hover,.room.active-room{filter:brightness(1.04);box-shadow:inset 0 0 0 3px #fff8}
+.room b{position:absolute;left:9px;top:8px;font-size:12px;z-index:3}
+.living{left:0;top:0;width:55%;height:62%}.kitchen{right:0;top:0;width:45%;height:48%;background:#ddd5c7}
+.bedroom{left:0;bottom:0;width:55%;height:38%;background:#d9d0c8}.bathroom{right:0;bottom:0;width:45%;height:52%;background:#cddcdf}
+.furniture{position:absolute;font-size:34px;filter:drop-shadow(0 2px 2px #0003);cursor:pointer;z-index:2}
+.sofa{left:12%;top:42%}.table{right:18%;top:48%}.tv{right:7%;top:18%}
+.counter{left:12%;top:38%}.fridge{right:12%;top:35%}.table2{left:46%;bottom:16%}
+.bed{left:25%;top:43%;font-size:42px}.wardrobe{right:12%;top:35%}.bath{left:22%;top:43%}.shower{right:15%;top:38%}
+#homeAvatar,#homeHumanoid{position:absolute;z-index:8;font-size:34px;filter:drop-shadow(0 3px 2px #0004);transition:.3s}
+#homeAvatar{left:47%;top:48%}#homeHumanoid{left:54%;top:52%}
+.home-actions{position:absolute;left:4%;right:4%;bottom:12px;display:flex;gap:7px;z-index:9}
+.home-actions button{width:auto;margin:0;background:#26353c}
+#buildHomePanel{display:none;position:absolute;right:5%;bottom:72px;z-index:12;width:220px;padding:10px;border-radius:10px;background:#182127eF;color:#fff;border:1px solid #fff4}
+#buildHomePanel.show{display:block}#buildHomePanel button{margin:5px 0}
+#homeMessage{position:absolute;left:5%;bottom:78px;z-index:10;max-width:48%;padding:8px 10px;border-radius:9px;background:#182127eF;color:#fff;font-size:12px}
+.added-furniture{z-index:10}
+@media(max-width:800px){.interior-top strong{font-size:12px}.floor-plan{left:2%;right:2%;top:68px;bottom:105px}.home-actions{flex-wrap:wrap}.home-actions button{flex:1 1 45%;font-size:11px}.homeMessage{max-width:80%}#homeMessage{max-width:90%;bottom:112px}.buildHomePanel{right:3%;bottom:112px}.interior-top span{display:none}}
