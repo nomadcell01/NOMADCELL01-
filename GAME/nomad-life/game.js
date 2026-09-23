@@ -8,8 +8,23 @@ const renderer=new T.WebGLRenderer({antialias:true}); renderer.setPixelRatio(Mat
 const hemi=new T.HemisphereLight(0xffffff,0x68766d,2.2); scene.add(hemi);
 const sun=new T.DirectionalLight(0xffffff,2.5); sun.position.set(-15,25,10); sun.castShadow=true; scene.add(sun);
 
-const mat=(c)=>new T.MeshStandardMaterial({color:c,roughness:.82});
-const M={grass:mat(0x78966f),road:mat(0x4c5357),side:mat(0xb8b29c),wall:mat(0xe6ddd0),roof:mat(0x665d57),wood:mat(0x9a6b48),glass:mat(0x87b8c7),dark:mat(0x30363a),skin:mat(0xd39a78),cloth:mat(0x365a68),green:mat(0x6c8561),white:mat(0xf2eee5),metal:mat(0x879097)};
+
+function texture(fill, detail, size=128){
+ const c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');
+ x.fillStyle=fill;x.fillRect(0,0,size,size);
+ for(let i=0;i<90;i++){x.globalAlpha=.16;x.fillStyle=detail;x.fillRect(Math.random()*size,Math.random()*size,2+Math.random()*8,2+Math.random()*8)}
+ x.globalAlpha=1;const t=new T.CanvasTexture(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(5,5);return t;
+}
+const tex={
+ grass:texture('#78966f','#d4d8a0'),
+ road:texture('#4c5357','#92999b'),
+ wall:texture('#e6ddd0','#a99e91'),
+ roof:texture('#665d57','#b7aaa0'),
+ wood:texture('#9a6b48','#d1a47a'),
+ side:texture('#b8b29c','#eee6d2')
+};
+function matTex(c,t){return new T.MeshStandardMaterial({color:c,map:tex[t],roughness:.9})}
+const M={grass:matTex(0xffffff,'grass'),road:matTex(0xffffff,'road'),side:matTex(0xffffff,'side'),wall:matTex(0xffffff,'wall'),roof:matTex(0xffffff,'roof'),wood:matTex(0xffffff,'wood'),glass:mat(0x87b8c7),dark:mat(0x30363a),skin:mat(0xd39a78),cloth:mat(0x365a68),green:mat(0x6c8561),white:mat(0xf2eee5),metal:mat(0x879097)};
 
 function box(w,h,d,x,y,z,ma,sh=true){const o=new T.Mesh(new T.BoxGeometry(w,h,d),ma);o.position.set(x,y,z);o.castShadow=sh;o.receiveShadow=true;scene.add(o);return o}
 function cyl(r,h,x,y,z,ma){const o=new T.Mesh(new T.CylinderGeometry(r,r,h,16),ma);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}
