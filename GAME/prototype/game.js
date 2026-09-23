@@ -123,3 +123,26 @@ placeObject=function(e,type,quiet=false){
   const fake={clientX:terrain.getBoundingClientRect().left+terrain.getBoundingClientRect().width*x/100,clientY:terrain.getBoundingClientRect().top+terrain.getBoundingClientRect().height*y/100};
   return originalPlaceObject(fake,type,quiet);
 };
+
+/* V1.0 — terrain et contraintes de construction */
+function terrainZone(x,y){
+  if(state.world==='sea') return y>72?'deepSea':(y>48?'water':'platform');
+  if(state.world==='space') return 'station';
+  if(state.world==='moon') return x<22?'crater':(x>78?'ridge':'base');
+  if(state.world==='mars') return y<25?'dust':(x>70?'rock':'plain');
+  return y>76?'water':(x<20?'forest':(x>78?'mountain':'plain'));
+}
+function canBuild(type,x,y){
+  const z=terrainZone(x,y);
+  if(state.world==='earth' && z==='water' && type!=='canal')return '🌊 Eau : une maison ne peut pas être posée ici.';
+  if(state.world==='earth' && z==='mountain' && type==='farm')return '⛰️ Terrain montagneux : cette ferme ne peut pas être installée ici.';
+  if(state.world==='sea' && z==='deepSea' && (type==='module'||type==='farm'))return '🌊 Haute mer : utilisez une structure flottante adaptée.';
+  if(state.world==='moon' && z==='crater' && type==='farm')return '🌙 Cratère : agriculture impossible ici.';
+  return '';
+}
+const previousPlaceObject=placeObject;
+placeObject=function(e,type,quiet=false){
+  const p=mapPosition(e),x=snap(p.x),y=snap(p.y),warning=canBuild(type,x,y);
+  if(warning){say('🎙️ Petite voix : '+warning);return false}
+  return previousPlaceObject(e,type,quiet);
+};
