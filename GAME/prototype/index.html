@@ -1,38 +1,25 @@
 <!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOMAD GAME — La ville est déjà là</title><link rel="stylesheet" href="style.css"></head>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NOMAD GAME — Simulation de vie</title><link rel="stylesheet" href="style.css"></head>
 <body>
-<header><div><strong>NOMAD GAME</strong><span> — Les Sims, version NOMAD</span></div><div class="status">🌍 <b id="worldName">NOMAD TERRE</b> · 🕒 <span id="clock">08:00</span> · 💚 <span id="mood">Bien</span></div></header>
+<div id="app">
+<header><div><strong>NOMAD</strong><span> · Simulation de vie</span></div><div class="topstats">🌍 <b id="worldName">NOMAD TERRE</b> · 🕒 <span id="clock">08:00</span> · 💰 <span id="money">1 000</span> N$</div></header>
 <main>
-<section class="game">
-<div class="citybar"><div><b id="cityTitle">NOMAD TERRE · VILLE CENTRALE</b><small>Une ville existe déjà. Vous venez simplement vous y greffer.</small></div><button id="mapBtn">🗺️ Changer de monde</button></div>
-<div id="scene">
-  <div class="district residential"><b>🏘️ QUARTIER HABITÉ</b><small>Habitats NOMAD · voisins · services</small></div>
-  <div class="district green"><b>🌱 SERRES & AGRICULTURE</b><small>Production locale · eau · alimentation</small></div>
-  <div class="district hub"><b>🏙️ HUB CENTRAL</b><small>Marché · gare · ateliers · rencontres</small></div>
-  <div class="district workshop"><b>🔧 FABRICATION</b><small>Atelier · recyclage · matériaux</small></div>
-  <div class="district nature"><b>🌳 ESPACE LIBRE</b><small>Emplacements disponibles</small></div>
-  <div class="road r1"></div><div class="road r2"></div><div class="road r3"></div>
-  <div class="npc n1">🧑‍🌾</div><div class="npc n2">🧑‍🔧</div><div class="npc n3">👩‍🔬</div><div class="npc n4">🧑‍🚀</div>
-  <div id="home" class="plot free p1" data-plot="1">🏠<small>terrain libre</small></div>
-  <div class="plot free p2" data-plot="2">🏡<small>terrain libre</small></div>
-  <div class="plot free p3" data-plot="3">🌿<small>terrain libre</small></div>
-  <div id="player">👤</div><div id="bot">🤖</div>
-</div>
-<div class="tip">👆 Touchez le terrain pour déplacer votre Nomad. Touchez un terrain libre pour vous installer.</div>
+<section class="viewport"><canvas id="gameCanvas" aria-label="Ville NOMAD en 3D"></canvas><div class="loading" id="loading">Chargement de la ville NOMAD…</div>
+<div class="sceneHint">Clic/toucher le sol : se déplacer · Glisser : tourner la caméra</div>
+<div class="interaction" id="interaction"><b id="interactionTitle"></b><span id="interactionText"></span><button id="interactionAction" type="button"></button></div>
+<div class="bottomHud"><button type="button" id="catalogBtn">🛋️ Construire / meubler</button><button type="button" id="worldBtn">🌍 Changer de monde</button><button type="button" id="workBtn">💼 Travailler</button><button type="button" id="homeBtn">🏠 Chez moi</button></div>
 </section>
 <aside>
-<div class="profile"><div id="avatar">👤</div><div><b id="name">Nomad</b><small>Habite ici depuis aujourd'hui</small></div></div>
-<div class="companion">🤖 <b id="botName">JERVIS</b><small>Votre compagnon vous accompagne, il ne dirige pas votre vie.</small></div>
-<h3>🏠 Votre vie</h3>
-<div class="card"><b id="homeStatus">Vous êtes visiteur</b><p id="homeText">La ville vous accueille. Choisissez un terrain libre quand vous êtes prêt.</p><button id="claim" disabled>🏡 S'installer ici</button></div>
-<h3>🌍 Où voulez-vous vivre ?</h3>
-<div id="worlds" class="worlds"></div>
-<h3>🎒 Vie quotidienne</h3>
-<div class="actions"><button data-action="work">🔧 Aller travailler</button><button data-action="market">🛒 Aller au marché</button><button data-action="meet">👋 Rencontrer un voisin</button><button data-action="explore">🧭 Explorer la ville</button></div>
-<div class="card"><b>💰 Économie</b><div class="money"><span>Portefeuille</span><strong id="money">1 000</strong> NOMAD</div><small>Le monde possède déjà ses commerces et ses ressources. Vous vivez dans son économie.</small></div>
-<div id="message" class="message">Bienvenue. La ville existe déjà : à vous d'y trouver votre place.</div>
-<button id="reset" class="danger">↺ Recommencer la vie</button>
+<div class="identity"><div class="avatar">👤</div><div><b>Nomad</b><small>Résident de la communauté</small></div></div>
+<div class="companion"><span>🤖</span><div><b>T.H.E.O.</b><small>Humanoïde compagnon · autonomie respectée</small></div></div>
+<div class="lifeCard"><div><span>Humeur</span><strong id="mood">Bien</strong></div><div><span>Maison</span><strong id="homeStatus">À choisir</strong></div></div>
+<h3>Ta vie</h3>
+<p id="message">Bienvenue dans une ville NOMAD déjà construite. Tu peux choisir un logement ou un terrain libre.</p>
+<div class="skills"><h3>Compétences</h3><div>🔧 Bricolage <b>1</b></div><div>🤖 Robotique <b>1</b></div><div>💻 Technologie <b>1</b></div><div>🌱 Agriculture <b>1</b></div></div>
+<div class="hintbox">🏙️ <b>La ville existe déjà.</b><br>Tu n'es pas là pour construire la ville. Tu viens y vivre, puis tu construis et aménages ta propre vie.</div>
+<button class="reset" id="reset" type="button">↺ Recommencer</button>
 </aside>
 </main>
-<div id="worldModal" class="modal hidden"><div class="modalBox"><button id="closeModal" class="close">✕</button><h2>🌍 Choisissez votre monde</h2><p>Chaque monde possède déjà sa ville NOMAD. Vous arrivez, vous explorez, puis vous vous installez.</p><div id="worldChoices"></div></div></div>
-<script src="game.js"></script></body></html>
+<div class="modal hidden" id="catalog"><div class="modalBox"><button class="close" id="closeCatalog" type="button">✕</button><h2>🛋️ Mode Construction & Achat</h2><p>Comme dans les Sims : choisis un objet, paie son prix et place-le dans ton logement.</p><div class="items" id="items"></div></div></div>
+<div class="modal hidden" id="worlds"><div class="modalBox"><button class="close" id="closeWorlds" type="button">✕</button><h2>🌍 Choisir un monde</h2><p>Chaque monde possède déjà sa propre ville NOMAD.</p><div id="worldList"></div></div></div>
+</div><script type="module" src="game.js"></script></body></html>
