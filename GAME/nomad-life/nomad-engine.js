@@ -59,7 +59,7 @@ function formatMoney(v){return 'N$ '+Math.floor(v).toLocaleString('fr-FR')}
 $('workBtn').onclick=()=>{working=!working;$('workBtn').textContent=working?'⏹️ Finir le travail':'💼 Travail';prompt.textContent=working?'Travail commencé. Tes revenus s’accumulent pendant ta journée.':'Journée de travail terminée. Tes gains restent acquis.'};
 $('buildBtn').onclick=openBuild;$('closeBuild').onclick=closeBuild;$('worldBtn').onclick=()=>$('worldPanel').classList.add('open');$('closeWorld').onclick=()=>$('worldPanel').classList.remove('open');$('buyBtn').onclick=()=>$('buyPanel').classList.add('open');$('closeBuy').onclick=()=>$('buyPanel').classList.remove('open');$('simBtn').onclick=()=>{$('avatarPanel').classList.add('open')};$('closeAvatar').onclick=()=>{$('avatarPanel').classList.remove('open')};document.querySelectorAll('[data-shirt]').forEach(b=>b.onclick=()=>{player.shirt=b.dataset.shirt;prompt.textContent='Tenue choisie. Tu peux valider ton avatar.'});document.querySelectorAll('[data-body]').forEach(b=>b.onclick=()=>{player.body=+b.dataset.body;prompt.textContent='Morphologie choisie.'});document.querySelectorAll('[data-face]').forEach(b=>b.onclick=()=>{player.face=+b.dataset.face;prompt.textContent='Visage choisi.'});$('saveAvatar').onclick=()=>{player.name=($('avatarName').value||'Mon Nomade').trim();$('simName').textContent=player.name;$('avatarPanel').classList.remove('open');prompt.textContent='Avatar enregistré. Maintenant, vis ta vie NOMAD.'};
 document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>{setWorld(b.dataset.world);$('worldPanel').classList.remove('open');prompt.textContent='🌍 '+b.textContent.replace(/\s+/g,' ').trim()+' chargé. Bienvenue dans ce monde NOMAD.';});
-document.querySelectorAll('.buildTool').forEach(b=>b.onclick=()=>{document.querySelectorAll('.buildTool').forEach(x=>x.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool;selected=null;roomStart=null;prompt.textContent=tool==='room'?'Touche un premier point puis un second pour créer ta pièce.':'Touche le terrain pour placer '+b.textContent.trim()+'.'});
+document.querySelectorAll('.buildTool').forEach(b=>b.onclick=()=>{document.querySelectorAll('.buildTool').forEach(x=>x.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool;selected=null;ghost=null;roomStart=null;prompt.textContent=tool==='room'?'Touche un premier coin puis un deuxième pour ancrer la pièce.':'Touche le terrain pour poser '+b.textContent.trim()+' — une fois posé, il reste ancré.'});
 document.querySelectorAll('.quickSizes button').forEach(b=>b.onclick=()=>{const v=+b.dataset.size;$('dimW').value=v;$('dimH').value=2.6;$('dimD').value=tool==='floor'||tool==='room'?v:.2;if(selected)applyAdvanced();prompt.textContent='Taille '+v+' m sélectionnée.'});
 $('advancedToggle').onclick=()=>{$('advanced').classList.toggle('open');$('advancedToggle').classList.toggle('open')};$('applyAdvanced').onclick=applyAdvanced;
 $('deleteBuild').onclick=()=>{if(selected){objects.splice(objects.indexOf(selected),1);selected=null;prompt.textContent='Objet supprimé.'}};$('duplicateBuild').onclick=()=>{if(selected){selected={...selected,x:selected.x+1};objects.push(selected);sync();prompt.textContent='Objet dupliqué.'}};
@@ -71,7 +71,31 @@ canvas.addEventListener('pointermove',e=>{if(!started)return;if(!pointers.has(e.
 if(pointers.size===2&&gesture?.type==='camera'){const a=[...pointers.values()],m={x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};const sc=dist(a[0],a[1])/gesture.dist;cam.zoom=Math.max(28,Math.min(90,gesture.zoom*sc));cam.rot=gesture.rot+(angle(a[0],a[1])-gesture.angle);const panX=m.x-gesture.mid.x,panY=m.y-gesture.mid.y;const units=1/(cam.zoom*.5);cam.x=gesture.camX-(panX+panY)*units*.7;cam.z=gesture.camZ+(panX-panY)*units*.7;return}
 if(gesture?.type==='one'){const dx=e.clientX-gesture.start.x,dy=e.clientY-gesture.start.y;if(Math.hypot(dx,dy)>8)gesture.moved=true;if(buildMode&&selected&&gesture.moved){const p=pointerGround(e);selected.x=p.x;selected.z=p.z}else if(buildMode&&!selected)ghost=pointerGround(e)}});
 canvas.addEventListener('pointerup',e=>{if(!started)return;pointers.delete(e.pointerId);if(pointers.size){if(pointers.size===1)gesture=null;return}const g=gesture;gesture=null;if(!g||g.type!=='one'||g.moved)return;const p=pointerGround(e);
-if(buildMode){if(selected){selected.x=p.x;selected.z=p.z;prompt.textContent='Objet déplacé. 🤏 Pince avec deux doigts pour l’agrandir ou le réduire.';return}if(tool==='room'){if(!roomStart){roomStart=p;prompt.textContent='Deuxième point : touche plus loin pour agrandir la pièce.'}else{const w=Math.max(1,Math.abs(p.x-roomStart.x)),d=Math.max(1,Math.abs(p.z-roomStart.z));selected={tool:'room',x:(p.x+roomStart.x)/2,z:(p.z+roomStart.z)/2,w,h:2.6,d,color:C.wall,rot:0};objects.push(selected);roomStart=null;sync();prompt.textContent='Pièce créée gratuitement. Touche-la pour la déplacer.'}}else{const d=dims(tool);selected={tool,x:Math.round(p.x*2)/2,z:Math.round(p.z*2)/2,w:d[0],h:d[1],d:d[2],color:color(tool),rot:0};objects.push(selected);sync();prompt.textContent='Élément posé. Touche-le pour le déplacer.'}}else{player.tx=p.x;player.tz=p.z;player.rot=Math.atan2(p.x-player.x,p.z-player.z);prompt.textContent='Ton Nomade se déplace vers cet endroit.'}});
+if(buildMode){
+  if(selected){
+    selected.x=p.x;selected.z=p.z;
+    const placed=selected; selected=null; sync();
+    prompt.textContent='Élément déplacé. Touche le sol pour le placer ailleurs, ou sélectionne un autre élément.';
+    return;
+  }
+  if(tool==='room'){
+    if(!roomStart){
+      roomStart=p;
+      ghost={x:p.x,z:p.z,w:1,h:2.6,d:1};
+      prompt.textContent='Premier coin posé. Touche le deuxième coin pour ancrer la pièce.';
+    }else{
+      const w=Math.max(1,Math.abs(p.x-roomStart.x)),d=Math.max(1,Math.abs(p.z-roomStart.z));
+      const obj={tool:'room',x:(p.x+roomStart.x)/2,z:(p.z+roomStart.z)/2,w,h:2.6,d,color:C.wall,rot:0};
+      objects.push(obj); roomStart=null; ghost=null; selected=null; sync();
+      prompt.textContent='Pièce ancrée ✓. Elle ne bougera plus. Touche-la seulement si tu veux la déplacer.';
+    }
+  }else{
+    const d=dims(tool);
+    const obj={tool,x:Math.round(p.x*2)/2,z:Math.round(p.z*2)/2,w:d[0],h:d[1],d:d[2],color:color(tool),rot:0};
+    objects.push(obj); selected=null; ghost=null; sync();
+    prompt.textContent='Élément ancré ✓. Pour en poser un autre, touche simplement le terrain.';
+  }
+}else{player.tx=p.x;player.tz=p.z;player.rot=Math.atan2(p.x-player.x,p.z-player.z);prompt.textContent='Ton Nomade se déplace vers cet endroit.'}});
 canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);gesture=null});
 canvas.addEventListener('wheel',e=>{e.preventDefault();cam.zoom=Math.max(28,Math.min(90,cam.zoom*(e.deltaY>0?.92:1.08)))} ,{passive:false});
 canvas.addEventListener('click',e=>{
