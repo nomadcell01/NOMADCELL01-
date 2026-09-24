@@ -21,7 +21,34 @@ function box(x,z,w,h,d,fill,rot=0){const c=Math.cos(rot),s=Math.sin(rot),p=[];[[
 function ground(){const bg={TERRE:['#bfe3ed','#79b56f'],BEACH:['#8fd4e5','#e2cf91'],MER:['#69b9ce','#74aeb0'],MONTAGNE:['#c7d4da','#9ca6a4'],LUNE:['#111925','#60656b'],MARS:['#9b5b4c','#b87957'],ESPACE:['#091225','#252d45'],HUB:['#8bc4d2','#78967e']}[worldKey]||['#bfe3ed','#79b56f'];ctx.fillStyle=bg[0];ctx.fillRect(0,0,W,H);const a=iso(-120,0,-120),b=iso(120,0,-120),c=iso(120,0,120),d=iso(-120,0,120);poly([a,b,c,d],bg[1]);if(worldKey==='MER'){ctx.fillStyle='#7fc4d2';ctx.fillRect(0,H*.52,W,H*.48)}else{box(0,-18,150,.04,8,C.road);box(-6,0,2,.05,150,C.sidewalk);box(6,0,2,.05,150,C.sidewalk);box(0,0,150,.05,2,C.sidewalk);for(let z=-60;z<60;z+=12)box(0,z,7,.04,1.3,C.road)}}
 function limb(x,z,h,thick,col,rot=0){box(x,z,thick,h,thick*.8,col,rot)}
 function tree(x,z){limb(x,z,2.4,.35,'#70513a');box(x,z,2.9,2.1,2.9,'#4f8e59');box(x,z,2.2,1.6,2.2,'#69a765')}
-function house(x,z,m){box(x,z,10,5.5,8,m);box(x,z-.02,11.5,.25,9.2,C.roof,Math.PI/4);box(x,z-4.05,2.4,2.2,.08,C.glass);box(x-2.7,z-4.08,1.2,2.2,.1,C.glass);box(x+2.7,z-4.08,1.2,2.2,.1,C.glass);box(x,z+4.05,1.5,2.4,.18,C.wood)}
+function house(x,z,m){
+  // Maison composée de murs réels : aucune face manquante.
+  const w=10,d=8,h=5.5,t=.22;
+  // Mur arrière + côtés
+  box(x,z+d/2-t/2,w,h,t,m);
+  box(x-w/2+t/2,z,t,h,d,m);
+  box(x+w/2-t/2,z,t,h,d,m);
+  // Façade avant avec ouverture de porte centrale et fenêtres de chaque côté
+  const front=z-d/2+t/2, doorW=1.5, doorH=2.6;
+  const sideW=(w-doorW)/2;
+  box(x-(doorW/2+sideW/2),front,sideW,h,t,m);
+  box(x+(doorW/2+sideW/2),front,sideW,h,t,m);
+  box(x,front,doorW,(h-doorH),t,m);
+  // Porte fixée au mur, dans son ouverture
+  box(x,front-t/2-.02,doorW-.08,doorH-.06,.10,C.wood);
+  // Fenêtres fixées à la façade
+  box(x-3.1,front-t/2-.03,1.45,1.65,.10,C.glass);
+  box(x+3.1,front-t/2-.03,1.45,1.65,.10,C.glass);
+  // Petite fenêtre sur le mur arrière
+  box(x,z+d/2-t-.03,2.2,1.5,.10,C.glass);
+  // Toit : deux pans solidement posés au sommet des murs
+  const roofY=h+.08, rw=w/2+.65, rd=d/2+.65;
+  const a=iso(x-rw,roofY,z-rd), b=iso(x+rw,roofY,z-rd), c=iso(x+rw,roofY,z+rd), dd=iso(x-rw,roofY,z+rd);
+  const ridgeY=roofY+.95;
+  const e=iso(x,ridgeY,z-rd+.12), f=iso(x,ridgeY,z+rd-.12);
+  poly([a,b,e],C.roof); poly([dd,c,f],shade(C.roof,.82));
+  poly([b,c,f,e],shade(C.roof,.72)); poly([dd,a,e,f],shade(C.roof,.92));
+}
 function ellipse(x,y,rx,ry,fill){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill()}
 function roundRect(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill()}
 function person(x,z,col=C.shirt){
