@@ -55,7 +55,37 @@
     <div class="catalog"><button data-item="chair" data-price="5">🪑<b>Chaise</b><small>N$ 5</small></button><button data-item="table" data-price="10">▱<b>Table</b><small>N$ 10</small></button><button data-item="sofa" data-price="100">🛋️<b>Canapé</b><small>N$ 100</small></button><button data-item="sink" data-price="150">🚰<b>Évier</b><small>N$ 150</small></button><button data-item="shower" data-price="200">🚿<b>Douche</b><small>N$ 200</small></button><button data-item="tv" data-price="250">📺<b>TV</b><small>N$ 250</small></button></div>
   </section>
 </div>
-<script src="nomad-engine.js?v=20"></script>
+<script src="nomad-engine.js?v=21"></script>
+<script>
+// Rendu visuel de secours : le monde doit toujours être visible, même si le moteur principal échoue.
+(function(){
+  const c=document.getElementById('world'),x=c.getContext('2d'); let raf;
+  function fit(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';x.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+  function draw(){const W=innerWidth,H=innerHeight,t=performance.now()/1000;x.clearRect(0,0,W,H);
+    const sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#8fc8df');sky.addColorStop(.58,'#cce8dc');sky.addColorStop(.581,'#6f9f68');sky.addColorStop(1,'#507d55');x.fillStyle=sky;x.fillRect(0,0,W,H);
+    // sol / quartier
+    x.fillStyle='#7eaa72';x.beginPath();x.moveTo(0,H*.58);x.lineTo(W,H*.48);x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();
+    x.fillStyle='#666b69';x.beginPath();x.moveTo(W*.42,H*.52);x.lineTo(W*.58,H*.52);x.lineTo(W*.86,H);x.lineTo(W*.14,H);x.closePath();x.fill();
+    x.fillStyle='#d5d0c2';x.fillRect(W*.48,H*.55,W*.04,H*.45);
+    function house(cx,cy,s,wall){x.fillStyle=wall;x.beginPath();x.moveTo(cx-s*.5,cy);x.lineTo(cx+s*.5,cy);x.lineTo(cx+s*.42,cy+s*.42);x.lineTo(cx-s*.42,cy+s*.42);x.closePath();x.fill();x.fillStyle='#80574c';x.beginPath();x.moveTo(cx-s*.58,cy);x.lineTo(cx,cy-s*.38);x.lineTo(cx+s*.58,cy);x.closePath();x.fill();x.fillStyle='#74b5c0';x.fillRect(cx-s*.30,cy+s*.10,s*.18,s*.16);x.fillRect(cx+s*.12,cy+s*.10,s*.18,s*.16);x.fillStyle='#946846';x.fillRect(cx-s*.06,cy+s*.18,s*.12,s*.24)}
+    house(W*.20,H*.48,120,'#d7e1d9');house(W*.80,H*.50,130,'#e5ceb9');house(W*.50,H*.34,145,'#d1dce1');
+    function tree(cx,cy,s){x.fillStyle='#6b5039';x.fillRect(cx-s*.06,cy,s*.12,s*.45);x.fillStyle='#4f8d58';x.beginPath();x.arc(cx,cy,s*.25,0,7);x.fill();x.fillStyle='#6da666';x.beginPath();x.arc(cx-s*.12,cy-s*.08,s*.20,0,7);x.fill();x.beginPath();x.arc(cx+s*.12,cy-s*.08,s*.20,0,7);x.fill()}
+    tree(W*.10,H*.55,80);tree(W*.90,H*.56,85);tree(W*.30,H*.43,55);tree(W*.70,H*.42,60);
+    // Nomade central, grand et immédiatement identifiable
+    const cx=W*.5, by=H*.68+Math.sin(t*2)*2, sc=Math.max(1,Math.min(W/420,1.7));
+    x.fillStyle='#0004';x.beginPath();x.ellipse(cx,by+6,34*sc,10*sc,0,0,7);x.fill();
+    x.fillStyle='#263239';x.fillRect(cx-13*sc,by-72*sc,10*sc,70*sc);x.fillRect(cx+3*sc,by-72*sc,10*sc,70*sc);
+    x.fillStyle='#567f91';x.beginPath();x.roundRect(cx-30*sc,by-125*sc,60*sc,65*sc,14*sc);x.fill();
+    x.fillStyle='#e3b28e';x.fillRect(cx-5*sc,by-135*sc,10*sc,14*sc);x.beginPath();x.arc(cx,by-164*sc,28*sc,0,7);x.fill();
+    x.fillStyle='#3b2d28';x.beginPath();x.arc(cx,by-171*sc,28*sc,Math.PI,7);x.fill();
+    x.fillStyle='#263239';x.beginPath();x.arc(cx-9*sc,by-166*sc,2.5*sc,0,7);x.arc(cx+9*sc,by-166*sc,2.5*sc,0,7);x.fill();
+    x.fillStyle='#fff';x.font='700 14px system-ui';x.textAlign='center';x.fillText('Mon Nomade',cx,by-205*sc);
+    x.fillStyle='#ffffffcc';x.beginPath();x.roundRect(cx-62*sc,by+20,124*sc,30,15);x.fill();x.fillStyle='#17353d';x.font='600 12px system-ui';x.fillText('🏠 Ton terrain NOMAD',cx,by+40);
+    raf=requestAnimationFrame(draw);
+  }
+  addEventListener('resize',fit);fit();draw();
+})();
+</script>
 <script>
 // Démarrage de secours : la présentation ne doit jamais rester bloquée sur « préparation ».
 (function(){
