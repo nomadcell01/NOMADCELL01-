@@ -22,7 +22,7 @@ function person(x,z,col=C.shirt){
   const head=player.face===0?.95:player.face===2?1.08:1;
   const moving=Math.hypot(player.tx-player.x,player.tz-player.z)>.08;
   const walk=moving?Math.sin(t*10)*.22:Math.sin(t*2)*.025;
-  const p=iso(x,0,z),unit=cam.zoom*.17*scale,cx=p.x,base=p.y-unit*.05;
+  const p=iso(x,0,z),unit=cam.zoom*.30*scale,cx=p.x,base=p.y-unit*.05;
   ellipse(cx,base+3,unit*1.25,unit*.28,'#00000030');
   ctx.save();ctx.translate(cx-unit*.22,base);ctx.rotate(walk);
   roundRect(-unit*.11,0,unit*.22,unit*1.05,unit*.1,C.dark);ctx.restore();
