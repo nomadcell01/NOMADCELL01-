@@ -1,63 +1,34 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>NOMAD — Les Sims version NOMAD</title>
-<link rel="stylesheet" href="style.css?v=20260924-4">
+<link rel="stylesheet" href="style.css?v=20260924-5">
 </head>
 <body>
-<div id="loading">NOMAD — préparation du quartier…</div>
+<div id="loading">NOMAD — préparation du monde…</div>
 <div id="game">
-  <div id="hud"><strong>NOMAD TERRE</strong><span id="clock">08:00</span><span id="money">N$ 500</span></div>
-  <div id="needs"><span>Énergie <i style="width:78%"></i></span><span>Faim <i style="width:82%"></i></span><span>Bonheur <i style="width:91%"></i></span></div>
-  <div id="prompt">Bienvenue dans ton quartier NOMAD.</div>
-  <div id="actions"><button id="work">💼 Travail</button><button id="home">🏠 Maison</button><button id="buy">🛋️ Construire</button></div>
-  <div id="touch"><button data-key="ArrowUp">▲</button><button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button></div>
-  <section id="buildPanel" aria-label="Éditeur de construction NOMAD">
-    <div class="buildHead"><strong>🏗️ CONSTRUCTION NOMAD</strong><button id="closeBuild">✕</button></div>
-    <div class="buildTabs">
-      <button class="buildTool active" data-tool="wall">🧱 Mur</button>
-      <button class="buildTool" data-tool="window">🪟 Fenêtre</button>
-      <button class="buildTool" data-tool="door">🚪 Porte</button>
-      <button class="buildTool" data-tool="floor">⬜ Sol</button>
-      <button class="buildTool" data-tool="roof">🏠 Toit</button>
-    </div>
-    <div class="buildHelp">Touchez le terrain pour placer. Sélectionnez ensuite l'élément pour le redimensionner.</div>
-    <div class="buildControls">
-      <label>Largeur <input id="dimW" type="range" min=".5" max="12" step=".1" value="4"><output id="dimWOut">4.0 m</output></label>
-      <label>Hauteur <input id="dimH" type="range" min=".1" max="5" step=".1" value="2.6"><output id="dimHOut">2.6 m</output></label>
-      <label>Épaisseur <input id="dimD" type="range" min=".05" max="1" step=".05" value=".2"><output id="dimDOut">0.20 m</output></label>
-      <label>Rotation <input id="dimR" type="range" min="-180" max="180" step="1" value="0"><output id="dimROut">0°</output></label>
-    </div>
-    <div class="buildActions">
-      <button id="duplicateBuild">Dupliquer</button><button id="deleteBuild" class="danger">Supprimer</button>
-    </div>
-    <div class="buildNotice">Terrain et structure de base : <b>GRATUITS</b> · Équipements payants dans le mode Vie.</div>
-  </section>
+<canvas id="world" aria-label="Monde 3D NOMAD"></canvas>
+<div id="hud"><strong>NOMAD TERRE</strong><span id="clock">08:00</span><span id="money">N$ 500</span></div>
+<div id="needs"><span>Énergie <i style="width:78%"></i></span><span>Faim <i style="width:82%"></i></span><span>Bonheur <i style="width:91%"></i></span></div>
+<div id="prompt">Bienvenue dans ton quartier NOMAD.</div>
+<div id="actions"><button id="work">💼 Travail</button><button id="home">🏠 Maison</button><button id="buy">🛋️ Construire</button></div>
+<div id="touch"><button data-key="ArrowUp">▲</button><button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button></div>
+<section id="buildPanel" aria-label="Éditeur de construction NOMAD">
+<div class="buildHead"><strong>🏗️ CONSTRUCTION NOMAD</strong><button id="closeBuild">✕</button></div>
+<div class="buildTabs"><button class="buildTool active" data-tool="wall">🧱 Mur</button><button class="buildTool" data-tool="window">🪟 Fenêtre</button><button class="buildTool" data-tool="door">🚪 Porte</button><button class="buildTool" data-tool="floor">⬜ Sol</button><button class="buildTool" data-tool="roof">🏠 Toit</button></div>
+<div class="buildHelp">Touchez le terrain pour placer. Sélectionnez ensuite l'élément pour le redimensionner.</div>
+<div class="buildControls">
+<label>Largeur <input id="dimW" type="range" min=".5" max="12" step=".1" value="4"><output id="dimWOut">4.00 m</output></label>
+<label>Hauteur <input id="dimH" type="range" min=".1" max="5" step=".1" value="2.6"><output id="dimHOut">2.60 m</output></label>
+<label>Épaisseur <input id="dimD" type="range" min=".05" max="4" step=".05" value=".2"><output id="dimDOut">0.20 m</output></label>
+<label>Rotation <input id="dimR" type="range" min="-180" max="180" step="1" value="0"><output id="dimROut">0°</output></label>
 </div>
-<script>
-(function(){
-  var sources=[
-    "https://unpkg.com/three@0.180.0/build/three.min.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/three.js/r180/three.min.js",
-    "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"
-  ];
-  function load(i){
-    if(i>=sources.length){
-      document.getElementById("loading").textContent="NOMAD — impossible de charger le moteur 3D. Vérifie la connexion puis recharge la page.";
-      return;
-    }
-    var s=document.createElement("script");
-    s.src=sources[i];
-    s.onload=function(){
-      var g=document.createElement("script");
-      g.src="game.js?v=20260924-4";
-      document.body.appendChild(g);
-    };
-    s.onerror=function(){load(i+1)};
-    document.head.appendChild(s);
-  }
-  load(0);
-})();
-</script>
-</body></html>
+<div class="buildActions"><button id="duplicateBuild">Dupliquer</button><button id="deleteBuild" class="danger">Supprimer</button></div>
+<div class="buildNotice">Terrain et structure de base : <b>GRATUITS</b> · Équipements payants dans le mode Vie.</div>
+</section>
+</div>
+<script src="game.js?v=20260924-5"></script>
+</body>
+</html>
