@@ -15,33 +15,51 @@ function ground(){ctx.fillStyle=C.sky;ctx.fillRect(0,0,W,H);const a=iso(-90,0,-9
 function limb(x,z,h,thick,col,rot=0){box(x,z,thick,h,thick*.8,col,rot)}
 function tree(x,z){limb(x,z,2.4,.35,'#70513a');box(x,z,2.9,2.1,2.9,'#4f8e59');box(x,z,2.2,1.6,2.2,'#69a765')}
 function house(x,z,m){box(x,z,10,5.5,8,m);box(x,z-.02,11.5,.25,9.2,C.roof,Math.PI/4);box(x,z-4.05,2.4,2.2,.08,C.glass);box(x-2.7,z-4.08,1.2,2.2,.1,C.glass);box(x+2.7,z-4.08,1.2,2.2,.1,C.glass);box(x,z+4.05,1.5,2.4,.18,C.wood)}
-function person(x,z,col=C.shirt){const scale=player.body===0?.88:player.body===2?1.12:1;const head=player.face===0?.95:player.face===2?1.08:1;const moving=Math.hypot(player.tx-player.x,player.tz-player.z)>.08;const walk=moving?Math.sin(t*10)*.18:Math.sin(t*2)*.025;box(x,z,.72*scale,1.05*scale,.48*scale,col);limb(x-.25*scale,z+.02,.9*scale,.13*scale,col,-.12+walk);limb(x+.25*scale,z+.02,.9*scale,.13*scale,col,.12-walk);limb(x-.19*scale,z,.92*scale,.16*scale,C.dark,.04-walk);limb(x+.19*scale,z,.92*scale,.16*scale,C.dark,-.04+walk);const p=iso(x,2.0*scale,z);ctx.beginPath();ctx.arc(p.x,p.y,Math.max(8,cam.zoom*.13*head),0,Math.PI*2);ctx.fillStyle=C.skin;ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y-cam.zoom*.055,Math.max(8,cam.zoom*.115*head),Math.PI,Math.PI*2);ctx.fillStyle=player.hair;ctx.fill();ctx.beginPath();ctx.arc(p.x-cam.zoom*.045,p.y-cam.zoom*.005,2.2,0,Math.PI*2);ctx.arc(p.x+cam.zoom*.045,p.y-cam.zoom*.005,2.2,0,Math.PI*2);ctx.fillStyle=C.dark;ctx.fill()}
-function humanoid(x,z){box(x,z,.78,1.25,.5,'#e1e6e1');box(x,z,.62,.68,.62,'#e1e6e1');limb(x-.25,z,.95,.14,'#e1e6e1',-.1);limb(x+.25,z,.95,.14,'#e1e6e1',.1);limb(x-.2,z,.95,.16,C.dark,.03);limb(x+.2,z,.95,.16,C.dark,-.03);box(x,z-.02,.7,.12,.65,C.dark)}
-function world(){ground();house(-19,-20,C.house[0]);house(19,-20,C.house[1]);house(-19,10,C.house[2]);house(19,10,C.house[3]);box(0,23,12,5,8,'#d7d2c5');box(0,23,13,.25,9.2,C.roof,Math.PI/4);for(let z=-55;z<=55;z+=10){tree(-12,z+(z%20?2:-2));tree(12,z+(z%20?-2:2))}person(-3,-14,'#9a6657');person(4,-24,'#6d8a62');person(-4,5,'#806b9a');person(3,16,'#a77a4f');humanoid(1.35,-7.4)}
-function dims(k){return k==='room'?[4,2.6,4]:k==='wall'?[4,2.6,.2]:k==='door'?[1,2.2,.18]:k==='window'?[2,1.5,.16]:k==='floor'?[4,.12,4]:[4,.18,4]}function color(k){return{room:C.wall,wall:C.wall,door:C.wood,window:C.glass,floor:C.floor,roof:C.roof}[k]}
-function pointerGround(e){const r=canvas.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top;const q=(H*.52-sy)/(cam.zoom*.24),p=(sx-W/2)/(cam.zoom*.5),c=Math.cos(cam.rot),s=Math.sin(cam.rot),x=(p+q)/2,z=(q-p)/2;return{x:cam.x+x*c+z*s,z:cam.z-x*s+z*c}}
-function sync(){if(!selected)return;$('dimW').value=selected.w;$('dimH').value=selected.h;$('dimD').value=selected.d;$('dimR').value=Math.round(selected.rot*180/Math.PI)}
-function applyAdvanced(){if(!selected)return;selected.w=Math.max(.1,+$('dimW').value||1);selected.h=Math.max(.1,+$('dimH').value||1);selected.d=Math.max(.1,+$('dimD').value||1);selected.rot=(+$('dimR').value||0)*Math.PI/180;prompt.textContent='Dimensions appliquées.'}
-function setWorld(k){worldKey=k;$('worldName').textContent=worlds[k][0];$('weather').textContent=worlds[k][1];$('worldPanel').classList.remove('open');prompt.textContent='Bienvenue dans '+worlds[k][0]+'. Construis ton habitat ici.'}
-function openBuild(){buildMode=true;$('buildPanel').classList.add('open');prompt.textContent=tool==='room'?'Touche deux points pour créer une pièce.':'Touche le terrain pour poser.'}
-function closeBuild(){buildMode=false;$('buildPanel').classList.remove('open');ghost=null;roomStart=null;selected=null;gesture=null;prompt.textContent='Mode Vie : ton habitat reste exactement comme tu l’as construit.'}
-$('startGame').onclick=()=>{$('intro').classList.add('hidden');game.style.display='block';started=true;load.style.display='none';hint.classList.remove('hidden');setTimeout(()=>hint.classList.add('hidden'),3500);prompt.textContent='Bienvenue dans ton quartier NOMAD. Touche le sol pour te déplacer.'};
-$('buildBtn').onclick=openBuild;$('closeBuild').onclick=closeBuild;$('worldBtn').onclick=()=>$('worldPanel').classList.add('open');$('closeWorld').onclick=()=>$('worldPanel').classList.remove('open');$('buyBtn').onclick=()=>$('buyPanel').classList.add('open');$('closeBuy').onclick=()=>$('buyPanel').classList.remove('open');$('simBtn').onclick=()=>{$('avatarPanel').classList.add('open')};$('closeAvatar').onclick=()=>{$('avatarPanel').classList.remove('open')};document.querySelectorAll('[data-body]').forEach(b=>b.onclick=()=>{player.body=+b.dataset.body;prompt.textContent='Morphologie choisie.'});document.querySelectorAll('[data-face]').forEach(b=>b.onclick=()=>{player.face=+b.dataset.face;prompt.textContent='Visage choisi.'});document.querySelectorAll('[data-shirt]').forEach(b=>b.onclick=()=>{player.shirt=b.dataset.shirt;prompt.textContent='Tenue choisie. Tu peux valider ton avatar.'});$('saveAvatar').onclick=()=>{player.name=($('avatarName').value||'Mon Nomade').trim();$('simName').textContent=player.name;$('avatarPanel').classList.remove('open');prompt.textContent='Avatar enregistré. Maintenant, vis ta vie NOMAD.'};
-document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>setWorld(b.dataset.world));
-document.querySelectorAll('.buildTool').forEach(b=>b.onclick=()=>{document.querySelectorAll('.buildTool').forEach(x=>x.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool;selected=null;roomStart=null;prompt.textContent=tool==='room'?'Touche un premier point puis un second pour créer ta pièce.':'Touche le terrain pour placer '+b.textContent.trim()+'.'});
-document.querySelectorAll('.quickSizes button').forEach(b=>b.onclick=()=>{const v=+b.dataset.size;$('dimW').value=v;$('dimH').value=2.6;$('dimD').value=tool==='floor'||tool==='room'?v:.2;if(selected)applyAdvanced();prompt.textContent='Taille '+v+' m sélectionnée.'});
-$('advancedToggle').onclick=()=>{$('advanced').classList.toggle('open');$('advancedToggle').classList.toggle('open')};$('applyAdvanced').onclick=applyAdvanced;
-$('deleteBuild').onclick=()=>{if(selected){objects.splice(objects.indexOf(selected),1);selected=null;prompt.textContent='Objet supprimé.'}};$('duplicateBuild').onclick=()=>{if(selected){selected={...selected,x:selected.x+1};objects.push(selected);sync();prompt.textContent='Objet dupliqué.'}};
-document.querySelectorAll('.catalog button').forEach(b=>b.onclick=()=>{const price=+b.dataset.price;if(money<price){prompt.textContent='Il te faut encore N$ '+(price-money)+'.';return}money-=price;moneyEl.textContent='N$ '+money;tool='furniture';const p={x:player.x+1,z:player.z+1};selected={tool:'furniture',item:b.dataset.item,x:p.x,z:p.z,w:1.2,h:.8,d:1,color:'#b7a58e',rot:0};objects.push(selected);$('buyPanel').classList.remove('open');prompt.textContent=b.textContent.trim()+' ajouté. Touche-le puis déplace-le avec ton doigt.'});
-function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}function angle(a,b){return Math.atan2(b.y-a.y,b.x-a.x)}
-function startGesture(){const a=[...pointers.values()];if(a.length===2){const d=dist(a[0],a[1]),ang=angle(a[0],a[1]),mid={x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};if(buildMode&&selected){gesture={type:'object',dist:d,angle:ang,mid,obj:selected,w:selected.w,h:selected.h,d:selected.d,rot:selected.rot};prompt.textContent='🤏 Pince pour agrandir/réduire · 🔄 tourne pour orienter.'}else{gesture={type:'camera',dist:d,angle:ang,mid,camX:cam.x,camZ:cam.z,zoom:cam.zoom,rot:cam.rot};}}}
-canvas.addEventListener('pointerdown',e=>{if(!started)return;canvas.setPointerCapture?.(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){startGesture();return}gesture={type:'one',start:{x:e.clientX,y:e.clientY},last:{x:e.clientX,y:e.clientY},moved:false}});
-canvas.addEventListener('pointermove',e=>{if(!started)return;if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2&&gesture?.type==='object'){const a=[...pointers.values()],m={x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};const sc=Math.max(.35,Math.min(4,dist(a[0],a[1])/gesture.dist));const min=.25;gesture.obj.w=Math.max(min,gesture.w*sc);gesture.obj.d=Math.max(min,gesture.d*sc);gesture.obj.h=Math.max(min,gesture.h*sc);gesture.obj.rot=gesture.rot+(angle(a[0],a[1])-gesture.angle);sync();return}\nif(pointers.size===2&&gesture?.type==='camera'){const a=[...pointers.values()],m={x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};const sc=dist(a[0],a[1])/gesture.dist;cam.zoom=Math.max(28,Math.min(90,gesture.zoom*sc));cam.rot=gesture.rot+(angle(a[0],a[1])-gesture.angle);const panX=m.x-gesture.mid.x,panY=m.y-gesture.mid.y;const units=1/(cam.zoom*.5);cam.x=gesture.camX-(panX+panY)*units*.7;cam.z=gesture.camZ+(panX-panY)*units*.7;return}
-if(gesture?.type==='one'){const dx=e.clientX-gesture.start.x,dy=e.clientY-gesture.start.y;if(Math.hypot(dx,dy)>8)gesture.moved=true;if(buildMode&&selected&&gesture.moved){const p=pointerGround(e);selected.x=p.x;selected.z=p.z}else if(buildMode&&!selected)ghost=pointerGround(e)}});
-canvas.addEventListener('pointerup',e=>{if(!started)return;pointers.delete(e.pointerId);if(pointers.size){if(pointers.size===1)gesture=null;return}const g=gesture;gesture=null;if(!g||g.type!=='one'||g.moved)return;const p=pointerGround(e);
-if(buildMode){if(selected){selected.x=p.x;selected.z=p.z;prompt.textContent='Objet déplacé. 🤏 Pince avec deux doigts pour l’agrandir ou le réduire.';return}if(tool==='room'){if(!roomStart){roomStart=p;prompt.textContent='Deuxième point : touche plus loin pour agrandir la pièce.'}else{const w=Math.max(1,Math.abs(p.x-roomStart.x)),d=Math.max(1,Math.abs(p.z-roomStart.z));selected={tool:'room',x:(p.x+roomStart.x)/2,z:(p.z+roomStart.z)/2,w,h:2.6,d,color:C.wall,rot:0};objects.push(selected);roomStart=null;sync();prompt.textContent='Pièce créée gratuitement. Touche-la pour la déplacer.'}}else{const d=dims(tool);selected={tool,x:Math.round(p.x*2)/2,z:Math.round(p.z*2)/2,w:d[0],h:d[1],d:d[2],color:color(tool),rot:0};objects.push(selected);sync();prompt.textContent='Élément posé. Touche-le pour le déplacer.'}}else{player.tx=p.x;player.tz=p.z;player.rot=Math.atan2(p.x-player.x,p.z-player.z);prompt.textContent='Ton Nomade se déplace vers cet endroit.'}});
-canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);gesture=null});
-canvas.addEventListener('wheel',e=>{e.preventDefault();cam.zoom=Math.max(28,Math.min(90,cam.zoom*(e.deltaY>0?.92:1.08)))} ,{passive:false});
-document.addEventListener('contextmenu',e=>{if(e.target===canvas)e.preventDefault()});
-function loop(){requestAnimationFrame(loop);t+=.016;clock+=.0008;clockEl.textContent=String(Math.floor(clock)%24).padStart(2,'0')+':'+String(Math.floor(clock*60)%60).padStart(2,'0');const step=.11;player.x+=(player.tx-player.x)*step;player.z+=(player.tz-player.z)*step;cam.x+=(player.x-cam.x)*.05;cam.z+=(player.z-cam.z)*.05;world();objects.slice().sort((a,b)=>(a.x+a.z)-(b.x+b.z)).forEach(o=>box(o.x,o.z,o.w,o.h,o.d,o.color,o.rot));if(buildMode&&ghost){const d=dims(tool);box(ghost.x,ghost.z,d[0],d[1],d[2],color(tool))}person(player.x,player.z,player.shirt)}
-loop();})();
+function ellipse(x,y,rx,ry,fill){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill()}
+function roundRect(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill()}
+function person(x,z,col=C.shirt){
+  const scale=player.body===0?.88:player.body===2?1.12:1;
+  const head=player.face===0?.95:player.face===2?1.08:1;
+  const moving=Math.hypot(player.tx-player.x,player.tz-player.z)>.08;
+  const walk=moving?Math.sin(t*10)*.22:Math.sin(t*2)*.025;
+  const p=iso(x,0,z);
+  const unit=cam.zoom*.17*scale;
+  // shadow
+  ellipse(p.x,p.y+3,unit*1.25,unit*.28,'#00000030');
+  // body is drawn in screen space for a more human silhouette
+  const cx=p.x, base=p.y-unit*.05;
+  const legL=walk, legR=-walk;
+  // legs
+  ctx.save();ctx.translate(cx-unit*.22,base-unit*.02);ctx.rotate(legL);
+  roundRect(-unit*.11,0,unit*.22,unit*1.05,unit*.1,C.dark);ctx.restore();
+  ctx.save();ctx.translate(cx+unit*.22,base-unit*.02);ctx.rotate(legR);
+  roundRect(-unit*.11,0,unit*.22,unit*1.05,unit*.1,C.dark);ctx.restore();
+  // shoes
+  ellipse(cx-unit*.22+legL*unit,base+unit*.99,unit*.15,unit*.07,'#182126');
+  ellipse(cx+unit*.22+legR*unit,base+unit*.99,unit*.15,unit*.07,'#182126');
+  // torso
+  roundRect(cx-unit*.48,base-unit*1.25,unit*.96,unit*1.35,unit*.22,col);
+  // waist detail
+  roundRect(cx-unit*.42,base+unit*.02,unit*.84,unit*.14,unit*.05,shade(col,.72));
+  // arms
+  ctx.save();ctx.translate(cx-unit*.48,base-unit*1.05);ctx.rotate(-.18+walk*.7);
+  roundRect(-unit*.11,0,unit*.22,unit*.95,unit*.11,col);ellipse(0,unit*.98,unit*.13,unit*.13,C.skin);ctx.restore();
+  ctx.save();ctx.translate(cx+unit*.48,base-unit*1.05);ctx.rotate(.18-walk*.7);
+  roundRect(-unit*.11,0,unit*.22,unit*.95,unit*.11,col);ellipse(0,unit*.98,unit*.13,unit*.13,C.skin);ctx.restore();
+  // neck
+  roundRect(cx-unit*.14,base-unit*1.42,unit*.28,unit*.24,unit*.07,C.skin);
+  // head + ears
+  const hr=unit*.48*head;
+  ellipse(cx,base-unit*1.78,hr,hr*1.08,C.skin);
+  ellipse(cx-hr*.96,base-unit*1.76,hr*.13,hr*.20,C.skin);
+  ellipse(cx+hr*.96,base-unit*1.76,hr*.13,hr*.20,C.skin);
+  // hair cap
+  ctx.beginPath();ctx.arc(cx,base-unit*1.84,hr*1.03,Math.PI,Math.PI*2);ctx.lineTo(cx+hr,base-unit*1.73);
+  ctx.quadraticCurveTo(cx+hr*.55,base-unit*1.55,cx,base-unit*1.62);
+  ctx.quadraticCurveTo(cx-hr*.55,base-unit*1.55,cx-hr,base-unit*1.73);ctx.closePath();ctx.fillStyle=player.hair;ctx.fill();
+  // face
+  ellipse(cx-hr*.32,base-unit*1.78,unit*.055,unit*.07,C.dark);
+  ellipse(cx+hr*.32,base-unit*1.78,unit*.055,unit*.07,C.dark);
+  ctx.strokeStyle=shade(C.skin,.62);ctx.lineWidth=Math.max(1,unit*.035);
+  ctx.beginPath();ctx.arc(cx,base-unit*1.66,unit*.15,.15*Math.PI,.85*Math.PI);ctx.stroke();
+};
