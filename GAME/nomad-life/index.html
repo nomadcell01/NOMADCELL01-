@@ -36,6 +36,24 @@
     </div>
     <div class="buildView"><button id="plan2dBtn" class="active">📐 Plan 2D</button><button id="view3dBtn">🏠 Vue 3D</button></div>
     <div class="buildHint" id="buildHint">En Plan 2D : trace tes murs, place les portes et fenêtres. Puis passe en Vue 3D pour entrer dans ton habitat.</div>
+    <div class="surfaceBox">
+      <b>🎨 Personnaliser</b>
+      <small>Une même structure peut avoir énormément de matières, couleurs, textures et effets.</small>
+      <div class="surfaceTitle">Matières</div>
+      <div class="surfaceChoices">
+        <button data-material="wood">🪵 Bois</button><button data-material="wood2">🎋 Bambou</button><button data-material="glass">🪟 Verre</button><button data-material="steel">⚙️ Acier</button><button data-material="metal">▤ Tôle</button><button data-material="plastic">◻️ Plastique</button><button data-material="stone">🪨 Pierre</button><button data-material="earth">🌍 Terre</button><button data-material="vegetation">🌿 Végétal</button><button data-material="fabric">🧵 Tissu</button><button data-material="concrete">⬜ Béton</button><button data-material="neon">💡 Néon</button>
+      </div>
+      <div class="surfaceTitle">Finitions & textures</div>
+      <div class="surfaceChoices">
+        <button data-finish="raw">Brut</button><button data-finish="paint">🎨 Peinture</button><button data-finish="wallpaper">🧩 Papier peint</button><button data-finish="plaster">Enduit</button><button data-finish="varnish">Vernis</button><button data-finish="matte">Mat</button><button data-finish="satin">Satiné</button><button data-finish="polished">✨ Poli</button><button data-finish="rough">Rugueux</button><button data-finish="translucent">Translucide</button>
+      </div>
+      <div class="surfaceTitle">Effets</div>
+      <div class="surfaceChoices">
+        <button data-effect="none">Sans effet</button><button data-effect="backlit">◉ Rétroéclairé</button><button data-effect="led">💡 LED</button><button data-effect="glow">✨ Lumineux</button><button data-effect="mirror">🪞 Miroir</button><button data-effect="frosted">❄️ Dépoli</button>
+      </div>
+      <div class="surfaceTitle">Couleurs</div>
+      <div class="colorChoices"><button data-color="#ffffff" style="background:#ffffff" aria-label="Couleur"></button><button data-color="#111827" style="background:#111827" aria-label="Couleur"></button><button data-color="#d94848" style="background:#d94848" aria-label="Couleur"></button><button data-color="#e58b38" style="background:#e58b38" aria-label="Couleur"></button><button data-color="#e8c547" style="background:#e8c547" aria-label="Couleur"></button><button data-color="#6da95b" style="background:#6da95b" aria-label="Couleur"></button><button data-color="#4c9a78" style="background:#4c9a78" aria-label="Couleur"></button><button data-color="#4b87c5" style="background:#4b87c5" aria-label="Couleur"></button><button data-color="#6554c0" style="background:#6554c0" aria-label="Couleur"></button><button data-color="#a85aa7" style="background:#a85aa7" aria-label="Couleur"></button><button data-color="#d97b9a" style="background:#d97b9a" aria-label="Couleur"></button><button data-color="#9b7655" style="background:#9b7655" aria-label="Couleur"></button><button data-color="#8d8d8d" style="background:#8d8d8d" aria-label="Couleur"></button><button data-color="#d6d0c5" style="background:#d6d0c5" aria-label="Couleur"></button></div>
+    </div>
     <div class="quickSizes"><button data-size="3">3 m</button><button data-size="4">4 m</button><button data-size="6">6 m</button><button data-size="8">8 m</button></div>
     <div id="advancedToggle">⚙️ Édition avancée <span>›</span></div>
     <div id="advanced" class="advanced">
@@ -56,7 +74,7 @@
     <div class="catalog"><button data-item="chair" data-price="5">🪑<b>Chaise</b><small>N$ 5</small></button><button data-item="table" data-price="10">▱<b>Table</b><small>N$ 10</small></button><button data-item="sofa" data-price="100">🛋️<b>Canapé</b><small>N$ 100</small></button><button data-item="sink" data-price="150">🚰<b>Évier</b><small>N$ 150</small></button><button data-item="shower" data-price="200">🚿<b>Douche</b><small>N$ 200</small></button><button data-item="tv" data-price="250">📺<b>TV</b><small>N$ 250</small></button></div>
   </section>
 </div>
-<script src="nomad-engine.js?v=30"></script>
+<script src="nomad-engine.js?v=31"></script>
 <script>
 // Démarrage de secours : la présentation ne doit jamais rester bloquée sur « préparation ».
 (function(){
