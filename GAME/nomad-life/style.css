@@ -3,3 +3,5 @@
 .avatarForm{display:flex;flex-direction:column;gap:14px;padding:16px}.avatarForm label{display:flex;flex-direction:column;gap:6px;font-size:13px}.avatarForm input{padding:12px 14px;border-radius:12px;border:1px solid #ffffff33;background:#ffffff12;color:inherit;font-size:16px}.avatarChoices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.avatarChoices button{padding:12px;border:1px solid #ffffff22;border-radius:12px;background:#ffffff12;color:inherit}.avatarChoices button:active{transform:scale(.97)}
 /* NOMAD Life v9 — avatar presentation */
 #simInfo{backdrop-filter:blur(6px);background:#17252b66;padding:7px 10px;border-radius:14px}
+
+.buildView{display:flex;gap:6px;margin:4px 0 9px}.buildView button{flex:1;background:#ffffff12;color:#fff;font-size:11px}.buildView button.active{background:#fff;color:#17252b}
