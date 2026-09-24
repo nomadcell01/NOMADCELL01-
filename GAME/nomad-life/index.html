@@ -57,33 +57,15 @@
 </div>
 <script src="nomad-engine.js?v=21"></script>
 <script>
-// Rendu visuel de secours : le monde doit toujours être visible, même si le moteur principal échoue.
+// Rendu visuel de secours : quartier lisible, tous les bâtiments ancrés au sol.
 (function(){
-  const c=document.getElementById('world'),x=c.getContext('2d'); let raf;
-  function fit(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';x.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
-  function draw(){const W=innerWidth,H=innerHeight,t=performance.now()/1000;x.clearRect(0,0,W,H);
-    const sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#8fc8df');sky.addColorStop(.58,'#cce8dc');sky.addColorStop(.581,'#6f9f68');sky.addColorStop(1,'#507d55');x.fillStyle=sky;x.fillRect(0,0,W,H);
-    // sol / quartier
-    x.fillStyle='#7eaa72';x.beginPath();x.moveTo(0,H*.58);x.lineTo(W,H*.48);x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();
-    x.fillStyle='#666b69';x.beginPath();x.moveTo(W*.42,H*.52);x.lineTo(W*.58,H*.52);x.lineTo(W*.86,H);x.lineTo(W*.14,H);x.closePath();x.fill();
-    x.fillStyle='#d5d0c2';x.fillRect(W*.48,H*.55,W*.04,H*.45);
-    function house(cx,cy,s,wall){x.fillStyle=wall;x.beginPath();x.moveTo(cx-s*.5,cy);x.lineTo(cx+s*.5,cy);x.lineTo(cx+s*.42,cy+s*.42);x.lineTo(cx-s*.42,cy+s*.42);x.closePath();x.fill();x.fillStyle='#80574c';x.beginPath();x.moveTo(cx-s*.58,cy);x.lineTo(cx,cy-s*.38);x.lineTo(cx+s*.58,cy);x.closePath();x.fill();x.fillStyle='#74b5c0';x.fillRect(cx-s*.30,cy+s*.10,s*.18,s*.16);x.fillRect(cx+s*.12,cy+s*.10,s*.18,s*.16);x.fillStyle='#946846';x.fillRect(cx-s*.06,cy+s*.18,s*.12,s*.24)}
-    house(W*.20,H*.48,120,'#d7e1d9');house(W*.80,H*.50,130,'#e5ceb9');house(W*.50,H*.34,145,'#d1dce1');
-    function tree(cx,cy,s){x.fillStyle='#6b5039';x.fillRect(cx-s*.06,cy,s*.12,s*.45);x.fillStyle='#4f8d58';x.beginPath();x.arc(cx,cy,s*.25,0,7);x.fill();x.fillStyle='#6da666';x.beginPath();x.arc(cx-s*.12,cy-s*.08,s*.20,0,7);x.fill();x.beginPath();x.arc(cx+s*.12,cy-s*.08,s*.20,0,7);x.fill()}
-    tree(W*.10,H*.55,80);tree(W*.90,H*.56,85);tree(W*.30,H*.43,55);tree(W*.70,H*.42,60);
-    // Nomade central, grand et immédiatement identifiable
-    const cx=W*.5, by=H*.68+Math.sin(t*2)*2, sc=Math.max(1,Math.min(W/420,1.7));
-    x.fillStyle='#0004';x.beginPath();x.ellipse(cx,by+6,34*sc,10*sc,0,0,7);x.fill();
-    x.fillStyle='#263239';x.fillRect(cx-13*sc,by-72*sc,10*sc,70*sc);x.fillRect(cx+3*sc,by-72*sc,10*sc,70*sc);
-    x.fillStyle='#567f91';x.beginPath();x.roundRect(cx-30*sc,by-125*sc,60*sc,65*sc,14*sc);x.fill();
-    x.fillStyle='#e3b28e';x.fillRect(cx-5*sc,by-135*sc,10*sc,14*sc);x.beginPath();x.arc(cx,by-164*sc,28*sc,0,7);x.fill();
-    x.fillStyle='#3b2d28';x.beginPath();x.arc(cx,by-171*sc,28*sc,Math.PI,7);x.fill();
-    x.fillStyle='#263239';x.beginPath();x.arc(cx-9*sc,by-166*sc,2.5*sc,0,7);x.arc(cx+9*sc,by-166*sc,2.5*sc,0,7);x.fill();
-    x.fillStyle='#fff';x.font='700 14px system-ui';x.textAlign='center';x.fillText('Mon Nomade',cx,by-205*sc);
-    x.fillStyle='#ffffffcc';x.beginPath();x.roundRect(cx-62*sc,by+20,124*sc,30,15);x.fill();x.fillStyle='#17353d';x.font='600 12px system-ui';x.fillText('🏠 Ton terrain NOMAD',cx,by+40);
-    raf=requestAnimationFrame(draw);
-  }
-  addEventListener('resize',fit);fit();draw();
+const c=document.getElementById('world'),x=c.getContext('2d');
+function fit(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';x.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+function house(cx,base,w,h,wall,roof){x.fillStyle='rgba(0,0,0,.15)';x.beginPath();x.ellipse(cx,base+7,w*.45,9,0,0,7);x.fill();x.fillStyle=wall;x.beginPath();x.moveTo(cx-w/2,base);x.lineTo(cx+w/2,base);x.lineTo(cx+w*.42,base-h);x.lineTo(cx-w*.42,base-h);x.closePath();x.fill();x.fillStyle=roof;x.beginPath();x.moveTo(cx-w*.58,base-h);x.lineTo(cx,base-h-h*.42);x.lineTo(cx+w*.58,base-h);x.closePath();x.fill();x.fillStyle='#78b9c2';x.fillRect(cx-w*.30,base-h*.58,w*.17,h*.22);x.fillRect(cx+w*.13,base-h*.58,w*.17,h*.22);x.fillStyle='#8b6547';x.fillRect(cx-w*.055,base-h*.42,w*.11,h*.42)}
+function tree(cx,base,s){x.fillStyle='#6a4e38';x.fillRect(cx-s*.055,base-s*.52,s*.11,s*.52);x.fillStyle='#4e8c57';x.beginPath();x.arc(cx,base-s*.68,s*.25,0,7);x.fill();x.fillStyle='#6aa264';x.beginPath();x.arc(cx-s*.13,base-s*.77,s*.19,0,7);x.arc(cx+s*.13,base-s*.77,s*.19,0,7);x.fill()}
+function avatar(cx,base,sc,t){const bob=Math.sin(t*2)*2;x.fillStyle='rgba(0,0,0,.2)';x.beginPath();x.ellipse(cx,base+5,30*sc,9*sc,0,0,7);x.fill();x.fillStyle='#263239';x.fillRect(cx-11*sc,base-67*sc+bob,9*sc,67*sc);x.fillRect(cx+2*sc,base-67*sc+bob,9*sc,67*sc);x.fillStyle='#567f91';x.beginPath();x.roundRect(cx-27*sc,base-120*sc+bob,54*sc,59*sc,13*sc);x.fill();x.fillStyle='#e3b28e';x.beginPath();x.arc(cx,base-157*sc+bob,26*sc,0,7);x.fill();x.fillStyle='#3b2d28';x.beginPath();x.arc(cx,base-164*sc+bob,26*sc,Math.PI,7);x.fill();x.fillStyle='#263239';x.beginPath();x.arc(cx-8*sc,base-159*sc+bob,2.4*sc,0,7);x.arc(cx+8*sc,base-159*sc+bob,2.4*sc,0,7);x.fill()}
+function draw(){const W=innerWidth,H=innerHeight,t=performance.now()/1000;x.clearRect(0,0,W,H);const sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#8fc8df');sky.addColorStop(.55,'#d7eadf');sky.addColorStop(.551,'#7eaa72');sky.addColorStop(1,'#5c875d');x.fillStyle=sky;x.fillRect(0,0,W,H);x.fillStyle='#708f67';x.fillRect(0,H*.55,W,H*.45);x.fillStyle='#646a68';x.beginPath();x.moveTo(W*.40,H*.55);x.lineTo(W*.60,H*.55);x.lineTo(W*.88,H);x.lineTo(W*.12,H);x.closePath();x.fill();x.fillStyle='#d5d0c2';x.beginPath();x.moveTo(W*.47,H*.55);x.lineTo(W*.53,H*.55);x.lineTo(W*.60,H);x.lineTo(W*.40,H);x.closePath();x.fill();house(W*.18,H*.60,100,70,'#d9e2dc','#8b6254');house(W*.82,H*.60,110,76,'#e6cfba','#87604f');tree(W*.08,H*.64,68);tree(W*.92,H*.64,72);tree(W*.29,H*.64,50);tree(W*.71,H*.64,53);house(W*.50,H*.69,205,132,'#d8e3dd','#7e584d');x.fillStyle='#b59a76';x.fillRect(W*.46,H*.69,W*.08,32);x.fillStyle='#7f9f69';x.beginPath();x.ellipse(W*.36,H*.75,48,14,0,0,7);x.fill();x.beginPath();x.ellipse(W*.64,H*.75,48,14,0,0,7);x.fill();const sc=Math.max(1,Math.min(W/430,1.55));avatar(W*.50,H*.88,sc,t);x.fillStyle='#fff';x.font='700 15px system-ui';x.textAlign='center';x.fillText('Mon Nomade',W*.50,H*.88-165*sc);x.fillStyle='#ffffffdd';x.beginPath();x.roundRect(W*.50-78,H*.88+18,156,30,15);x.fill();x.fillStyle='#17353d';x.font='600 12px system-ui';x.fillText('🏠 Ton terrain NOMAD',W*.50,H*.88+38);requestAnimationFrame(draw)}
+addEventListener('resize',fit);fit();draw();
 })();
 </script>
 <script>
