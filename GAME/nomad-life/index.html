@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NOMAD — Les Sims version NOMAD</title>
-<link rel="stylesheet" href="style.css?v=20260924-3">
+<link rel="stylesheet" href="style.css?v=20260924-4">
 </head>
 <body>
 <div id="loading">NOMAD — préparation du quartier…</div>
@@ -35,6 +35,29 @@
     <div class="buildNotice">Terrain et structure de base : <b>GRATUITS</b> · Équipements payants dans le mode Vie.</div>
   </section>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
-<script src="game.js?v=20260924-3"></script>
+<script>
+(function(){
+  var sources=[
+    "https://unpkg.com/three@0.180.0/build/three.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/three.js/r180/three.min.js",
+    "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"
+  ];
+  function load(i){
+    if(i>=sources.length){
+      document.getElementById("loading").textContent="NOMAD — impossible de charger le moteur 3D. Vérifie la connexion puis recharge la page.";
+      return;
+    }
+    var s=document.createElement("script");
+    s.src=sources[i];
+    s.onload=function(){
+      var g=document.createElement("script");
+      g.src="game.js?v=20260924-4";
+      document.body.appendChild(g);
+    };
+    s.onerror=function(){load(i+1)};
+    document.head.appendChild(s);
+  }
+  load(0);
+})();
+</script>
 </body></html>
