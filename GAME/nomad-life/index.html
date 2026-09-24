@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NOMAD — Les Sims version NOMAD</title>
-<link rel="stylesheet" href="style.css?v=20260924-2">
+<link rel="stylesheet" href="style.css?v=20260924-3">
 </head>
 <body>
 <div id="loading">NOMAD — préparation du quartier…</div>
@@ -13,7 +13,28 @@
   <div id="prompt">Bienvenue dans ton quartier NOMAD.</div>
   <div id="actions"><button id="work">💼 Travail</button><button id="home">🏠 Maison</button><button id="buy">🛋️ Construire</button></div>
   <div id="touch"><button data-key="ArrowUp">▲</button><button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button></div>
+  <section id="buildPanel" aria-label="Éditeur de construction NOMAD">
+    <div class="buildHead"><strong>🏗️ CONSTRUCTION NOMAD</strong><button id="closeBuild">✕</button></div>
+    <div class="buildTabs">
+      <button class="buildTool active" data-tool="wall">🧱 Mur</button>
+      <button class="buildTool" data-tool="window">🪟 Fenêtre</button>
+      <button class="buildTool" data-tool="door">🚪 Porte</button>
+      <button class="buildTool" data-tool="floor">⬜ Sol</button>
+      <button class="buildTool" data-tool="roof">🏠 Toit</button>
+    </div>
+    <div class="buildHelp">Touchez le terrain pour placer. Sélectionnez ensuite l'élément pour le redimensionner.</div>
+    <div class="buildControls">
+      <label>Largeur <input id="dimW" type="range" min=".5" max="12" step=".1" value="4"><output id="dimWOut">4.0 m</output></label>
+      <label>Hauteur <input id="dimH" type="range" min=".1" max="5" step=".1" value="2.6"><output id="dimHOut">2.6 m</output></label>
+      <label>Épaisseur <input id="dimD" type="range" min=".05" max="1" step=".05" value=".2"><output id="dimDOut">0.20 m</output></label>
+      <label>Rotation <input id="dimR" type="range" min="-180" max="180" step="1" value="0"><output id="dimROut">0°</output></label>
+    </div>
+    <div class="buildActions">
+      <button id="duplicateBuild">Dupliquer</button><button id="deleteBuild" class="danger">Supprimer</button>
+    </div>
+    <div class="buildNotice">Terrain et structure de base : <b>GRATUITS</b> · Équipements payants dans le mode Vie.</div>
+  </section>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
-<script src="game.js?v=20260924-2"></script>
+<script src="game.js?v=20260924-3"></script>
 </body></html>
