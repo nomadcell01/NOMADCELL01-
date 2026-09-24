@@ -34,7 +34,8 @@
     <div class="buildTabs">
       <button class="buildTool active" data-tool="room">▣ Pièce</button><button class="buildTool" data-tool="wall">🧱 Mur</button><button class="buildTool" data-tool="door">🚪 Porte</button><button class="buildTool" data-tool="window">🪟 Fenêtre</button><button class="buildTool" data-tool="floor">⬜ Sol</button><button class="buildTool" data-tool="roof">⌂ Toit</button>
     </div>
-    <div class="buildHint">Choisis un élément puis touche le terrain. Pour une pièce, touche deux fois pour définir son rectangle.</div>
+    <div class="buildView"><button id="plan2dBtn" class="active">📐 Plan 2D</button><button id="view3dBtn">🏠 Vue 3D</button></div>
+    <div class="buildHint" id="buildHint">En Plan 2D : trace tes murs, place les portes et fenêtres. Puis passe en Vue 3D pour entrer dans ton habitat.</div>
     <div class="quickSizes"><button data-size="3">3 m</button><button data-size="4">4 m</button><button data-size="6">6 m</button><button data-size="8">8 m</button></div>
     <div id="advancedToggle">⚙️ Édition avancée <span>›</span></div>
     <div id="advanced" class="advanced">
@@ -55,7 +56,7 @@
     <div class="catalog"><button data-item="chair" data-price="5">🪑<b>Chaise</b><small>N$ 5</small></button><button data-item="table" data-price="10">▱<b>Table</b><small>N$ 10</small></button><button data-item="sofa" data-price="100">🛋️<b>Canapé</b><small>N$ 100</small></button><button data-item="sink" data-price="150">🚰<b>Évier</b><small>N$ 150</small></button><button data-item="shower" data-price="200">🚿<b>Douche</b><small>N$ 200</small></button><button data-item="tv" data-price="250">📺<b>TV</b><small>N$ 250</small></button></div>
   </section>
 </div>
-<script src="nomad-engine.js?v=24"></script>
+<script src="nomad-engine.js?v=25"></script>
 <script>
 // Démarrage de secours : la présentation ne doit jamais rester bloquée sur « préparation ».
 (function(){
