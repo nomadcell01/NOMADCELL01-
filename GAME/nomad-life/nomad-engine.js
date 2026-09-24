@@ -45,7 +45,7 @@ function person(x,z,col=C.shirt){
 }
 function humanoid(x,z){box(x,z,.78,1.25,.5,'#e1e6e1');box(x,z,.62,.68,.62,'#e1e6e1');limb(x-.25,z,.95,.14,'#e1e6e1',-.1);limb(x+.25,z,.95,.14,'#e1e6e1',.1);limb(x-.2,z,.95,.16,C.dark,.03);limb(x+.2,z,.95,.16,C.dark,-.03);box(x,z-.02,.7,.12,.65,C.dark)}
 function world(){ground();if(worldKey==='BEACH'){house(-18,18,C.house[0]);house(18,18,C.house[1]);house(0,32,C.house[2]);for(let x=-35;x<=35;x+=10)tree(x,42)}else if(worldKey==='MER'){box(-12,15,12,.5,8,'#c7d1c5');box(12,15,12,.5,8,'#c7d1c5');box(0,34,18,.5,12,'#d7d2c5');}else if(worldKey==='MONTAGNE'){house(-18,20,C.house[2]);house(18,26,C.house[3]);for(let x=-40;x<=40;x+=12)box(x,45,7,5,7,'#d8dce0')}else if(worldKey==='LUNE'||worldKey==='MARS'||worldKey==='ESPACE'){box(-14,22,10,4.5,8,'#c7c8c2');box(14,28,12,5,9,'#d7d2c5');box(0,42,8,3,8,'#aeb4b7')}else if(worldKey==='HUB'){box(-18,22,12,5,10,'#d7d2c5');box(18,22,12,5,10,'#d7d2c5');box(0,42,18,4,18,'#c8d6d0')}else{house(-18,22,C.house[0]);house(18,22,C.house[1]);house(-18,48,C.house[2]);house(18,48,C.house[3]);}for(let z=-35;z<=65;z+=10){if(worldKey==='TERRE'||worldKey==='BEACH'||worldKey==='HUB'){tree(-12,z+(z%20?2:-2));tree(12,z+(z%20?-2:2))}}person(-3,10,'#9a6657');person(4,18,'#6d8a62');person(-4,32,'#806b9a');person(3,42,'#a77a4f');humanoid(1.35,-2.4)}
-function dims(k){return k==='room'?[4,2.6,4]:k==='wall'?[4,2.6,.2]:k==='door'?[1,2.2,.18]:k==='window'?[2,1.5,.16]:k==='floor'?[4,.12,4]:[4,.18,4]}function color(k){return{room:C.wall,wall:C.wall,door:C.wood,window:C.glass,floor:C.floor,roof:C.roof}[k]}
+function dims(k){return k==='room'?[4,2.6,4]:k==='wall'?[4,2.6,.2]:k==='door'?[1,2.2,.18]:k==='window'?[2,1.5,.16]:k==='floor'?[4,.12,4]:[4,.18,4]}function color(k){return{room:C.wall,wall:C.wall,door:C.wood,window:C.glass,floor:C.floor,roof:C.roof}[k]}function wallSegment(a,b){const dx=b.x-a.x,dz=b.z-a.z,len=Math.max(1,Math.hypot(dx,dz));return{x:(a.x+b.x)/2,z:(a.z+b.z)/2,w:len,h:2.6,d:.2,rot:Math.atan2(dz,dx),tool:'wall',color:C.wall}}function nearestWall(p){let best=null,bd=1e9;for(const o of objects){if(o.tool!=='wall')continue;const ux=Math.cos(o.rot),uz=Math.sin(o.rot),vx=p.x-o.x,vz=p.z-o.z;const q=Math.max(-o.w/2,Math.min(o.w/2,vx*ux+vz*uz));const px=o.x+q*ux,pz=o.z+q*uz;const d=Math.hypot(p.x-px,p.z-pz);if(d<bd){bd=d;best={o,px,pz,q}}}return bd<1.8?best:null}
 function pointerGround(e){const r=canvas.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top;const q=(H*.52-sy)/(cam.zoom*.24),p=(sx-W/2)/(cam.zoom*.5),c=Math.cos(cam.rot),s=Math.sin(cam.rot),x=(p+q)/2,z=(q-p)/2;return{x:cam.x+x*c+z*s,z:cam.z-x*s+z*c}}
 function sync(){if(!selected)return;$('dimW').value=selected.w;$('dimH').value=selected.h;$('dimD').value=selected.d;$('dimR').value=Math.round(selected.rot*180/Math.PI)}
 function applyAdvanced(){if(!selected)return;selected.w=Math.max(.1,+$('dimW').value||1);selected.h=Math.max(.1,+$('dimH').value||1);selected.d=Math.max(.1,+$('dimD').value||1);selected.rot=(+$('dimR').value||0)*Math.PI/180;prompt.textContent='Dimensions appliquées.'}
@@ -59,7 +59,7 @@ function formatMoney(v){return 'N$ '+Math.floor(v).toLocaleString('fr-FR')}
 $('workBtn').onclick=()=>{working=!working;$('workBtn').textContent=working?'⏹️ Finir le travail':'💼 Travail';prompt.textContent=working?'Travail commencé. Tes revenus s’accumulent pendant ta journée.':'Journée de travail terminée. Tes gains restent acquis.'};
 $('buildBtn').onclick=openBuild;$('closeBuild').onclick=closeBuild;$('worldBtn').onclick=()=>$('worldPanel').classList.add('open');$('closeWorld').onclick=()=>$('worldPanel').classList.remove('open');$('buyBtn').onclick=()=>$('buyPanel').classList.add('open');$('closeBuy').onclick=()=>$('buyPanel').classList.remove('open');$('simBtn').onclick=()=>{$('avatarPanel').classList.add('open')};$('closeAvatar').onclick=()=>{$('avatarPanel').classList.remove('open')};document.querySelectorAll('[data-shirt]').forEach(b=>b.onclick=()=>{player.shirt=b.dataset.shirt;prompt.textContent='Tenue choisie. Tu peux valider ton avatar.'});document.querySelectorAll('[data-body]').forEach(b=>b.onclick=()=>{player.body=+b.dataset.body;prompt.textContent='Morphologie choisie.'});document.querySelectorAll('[data-face]').forEach(b=>b.onclick=()=>{player.face=+b.dataset.face;prompt.textContent='Visage choisi.'});$('saveAvatar').onclick=()=>{player.name=($('avatarName').value||'Mon Nomade').trim();$('simName').textContent=player.name;$('avatarPanel').classList.remove('open');prompt.textContent='Avatar enregistré. Maintenant, vis ta vie NOMAD.'};
 document.querySelectorAll('[data-world]').forEach(b=>b.onclick=()=>{setWorld(b.dataset.world);$('worldPanel').classList.remove('open');prompt.textContent='🌍 '+b.textContent.replace(/\s+/g,' ').trim()+' chargé. Bienvenue dans ce monde NOMAD.';});
-document.querySelectorAll('.buildTool').forEach(b=>b.onclick=()=>{document.querySelectorAll('.buildTool').forEach(x=>x.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool;selected=null;ghost=null;roomStart=null;prompt.textContent=tool==='room'?'Touche un premier coin puis un deuxième pour ancrer la pièce.':'Touche le terrain pour poser '+b.textContent.trim()+' — une fois posé, il reste ancré.'});
+document.querySelectorAll('.buildTool').forEach(b=>b.onclick=()=>{document.querySelectorAll('.buildTool').forEach(x=>x.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool;selected=null;ghost=null;roomStart=null;prompt.textContent=tool==='room'?'Dessine le contour : A → B → C → D… puis reviens sur A pour fermer.':tool==='wall'?'Pose le départ puis le point d’arrivée du mur.':tool==='door'||tool==='window'?'Touche un mur pour y accrocher '+(tool==='door'?'la porte.':'la fenêtre.'):'Touche le terrain pour poser '+b.textContent.trim()+'.'});
 document.querySelectorAll('.quickSizes button').forEach(b=>b.onclick=()=>{const v=+b.dataset.size;$('dimW').value=v;$('dimH').value=2.6;$('dimD').value=tool==='floor'||tool==='room'?v:.2;if(selected)applyAdvanced();prompt.textContent='Taille '+v+' m sélectionnée.'});
 $('advancedToggle').onclick=()=>{$('advanced').classList.toggle('open');$('advancedToggle').classList.toggle('open')};$('applyAdvanced').onclick=applyAdvanced;
 $('deleteBuild').onclick=()=>{if(selected){objects.splice(objects.indexOf(selected),1);selected=null;prompt.textContent='Objet supprimé.'}};$('duplicateBuild').onclick=()=>{if(selected){selected={...selected,x:selected.x+1};objects.push(selected);sync();prompt.textContent='Objet dupliqué.'}};
@@ -73,27 +73,36 @@ if(gesture?.type==='one'){const dx=e.clientX-gesture.start.x,dy=e.clientY-gestur
 canvas.addEventListener('pointerup',e=>{if(!started)return;pointers.delete(e.pointerId);if(pointers.size){if(pointers.size===1)gesture=null;return}const g=gesture;gesture=null;if(!g||g.type!=='one'||g.moved)return;const p=pointerGround(e);
 if(buildMode){
   if(selected){
-    selected.x=p.x;selected.z=p.z;
-    const placed=selected; selected=null; sync();
-    prompt.textContent='Élément déplacé. Touche le sol pour le placer ailleurs, ou sélectionne un autre élément.';
+    selected.x=p.x;selected.z=p.z;selected=null;sync();
+    prompt.textContent='Élément déplacé puis ancré ✓.';
     return;
   }
   if(tool==='room'){
     if(!roomStart){
-      roomStart=p;
-      ghost={x:p.x,z:p.z,w:1,h:2.6,d:1};
-      prompt.textContent='Premier coin posé. Touche le deuxième coin pour ancrer la pièce.';
+      roomStart=[p]; ghost={poly:roomStart};
+      prompt.textContent='Point A posé. Continue le contour : B, C, D…';
     }else{
-      const w=Math.max(1,Math.abs(p.x-roomStart.x)),d=Math.max(1,Math.abs(p.z-roomStart.z));
-      const obj={tool:'room',x:(p.x+roomStart.x)/2,z:(p.z+roomStart.z)/2,w,h:2.6,d,color:C.wall,rot:0};
-      objects.push(obj); roomStart=null; ghost=null; selected=null; sync();
-      prompt.textContent='Pièce ancrée ✓. Elle ne bougera plus. Touche-la seulement si tu veux la déplacer.';
+      const pts=roomStart, first=pts[0];
+      if(pts.length>=3 && Math.hypot(p.x-first.x,p.z-first.z)<1.2){
+        const walls=[]; for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length];walls.push(wallSegment(a,b))}
+        const xs=pts.map(q=>q.x),zs=pts.map(q=>q.z);
+        const obj={tool:'room',x:(Math.min(...xs)+Math.max(...xs))/2,z:(Math.min(...zs)+Math.max(...zs))/2,w:Math.max(...xs)-Math.min(...xs),h:2.6,d:Math.max(...zs)-Math.min(...zs),color:C.wall,rot:0,walls};
+        objects.push(obj);roomStart=null;ghost=null;selected=null;sync();
+        prompt.textContent='Maison ancrée ✓. Ajoute portes et fenêtres sur les murs.';
+      }else{
+        pts.push(p);ghost={poly:pts};
+        prompt.textContent='Point '+String.fromCharCode(65+pts.length-1)+' posé. Retourne au point A pour fermer la pièce.';
+      }
     }
+  }else if(tool==='wall'){
+    if(!roomStart){roomStart=[p];ghost={a:p,b:p};prompt.textContent='Départ du mur posé. Touche le point d’arrivée.'}
+    else{const a=roomStart[0],g=wallSegment(a,p);objects.push(g);roomStart=null;ghost=null;selected=null;sync();prompt.textContent='Mur ancré ✓. Touche le terrain pour tracer le suivant.'}
+  }else if(tool==='door'||tool==='window'){
+    const n=nearestWall(p);
+    if(n){const d=dims(tool);const o=n.o;const offset=Math.max(-o.w/2+d[0]/2,Math.min(o.w/2-d[0]/2,n.q));const ux=Math.cos(o.rot),uz=Math.sin(o.rot);objects.push({tool,x:o.x+offset*ux,z:o.z+offset*uz,w:d[0],h:d[1],d:d[2],color:color(tool),rot:o.rot});sync();prompt.textContent=(tool==='door'?'Porte':'Fenêtre')+' accrochée au mur ✓. Tu peux en ajouter une autre.'}
+    else prompt.textContent='Touche directement un mur pour y accrocher '+(tool==='door'?'la porte.':'la fenêtre.');
   }else{
-    const d=dims(tool);
-    const obj={tool,x:Math.round(p.x*2)/2,z:Math.round(p.z*2)/2,w:d[0],h:d[1],d:d[2],color:color(tool),rot:0};
-    objects.push(obj); selected=null; ghost=null; sync();
-    prompt.textContent='Élément ancré ✓. Pour en poser un autre, touche simplement le terrain.';
+    const d=dims(tool);objects.push({tool,x:Math.round(p.x*2)/2,z:Math.round(p.z*2)/2,w:d[0],h:d[1],d:d[2],color:color(tool),rot:0});selected=null;ghost=null;sync();prompt.textContent='Élément ancré ✓. Touche le terrain pour en poser un autre.';
   }
 }else{player.tx=p.x;player.tz=p.z;player.rot=Math.atan2(p.x-player.x,p.z-player.z);prompt.textContent='Ton Nomade se déplace vers cet endroit.'}});
 canvas.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);gesture=null});
@@ -110,5 +119,5 @@ canvas.addEventListener('click',e=>{
 
 document.addEventListener('contextmenu',e=>{if(e.target===canvas)e.preventDefault()});
 function loop(){requestAnimationFrame(loop);t+=.016;clock+=.0008;try{player.x+=(player.tx-player.x)*.08;player.z+=(player.tz-player.z)*.08;if(working && Math.floor(clock)!==Math.floor(lastPayClock)){money+=500;lastPayClock=clock;moneyEl.textContent=formatMoney(money);prompt.textContent='💼 Travail : +N$ 500. Tes économies grandissent.'}
-clockEl.textContent=String(Math.floor(clock)%24).padStart(2,'0')+':'+String(Math.floor(clock*60)%60).padStart(2,'0');world();objects.slice().sort((a,b)=>(a.x+a.z)-(b.x+b.z)).forEach(o=>box(o.x,o.z,o.w,o.h,o.d,o.color,o.rot));if(buildMode&&ghost){const d=dims(tool);box(ghost.x,ghost.z,d[0],d[1],d[2],color(tool))}person(player.x,player.z,player.shirt)}catch(err){showEngineError(err)}}
+clockEl.textContent=String(Math.floor(clock)%24).padStart(2,'0')+':'+String(Math.floor(clock*60)%60).padStart(2,'0');world();objects.slice().sort((a,b)=>(a.x+a.z)-(b.x+b.z)).forEach(o=>{if(o.tool==='room'&&o.walls){o.walls.forEach(w=>box(w.x,w.z,w.w,w.h,w.d,w.color,w.rot));box(o.x,o.z,o.w,.12,o.d,C.floor,o.rot)}else{box(o.x,o.z,o.w,o.h,o.d,o.color,o.rot)}});if(buildMode&&ghost){if(tool==='wall'&&ghost.a&&ghost.b){const g=wallSegment(ghost.a,ghost.b);box(g.x,g.z,g.w,g.h,g.d,g.color,g.rot)}else{const d=dims(tool);box(ghost.x,ghost.z,d[0],d[1],d[2],color(tool))}}person(player.x,player.z,player.shirt)}catch(err){showEngineError(err)}}
 loop();})();
