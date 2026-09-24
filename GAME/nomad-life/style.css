@@ -5,3 +5,21 @@
 #simInfo{backdrop-filter:blur(6px);background:#17252b66;padding:7px 10px;border-radius:14px}
 
 .buildView{display:flex;gap:6px;margin:4px 0 9px}.buildView button{flex:1;background:#ffffff12;color:#fff;font-size:11px}.buildView button.active{background:#fff;color:#17252b}
+
+/* NOMAD Life v32 — lecture carte / construction */
+#mapMini{position:absolute;z-index:4;left:10px;bottom:86px;width:150px;height:92px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#77aa69,#8fbe78);border:2px solid #ffffffd9;box-shadow:0 5px 18px #0004;opacity:.96}
+#mapMini:before{content:"";position:absolute;inset:0;background:linear-gradient(25deg,transparent 46%,#696d6a 47%,#696d6a 53%,transparent 54%),linear-gradient(115deg,transparent 44%,#696d6a 45%,#696d6a 55%,transparent 56%),linear-gradient(0deg,transparent 46%,#ddd8ca 47%,#ddd8ca 53%,transparent 54%);opacity:.9}
+.miniRoad{position:absolute;background:#646966;border-radius:4px}
+.miniRoad.r1{width:116%;height:8px;left:-8%;top:37px;transform:rotate(-10deg)}
+.miniRoad.r2{width:8px;height:115%;left:70px;top:-8%;transform:rotate(16deg)}
+.miniRoad.r3{width:112%;height:6px;left:-6%;top:68px;transform:rotate(8deg)}
+.miniPlot{position:absolute;width:25px;height:18px;background:#7fb574;border:1px solid #e9eadf;border-radius:3px}
+.miniPlot.p1{left:18px;top:14px}.miniPlot.p2{left:103px;top:12px}.miniPlot.p3{left:24px;top:57px}.miniPlot.p4{left:104px;top:63px}
+.miniYou{position:absolute;left:72px;top:42px;width:14px;height:14px;border-radius:50%;background:#35a8ff;border:2px solid #fff;color:#fff;text-align:center;font-size:8px;line-height:9px;box-shadow:0 0 0 3px #35a8ff55}
+.surfaceBox{margin-top:10px;padding:11px;border-radius:15px;background:#ffffff0a;border:1px solid #ffffff14;max-height:210px;overflow:auto}
+.surfaceBox>b{display:block;font-size:12px}.surfaceBox>small{display:block;font-size:9px;opacity:.68;margin:3px 0 8px}
+.surfaceTitle{font-size:9px;text-transform:uppercase;letter-spacing:.08em;opacity:.6;margin:9px 0 5px}
+.surfaceChoices{display:flex;flex-wrap:wrap;gap:5px}.surfaceChoices button{min-height:32px;padding:6px 8px;border-radius:10px;background:#ffffff12;color:#fff;border:1px solid #ffffff12;font-size:9px;box-shadow:none}
+.surfaceChoices button:active{background:#fff;color:#17252b}
+.colorChoices{display:flex;flex-wrap:wrap;gap:6px}.colorChoices button{width:26px;height:26px;min-height:26px;padding:0;border-radius:50%;border:2px solid #ffffff99;box-shadow:0 2px 6px #0004}
+@media(max-width:600px){#mapMini{width:126px;height:78px;bottom:92px}.miniPlot{transform:scale(.9)}#buildPanel{max-height:76vh;overflow:auto}.surfaceBox{max-height:190px}}
