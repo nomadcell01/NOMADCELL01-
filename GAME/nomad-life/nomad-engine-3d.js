@@ -6,8 +6,8 @@
  const key=e=>{keys[e.key]=e.type==='keydown'};addEventListener('keydown',key);addEventListener('keyup',key);
  function frame(){if(!document.body.contains(overlay))return;ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#101827';ctx.fillRect(0,0,c.width,c.height);
  ctx.fillStyle='#263b5a';ctx.fillRect(0,315,640,45);ctx.fillStyle='#55d6be';ctx.fillRect(x-14,y-14,28,28);
- if(type==='console'){ctx.fillStyle='#ffd166';ctx.fillRect(120,80,18,18);ctx.fillRect(400,160,18,18);if(keys.ArrowLeft)x-=4;if(keys.ArrowRight)x+=4;if(keys.ArrowUp)y-=4;if(keys.ArrowDown)y+=4; x=Math.max(14,Math.min(626,x));y=Math.max(14,Math.min(300,y));}
- else {vx=(keys.ArrowLeft?-3:keys.ArrowRight?3:0);x=Math.max(14,Math.min(626,x+vx));vy=keys[' ']&&y>=300?-8:vy+.4;y=Math.min(300,y+vy);if(y===300)vy=0;ctx.fillStyle='#f4a261';ctx.fillRect(520,275,24,40);}
+ if(type==='console'){ctx.fillStyle='#ffd166';ctx.fillRect(120,80,18,18);ctx.fillRect(400,160,18,18);if(keys.ArrowLeft)x-=4;if(keys.ArrowRight)x+=4;if(keys.ArrowUp)y-=4;if(keys.ArrowDown)y+=4;x=Math.max(14,Math.min(626,x));y=Math.max(14,Math.min(300,y));if(Math.abs(x-120)<24&&Math.abs(y-80)<24){score+=50}if(Math.abs(x-400)<24&&Math.abs(y-160)<24){score+=50}}
+ else {vx=(keys.ArrowLeft?-3:keys.ArrowRight?3:0);x=Math.max(14,Math.min(626,x+vx));vy=keys[' ']&&y>=300?-8:vy+.4;y=Math.min(300,y+vy);if(y===300)vy=0;ctx.fillStyle='#f4a261';ctx.fillRect(520,275,24,40);if(x>500&&y>250){score+=25;x=80;y=300;}}
  scoreEl.textContent='Score : '+score++;requestAnimationFrame(frame)}
  overlay.querySelector('#closeNomadGame').onclick=()=>{overlay.remove();removeEventListener('keydown',key);removeEventListener('keyup',key)};frame();
 }
