@@ -2,7 +2,7 @@
 const KEY='NOMAD_LIFE_STATE_V1';
 const esc=s=>String(s??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
 const state=()=>({world:document.getElementById('worldName')?.textContent||'NOMAD TERRE',money:document.getElementById('money')?.textContent||'🪙 1 000 000',avatar:document.getElementById('simName')?.textContent||'Mon Nomade',inventory:window.__nomadInventory||[],lastSeen:Date.now(),habitants:window.NOMAD_HABITANTS||[]});
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state()));setMsg('État NOMAD enregistré.')}catch(e){setMsg('Sauvegarde locale indisponible.')}}
+function save(touch=true){try{const st=state();if(!touch){const prev=JSON.parse(localStorage.getItem(KEY)||'null');if(prev?.lastSeen)st.lastSeen=prev.lastSeen}localStorage.setItem(KEY,JSON.stringify(st));setMsg('État NOMAD enregistré.')}catch(e){setMsg('Sauvegarde locale indisponible.')}}
 function setMsg(t){const p=document.getElementById('theoMessage');if(p)p.textContent=t}
 function restore(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(!s)return null;const n=(Date.now()-Number(s.lastSeen||Date.now()));return {...s,elapsed:n}}catch(e){return null}}
 const old=restore();
@@ -15,7 +15,7 @@ function open(){refresh();panel.classList.add('open')}
 function close(){panel.classList.remove('open')}
 btn.addEventListener('click',open);panel.querySelector('.theoClose').addEventListener('click',close);panel.querySelector('#theoClose2').addEventListener('click',close);panel.querySelector('#theoSave').addEventListener('click',save);
 setInterval(()=>{refresh();if(document.getElementById('game')?.style.display!=='none')save()},30000);
-window.addEventListener('beforeunload',save);
+window.addEventListener('beforeunload',()=>save(false));
 if(old){const days=Math.floor(old.elapsed/86400000);if(days>0){setTimeout(()=>{setMsg(`T.H.E.O. : tu étais absent depuis ${days} jour${days>1?'s':''}. Les habitants ont continué leur vie.`);const h=document.getElementById('theoHabitants');if(h)h.innerHTML+='<br>🕒 Pendant ton absence, les routines NOMAD ont continué localement.';'},700)}}
 window.NOMAD_THEO={save,restore};
 })();
