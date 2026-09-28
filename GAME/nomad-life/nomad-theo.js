@@ -16,6 +16,6 @@ function close(){panel.classList.remove('open')}
 btn.addEventListener('click',open);panel.querySelector('.theoClose').addEventListener('click',close);panel.querySelector('#theoClose2').addEventListener('click',close);panel.querySelector('#theoSave').addEventListener('click',save);
 setInterval(()=>{refresh();if(document.getElementById('game')?.style.display!=='none')save()},30000);
 window.addEventListener('beforeunload',save);
-if(old){const days=Math.floor(old.elapsed/86400000);if(days>0){setTimeout(()=>{setMsg(`T.H.E.O. : tu étais absent depuis ${days} jour${days>1?'s':''}. Les habitants ont continué leur vie.`);const h=document.getElementById('theoHabitants');if(h)h.innerHTML+=''<br>🕒 Pendant ton absence, les routines NOMAD ont continué localement.'},700)}}
+if(old){const days=Math.floor(old.elapsed/86400000);if(days>0){setTimeout(()=>{setMsg(`T.H.E.O. : tu étais absent depuis ${days} jour${days>1?'s':''}. Les habitants ont continué leur vie.`);const h=document.getElementById('theoHabitants');if(h)h.innerHTML+='<br>🕒 Pendant ton absence, les routines NOMAD ont continué localement.';'},700)}}
 window.NOMAD_THEO={save,restore};
 })();
