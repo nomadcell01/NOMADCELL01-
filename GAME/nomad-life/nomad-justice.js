@@ -25,7 +25,7 @@ const panel=document.createElement('section');panel.id='justicePanel';panel.inne
 function save(){try{localStorage.setItem(KEY,JSON.stringify({cases,history,playerHistory}))}catch(e){}}
 try{const old=JSON.parse(localStorage.getItem('NOMAD_JUSTICE_V1')||'{}')||{};Object.keys(old).forEach(n=>{if(!cases[n]&&old[n]){const x=old[n];const remain=Math.max(0,Number(x.end||0)-currentSimStamp());cases[n]={...x,endAt:Date.now()+remain*1200}});save()}catch(e){}
 function nowCase(name){return cases[name]||null}
-function recordPlayerHistory(event){try{playerHistory.unshift({...event,at:Date.now()});playerHistory=playerHistory.slice(0,100);save();window.NOMAD_PLAYER_HISTORY=playerHistory}catch(e){}}
+function recordPlayerHistory(event){try{const e={...event,at:Date.now()};playerHistory.unshift(e);playerHistory=playerHistory.slice(0,100);save();window.NOMAD_PLAYER_HISTORY=playerHistory;if(window.NOMAD_PLAYER_HISTORY_API?.record)window.NOMAD_PLAYER_HISTORY_API.record(e);window.dispatchEvent(new Event('nomad:player-story-updated'))}catch(e){}}
 function player(){return (window.NOMAD_PEOPLE||[]).find(p=>p&&p.userData&&p.userData.isPlayer)||null}
 function people(){return (window.NOMAD_PEOPLE||[]).filter(p=>p&&p.userData&&p.userData.life&&!p.userData.isPlayer&&!p.userData.isHumanoid)}
 function clockMinutes(){
