@@ -29,7 +29,10 @@ function addButton(){
       const session=await navigator.xr.requestSession('immersive-vr',{optionalFeatures:['local-floor','bounded-floor','hand-tracking']});
       r.xr.enabled=true;
       r.xr.setReferenceSpaceType('local-floor');
-      r.setAnimationLoop(()=>{if(r.__nomadLastScene&&r.__nomadLastCamera)r.render(r.__nomadLastScene,r.__nomadLastCamera)});
+      r.setAnimationLoop((time,frame)=>{
+        if(frame){for(const t of (window.NOMAD_VR_TICKERS||[])){try{t.tick?.(time,frame)}catch(e){}}}
+        if(r.__nomadLastScene&&r.__nomadLastCamera)r.render(r.__nomadLastScene,r.__nomadLastCamera);
+      });
       await r.xr.setSession(session);
       session.addEventListener('end',()=>{r.setAnimationLoop(null);status('🥽 VR terminée · retour écran');});
       status('🥽 VR NOMAD activée · regarde autour de toi');
