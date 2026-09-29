@@ -1,5 +1,6 @@
 (()=>{'use strict';
-const KEY='NOMAD_JUSTICE_V1';
+const KEY='NOMAD_JUSTICE_V2';
+const SIM_DAY_MS=1440*1200;
 const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 let cases={};
 try{cases=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){cases={}}
@@ -20,6 +21,7 @@ const btn=document.createElement('button');btn.id='justiceBtn';btn.textContent='
 const panel=document.createElement('section');panel.id='justicePanel';panel.innerHTML='<div class="justiceHead"><b>⚖️ Justice NOMAD</b><button class="justiceClose">✕</button></div><div class="justiceIntro">Pas de prison dans NOMAD. Une infraction peut entraîner une <b>assignation à domicile</b> pendant une durée déterminée. La personne continue à vivre chez elle ; ses sorties sont interdites pendant la mesure.</div><div id="justiceList"></div>';document.getElementById('game')?.appendChild(panel);
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(cases))}catch(e){}}
+try{const old=JSON.parse(localStorage.getItem('NOMAD_JUSTICE_V1')||'{}')||{};Object.keys(old).forEach(n=>{if(!cases[n]&&old[n]){const x=old[n];const remain=Math.max(0,Number(x.end||0)-currentSimStamp());cases[n]={...x,endAt:Date.now()+remain*1200}});save()}catch(e){}
 function nowCase(name){return cases[name]||null}
 function people(){return (window.NOMAD_PEOPLE||[]).filter(p=>p&&p.userData&&p.userData.life&&!p.userData.isPlayer&&!p.userData.isHumanoid)}
 function clockMinutes(){
@@ -39,7 +41,8 @@ function homeOf(p){
 function assign(p,days){
  const name=p.userData.life.name;
  const start=currentSimStamp();
- cases[name]={name,reason:'Infraction NOMAD',start,end:start+Math.max(1,days)*1440,home:homeOf(p),violations:0,active:true};
+ const durationDays=Math.max(1,days);
+ cases[name]={name,reason:'Infraction NOMAD',start,end:start+durationDays*1440,endAt:Date.now()+durationDays*SIM_DAY_MS,home:homeOf(p),violations:0,active:true};
  p.userData.life.justiceStatus='Assignation à domicile';
  p.userData.life.justiceReason='Infraction · interdiction de sortie';
  p.userData.life.justiceUntil=cases[name].end;
@@ -55,7 +58,7 @@ function enforce(){
  people().forEach(p=>{
    const name=p.userData.life.name,c=cases[name];
    if(!c||!c.active)return;
-   if(stamp>=c.end){lift(p);return}
+   if(Date.now()>=Number(c.endAt||0)){lift(p);return}
    const dx=p.position.x-c.home.x,dz=p.position.z-c.home.z;
    if(Math.hypot(dx,dz)>2.2){
      c.violations=(c.violations||0)+1;
@@ -66,10 +69,10 @@ function enforce(){
    }
    p.userData.life.justiceStatus='Assignation à domicile';
    p.userData.life.justiceReason='Interdiction de sortie · '+Math.max(0,Math.ceil((c.end-stamp)/1440))+' j restante(s)';
-   p.userData.life.justiceUntil=c.end;
+   p.userData.life.justiceUntil=c.endAt||c.end;
  });
 }
-function remaining(c){return Math.max(0,Math.ceil((c.end-currentSimStamp())/1440))}
+function remaining(c){return Math.max(0,Math.ceil((Number(c.endAt||0)-Date.now())/SIM_DAY_MS))}
 function render(){
  const list=document.getElementById('justiceList');if(!list)return;
  const a=people();
