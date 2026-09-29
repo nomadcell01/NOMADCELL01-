@@ -4,6 +4,7 @@ function boot(){
  const r=window.NOMAD_XR_RENDERER;
  if(!r||!r.xr)return setTimeout(boot,400);
  let session=null,ray=new THREE.Raycaster(),hands=[];
+ let grabbed=null;
  window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS||[];
  const status=m=>{const p=document.getElementById('prompt');if(p)p.textContent=m};
  function makeHand(side){
@@ -20,6 +21,15 @@ function boot(){
    if(controller)g.userData.controller=controller;
    hands.push({src,g,controller});
  }
+ function refreshInteractables(){
+   const scene=r.__nomadLastScene;if(!scene)return;
+   const list=[];
+   scene.traverse(o=>{if(o?.userData?.nomadObject||o?.userData?.vrLabel||o?.userData?.interactionLabel)list.push(o)});
+   window.NOMAD_VR_INTERACTABLES=list;
+ }
+ function findGrabbable(hit){
+   let o=hit;while(o&&o.parent){if(o.userData?.nomadObject)return o;o=o.parent}return null;
+ }
  function target(src){
    const p=(window.NOMAD_PEOPLE||[]).find(x=>x?.userData?.isPlayer);
    if(!p)return null;
@@ -29,6 +39,7 @@ function boot(){
    src.grip?.getWorldDirection?.(dir);
    if(!origin.length())return null;
    ray.set(origin,dir);
+   refreshInteractables();
    const objects=(window.NOMAD_VR_INTERACTABLES||[]);
    const hit=ray.intersectObjects(objects,true)[0];
    return hit?.object||null;
@@ -54,8 +65,18 @@ function boot(){
              const label=hit.userData?.vrLabel||hit.userData?.name||hit.parent?.userData?.vrLabel;
              if(label){status('👋 VR · '+label);window.NOMAD_VR_ACTION?.(label,hit);}
            }
+           if(b[1]?.pressed && !grabbed){
+             const g=findGrabbable(hit);
+             if(g){grabbed={obj:g,hand:h};const parent=h.g;parent.add(g);g.position.set(0,0,-.45);status('✋ Objet saisi · '+(g.userData.item||'objet NOMAD'));}
+           }
+         }else if(grabbed?.hand===h && b[1] && !b[1].pressed){
+           const obj=grabbed.obj;const scene=r.__nomadLastScene;
+           if(scene){const p=obj.getWorldPosition(new THREE.Vector3());scene.add(obj);obj.position.set(p.x,Math.max(.2,p.y),p.z);}
+           status('📦 Objet posé');grabbed=null;
+           }
          }
        }
+       if(grabbed?.hand && !hands.includes(grabbed.hand)){grabbed=null;}
      }
    }});
    status('🥽 VR · mains et contrôleurs actifs');
