@@ -3,20 +3,29 @@
 function boot(){
   const r=window.NOMAD_XR_RENDERER;
   if(!r||!r.xr)return setTimeout(boot,300);
-  let session=null,refSpace=null,rig=null;
+  let session=null,refSpace=null;
   const state={moveX:0,moveY:0,turn:0};
   function getCamera(){
     return window.NOMAD_XR_CAMERA||r.__nomadLastCamera||r.xr.getCamera?.(r.__nomadLastCamera);
   }
   function applyMovement(dt){
-    const c=getCamera(); if(!c||!c.position)return;
+    const p=(window.NOMAD_PEOPLE||[]).find(x=>x?.userData?.isPlayer);
+    const rig=p?.parent||null;
+    if(!rig)return;
+    const cam=r.__nomadLastCamera||r.xr.getCamera?.(r.__nomadLastCamera);
+    if(!cam)return;
+    const dir=new THREE.Vector3();cam.getWorldDirection(dir);dir.y=0;dir.normalize();
+    const right=new THREE.Vector3().crossVectors(dir,new THREE.Vector3(0,1,0)).normalize();
     const speed=state.fast?3.2:1.8;
-    const yaw=new THREE.Vector3();
-    c.getWorldDirection(yaw); yaw.y=0; yaw.normalize();
-    const right=new THREE.Vector3().crossVectors(yaw,new THREE.Vector3(0,1,0)).normalize();
-    c.position.addScaledVector(yaw,state.moveY*speed*dt);
-    c.position.addScaledVector(right,state.moveX*speed*dt);
-    if(state.turn) c.rotation.y+=state.turn*dt;
+    if(state.moveY||state.moveX){
+      rig.position.addScaledVector(dir,-state.moveY*speed*dt);
+      rig.position.addScaledVector(right,-state.moveX*speed*dt);
+    }
+    if(Math.abs(state.turn)>0.45){
+      const step=state.turn>0?-0.045:0.045;
+      rig.rotation.y+=step;
+      state.turn=0;
+    }
   }
   function controllerInput(src){
     const g=src.gamepad;if(!g)return;
@@ -30,7 +39,6 @@ function boot(){
     session=s;
     refSpace=null;
     s.requestReferenceSpace?.('local-floor').then(x=>refSpace=x).catch(()=>{});
-    const oldLoop=r.__nomadOriginalSetAnimationLoop;
     r.setAnimationLoop((time,frame)=>{
       if(frame){
         const dt=Math.min(.05,(time-(window.__NOMAD_VR_LAST||time))/1000);
@@ -40,7 +48,7 @@ function boot(){
       }
       if(r.__nomadLastScene&&r.__nomadLastCamera)r.render(r.__nomadLastScene,r.__nomadLastCamera);
     });
-    s.addEventListener('end',()=>{session=null;state.moveX=state.moveY=state.turn=0;window.__NOMAD_VR_LAST=0;});
+    s.addEventListener('end',()=>{session=null;state.moveX=state.moveY=state.turn=0;window.__NOMAD_VR_LAST=0;const p=(window.NOMAD_PEOPLE||[]).find(x=>x?.userData?.isPlayer);const rig=p?.parent;if(rig){rig.position.set(0,0,0);rig.rotation.y=0;} });
   }
   const originalSetSession=r.xr.setSession.bind(r.xr);
   r.xr.setSession=async s=>{const out=await originalSetSession(s);onSessionStart(s);return out};
@@ -51,9 +59,9 @@ function boot(){
   b.addEventListener('click',async()=>{
     if(!session)return;
     try{
-      const base=await session.requestReferenceSpace('local-floor');
-      if(r.xr.setReferenceSpaceType)r.xr.setReferenceSpaceType('local-floor');
-      refSpace=base;
+      const p=(window.NOMAD_PEOPLE||[]).find(x=>x?.userData?.isPlayer);
+      const rig=p?.parent;
+      if(rig){rig.position.set(0,0,0);rig.rotation.y=0;}
       status('🥽 VR recentrée');
     }catch(e){status('🥽 Recentrage VR indisponible');}
   });
