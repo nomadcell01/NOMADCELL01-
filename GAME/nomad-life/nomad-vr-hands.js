@@ -4,6 +4,7 @@ function boot(){
  const r=window.NOMAD_XR_RENDERER;
  if(!r||!r.xr)return setTimeout(boot,400);
  let session=null,ray=new THREE.Raycaster(),hands=[];
+ window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS||[];
  const status=m=>{const p=document.getElementById('prompt');if(p)p.textContent=m};
  function makeHand(side){
    const g=new THREE.Group(),p=new THREE.Mesh(new THREE.SphereGeometry(.045,12,8),new THREE.MeshBasicMaterial({color:0x6ee7ff,transparent:true,opacity:.8}));
@@ -11,7 +12,13 @@ function boot(){
    g.add(p,line);g.userData.side=side;return g;
  }
  function attach(src){
-   const g=makeHand(src.handedness||'none');r.scene?.add?.(g);hands.push({src,g});
+   const index=Array.from(session?.inputSources||[]).indexOf(src);
+   const controller=index>=0?(r.xr.getController?.(index)||null):null;
+   const g=makeHand(src.handedness||'none');
+   const scene=r.__nomadLastScene;
+   if(scene)scene.add(g);
+   if(controller)g.userData.controller=controller;
+   hands.push({src,g,controller});
  }
  function target(src){
    const p=(window.NOMAD_PEOPLE||[]).find(x=>x?.userData?.isPlayer);
@@ -33,24 +40,24 @@ function boot(){
      e.removed.forEach(src=>{hands=hands.filter(h=>h.src!==src)});
    });
    s.inputSources?.forEach(src=>{if(src.gamepad)attach(src)});
-   r.setAnimationLoop((time,frame)=>{
-     if(frame){
-       for(const h of hands){
-         const src=h.src;
-         if(src.gamepad){
-           const b=src.gamepad.buttons||[];
-           if(b[0]?.pressed){
-             const hit=target(src);
-             if(hit){
-               const label=hit.userData?.vrLabel||hit.userData?.name||hit.parent?.userData?.vrLabel;
-               if(label){status('👋 VR · '+label);window.NOMAD_VR_ACTION?.(label,hit);}
-             }
+   window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS.filter(x=>x.id!=='hands');
+   window.NOMAD_VR_TICKERS.push({id:'hands',tick:(time,frame)=>{
+     if(!frame)return;
+     for(const h of hands){
+       if(h.controller){h.g.position.copy(h.controller.position);h.g.quaternion.copy(h.controller.quaternion);}
+       const src=h.src;
+       if(src.gamepad){
+         const b=src.gamepad.buttons||[];
+         if(b[0]?.pressed){
+           const hit=target(src);
+           if(hit){
+             const label=hit.userData?.vrLabel||hit.userData?.name||hit.parent?.userData?.vrLabel;
+             if(label){status('👋 VR · '+label);window.NOMAD_VR_ACTION?.(label,hit);}
            }
          }
        }
      }
-     if(r.__nomadLastScene&&r.__nomadLastCamera)r.render(r.__nomadLastScene,r.__nomadLastCamera);
-   });
+   }});
    status('🥽 VR · mains et contrôleurs actifs');
  }
  const original=r.xr.setSession.bind(r.xr);
