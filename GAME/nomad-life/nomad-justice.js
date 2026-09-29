@@ -3,7 +3,8 @@ const KEY='NOMAD_JUSTICE_V2';
 const SIM_DAY_MS=1440*1200;
 const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 let cases={};
-try{cases=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){cases={}}
+let history=[];
+try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}')||{};cases=saved.cases||saved||{};history=Array.isArray(saved.history)?saved.history:[]}catch(e){cases={};history=[]}
 
 const css=document.createElement('style');
 css.textContent=`
@@ -20,7 +21,7 @@ document.head.appendChild(css);
 const btn=document.createElement('button');btn.id='justiceBtn';btn.textContent='⚖️ Justice';document.getElementById('game')?.appendChild(btn);
 const panel=document.createElement('section');panel.id='justicePanel';panel.innerHTML='<div class="justiceHead"><b>⚖️ Justice NOMAD</b><button class="justiceClose">✕</button></div><div class="justiceIntro">Pas de prison dans NOMAD. Une infraction peut entraîner une <b>assignation à domicile</b> pendant une durée déterminée. La personne continue à vivre chez elle ; ses sorties sont interdites pendant la mesure.</div><div id="justiceList"></div>';document.getElementById('game')?.appendChild(panel);
 
-function save(){try{localStorage.setItem(KEY,JSON.stringify(cases))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({cases,history}))}catch(e){}}
 try{const old=JSON.parse(localStorage.getItem('NOMAD_JUSTICE_V1')||'{}')||{};Object.keys(old).forEach(n=>{if(!cases[n]&&old[n]){const x=old[n];const remain=Math.max(0,Number(x.end||0)-currentSimStamp());cases[n]={...x,endAt:Date.now()+remain*1200}});save()}catch(e){}
 function nowCase(name){return cases[name]||null}
 function people(){return (window.NOMAD_PEOPLE||[]).filter(p=>p&&p.userData&&p.userData.life&&!p.userData.isPlayer&&!p.userData.isHumanoid)}
@@ -49,7 +50,9 @@ function assign(p,days,reason='Infraction NOMAD'){
  save();render();window.showPrompt&&window.showPrompt('⚖️ '+name+' : '+String(reason||'Infraction NOMAD')+' · assignation à domicile pour '+days+' jour'+(days>1?'s':''));
 }
 function lift(p){
- const name=p.userData.life.name;delete cases[name];
+ const name=p.userData.life.name,c=cases[name];
+ if(c){history.unshift({...c,active:false,endedAt:Date.now()});history=history.slice(0,50)}
+ delete cases[name];
  p.userData.life.justiceStatus='Mesure terminée';p.userData.life.justiceReason='Fin de l’assignation à domicile';p.userData.life.justiceUntil=0;
  save();render();window.showPrompt&&window.showPrompt('✅ '+name+' : fin de l’assignation à domicile');
 }
@@ -88,6 +91,7 @@ function render(){
  list.querySelectorAll('[data-days]').forEach(b=>b.addEventListener('click',()=>{
    const p=a.find(x=>x.userData.life.name===b.dataset.name);const sel=list.querySelector('select[data-reason="'+CSS.escape(b.dataset.name)+'"]');if(p)assign(p,Number(b.dataset.days),sel?sel.value:'Infraction NOMAD');
  }));
+ if(history.length){list.innerHTML+='<div class="justicePerson"><b>📋 Historique récent</b>'+history.slice(0,8).map(h=>'<small>• '+esc(h.name)+' · '+esc(h.reason)+' · '+new Date(Number(h.endedAt||Date.now())).toLocaleDateString('fr-FR')+'</small>').join('')+'</div>'}
  list.querySelectorAll('[data-lift]').forEach(b=>b.addEventListener('click',()=>{
    const p=a.find(x=>x.userData.life.name===b.dataset.lift);if(p)lift(p);
  }));
