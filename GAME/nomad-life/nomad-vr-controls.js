@@ -39,15 +39,15 @@ function boot(){
     session=s;
     refSpace=null;
     s.requestReferenceSpace?.('local-floor').then(x=>refSpace=x).catch(()=>{});
-    r.setAnimationLoop((time,frame)=>{
-      if(frame){
-        const dt=Math.min(.05,(time-(window.__NOMAD_VR_LAST||time))/1000);
-        window.__NOMAD_VR_LAST=time;
-        if(s.inputSources)for(const src of s.inputSources)controllerInput(src);
-        applyMovement(dt);
-      }
-      if(r.__nomadLastScene&&r.__nomadLastCamera)r.render(r.__nomadLastScene,r.__nomadLastCamera);
-    });
+    window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS||[];
+    window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS.filter(x=>x.id!=='controls');
+    window.NOMAD_VR_TICKERS.push({id:'controls',tick:(time,frame)=>{
+      if(!frame)return;
+      const dt=Math.min(.05,(time-(window.__NOMAD_VR_LAST||time))/1000);
+      window.__NOMAD_VR_LAST=time;
+      if(s.inputSources)for(const src of s.inputSources)controllerInput(src);
+      applyMovement(dt);
+    }});
     s.addEventListener('end',()=>{session=null;state.moveX=state.moveY=state.turn=0;window.__NOMAD_VR_LAST=0;const p=(window.NOMAD_PEOPLE||[]).find(x=>x?.userData?.isPlayer);const rig=p?.parent;if(rig){rig.position.set(0,0,0);rig.rotation.y=0;} });
   }
   const originalSetSession=r.xr.setSession.bind(r.xr);
