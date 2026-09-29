@@ -7,6 +7,7 @@ function boot(){
  const ACTION_COOLDOWN=420;
  window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS||[];
  const status=m=>{const p=document.getElementById('prompt');if(p)p.textContent=m};
+ function haptic(src,strong=false){try{const act=src.gamepad?.hapticActuators?.[0];act?.pulse?.(strong?.55:.25,90)}catch(e){}}
  function makeHand(side){
    const g=new THREE.Group(),p=new THREE.Mesh(new THREE.SphereGeometry(.045,12,8),new THREE.MeshBasicMaterial({color:0x6ee7ff,transparent:true,opacity:.8}));
    const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,0,-2)]),new THREE.LineBasicMaterial({color:0x6ee7ff,transparent:true,opacity:.55}));
@@ -34,7 +35,6 @@ function boot(){
  }
  function findGrabbable(hit){let o=hit;while(o&&o.parent){if(o.userData?.nomadObject)return o;o=o.parent}return null}
  function target(src){
-   const cam=r.__nomadLastCamera;if(!cam)return null;
    const origin=new THREE.Vector3(),dir=new THREE.Vector3();
    if(src.targetRaySpace)src.targetRaySpace.getWorldPosition(origin);else if(src.grip)src.grip.getWorldPosition(origin);else return null;
    if(src.targetRaySpace)src.targetRaySpace.getWorldDirection(dir);else src.grip?.getWorldDirection?.(dir);
@@ -43,17 +43,10 @@ function boot(){
    return ray.intersectObjects(window.NOMAD_VR_INTERACTABLES||[],true)[0]?.object||null;
  }
  function labelOf(hit){return hit?.userData?.vrLabel||hit?.userData?.interactionLabel||hit?.userData?.name||hit?.parent?.userData?.vrLabel||''}
- function fireAction(label,hit){
-   if(!label||performance.now()-lastAction<ACTION_COOLDOWN)return;
-   lastAction=performance.now();status('👋 VR · '+label);window.NOMAD_VR_ACTION?.(label,hit);
-   if(['Bibliothèque NOMAD','Ordinateur archives','Ordinateur site NOMAD','Galerie projet NOMAD','Musée NOMAD','Archives techniques'].includes(label))window.NOMAD_REAL_ARCHIVE?.open?.(label);
- }
+ function fireAction(label,hit,h){if(!label||performance.now()-lastAction<ACTION_COOLDOWN)return;lastAction=performance.now();status('👋 VR · '+label);haptic(h.src,true);window.NOMAD_VR_ACTION?.(label,hit);if(['Bibliothèque NOMAD','Ordinateur archives','Ordinateur site NOMAD','Galerie projet NOMAD','Musée NOMAD','Archives techniques'].includes(label))window.NOMAD_REAL_ARCHIVE?.open?.(label)}
  function bindSession(s){
    session=s;
-   s.addEventListener('inputsourceschange',e=>{
-     e.added.forEach(src=>{if(src.gamepad&&!hands.some(h=>h.src===src))attach(src)});
-     e.removed.forEach(src=>{hands=hands.filter(h=>h.src!==src);if(grabbed?.hand?.src===src)grabbed=null});
-   });
+   s.addEventListener('inputsourceschange',e=>{e.added.forEach(src=>{if(src.gamepad&&!hands.some(h=>h.src===src))attach(src)});e.removed.forEach(src=>{hands=hands.filter(h=>h.src!==src);if(grabbed?.hand?.src===src)grabbed=null})});
    s.inputSources?.forEach(src=>{if(src.gamepad)attach(src)});
    window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS.filter(x=>x.id!=='hands');
    window.NOMAD_VR_TICKERS.push({id:'hands',tick:(time,frame)=>{
@@ -61,15 +54,9 @@ function boot(){
      for(const h of hands){
        if(h.controller){h.g.position.copy(h.controller.position);h.g.quaternion.copy(h.controller.quaternion)}
        const src=h.src,b=src.gamepad?.buttons||[],hit=target(src),label=labelOf(hit);
-       if(label&&b[0]?.pressed)fireAction(label,hit);
-       if(b[1]?.pressed&&!grabbed){
-         const g=findGrabbable(hit);
-         if(g){grabbed={obj:g,hand:h};h.g.add(g);g.position.set(0,0,-.45);g.rotation.set(0,0,0);status('✋ Objet saisi · '+(g.userData.item||'objet NOMAD'))}
-       }else if(grabbed?.hand===h&&b[1]&&!b[1].pressed){
-         const obj=grabbed.obj,scene=r.__nomadLastScene;
-         if(scene){const p=obj.getWorldPosition(new THREE.Vector3()),q=obj.getWorldQuaternion(new THREE.Quaternion());scene.add(obj);obj.position.set(p.x,Math.max(.2,p.y),p.z);obj.quaternion.copy(q)}
-         status('📦 Objet posé');grabbed=null;
-       }
+       if(label&&b[0]?.pressed)fireAction(label,hit,h);
+       if(b[1]?.pressed&&!grabbed){const g=findGrabbable(hit);if(g){grabbed={obj:g,hand:h};h.g.add(g);g.position.set(0,0,-.45);g.rotation.set(0,0,0);haptic(src,true);status('✋ Objet saisi · '+(g.userData.item||'objet NOMAD'))}}
+       else if(grabbed?.hand===h&&b[1]&&!b[1].pressed){const obj=grabbed.obj,scene=r.__nomadLastScene;if(scene){const p=obj.getWorldPosition(new THREE.Vector3()),q=obj.getWorldQuaternion(new THREE.Quaternion());scene.add(obj);obj.position.set(p.x,Math.max(.2,p.y),p.z);obj.quaternion.copy(q)}haptic(src,false);status('📦 Objet posé');grabbed=null}
        if(label&&!b[0]?.pressed&&!b[1]?.pressed&&performance.now()-lastAction>900)status('👉 '+label);
      }
    }});
