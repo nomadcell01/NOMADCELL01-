@@ -59,21 +59,32 @@ function boot(){
        const src=h.src;
        if(src.gamepad){
          const b=src.gamepad.buttons||[];
-         if(b[0]?.pressed){
-           const hit=target(src);
-           if(hit){
-             const label=hit.userData?.vrLabel||hit.userData?.name||hit.parent?.userData?.vrLabel;
-             if(label){status('👋 VR · '+label);window.NOMAD_VR_ACTION?.(label,hit);}
-           }
-           if(b[1]?.pressed && !grabbed){
-             const g=findGrabbable(hit);
-             if(g){grabbed={obj:g,hand:h};const parent=h.g;parent.add(g);g.position.set(0,0,-.45);status('✋ Objet saisi · '+(g.userData.item||'objet NOMAD'));}
+         const hit=target(src);
+         if(b[0]?.pressed && hit){
+           const label=hit.userData?.vrLabel||hit.userData?.name||hit.parent?.userData?.vrLabel;
+           if(label){status('👋 VR · '+label);window.NOMAD_VR_ACTION?.(label,hit);}
+         }
+         if(b[1]?.pressed && !grabbed){
+           const g=findGrabbable(hit);
+           if(g){
+             grabbed={obj:g,hand:h};
+             h.g.add(g);
+             g.position.set(0,0,-.45);
+             g.rotation.set(0,0,0);
+             status('✋ Objet saisi · '+(g.userData.item||'objet NOMAD'));
            }
          }else if(grabbed?.hand===h && b[1] && !b[1].pressed){
-           const obj=grabbed.obj;const scene=r.__nomadLastScene;
-           if(scene){const p=obj.getWorldPosition(new THREE.Vector3());scene.add(obj);obj.position.set(p.x,Math.max(.2,p.y),p.z);}
-           status('📦 Objet posé');grabbed=null;
+           const obj=grabbed.obj,scene=r.__nomadLastScene;
+           if(scene){
+             const p=obj.getWorldPosition(new THREE.Vector3());
+             const q=obj.getWorldQuaternion(new THREE.Quaternion());
+             scene.add(obj);
+             obj.position.set(p.x,Math.max(.2,p.y),p.z);
+             obj.quaternion.copy(q);
            }
+           status('📦 Objet posé');
+           grabbed=null;
+         }
          }
        }
        if(grabbed?.hand && !hands.includes(grabbed.hand)){grabbed=null;}
