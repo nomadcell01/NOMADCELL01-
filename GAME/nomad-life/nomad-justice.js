@@ -4,7 +4,8 @@ const SIM_DAY_MS=1440*1200;
 const esc=s=>String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 let cases={};
 let history=[];
-try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}')||{};cases=saved.cases||saved||{};history=Array.isArray(saved.history)?saved.history:[]}catch(e){cases={};history=[]}
+let playerHistory=[];
+try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}')||{};cases=saved.cases||saved||{};history=Array.isArray(saved.history)?saved.history:[];playerHistory=Array.isArray(saved.playerHistory)?saved.playerHistory:[]}catch(e){cases={};history=[];playerHistory=[]}
 
 const css=document.createElement('style');
 css.textContent=`
@@ -21,9 +22,11 @@ document.head.appendChild(css);
 const btn=document.createElement('button');btn.id='justiceBtn';btn.textContent='⚖️ Justice';document.getElementById('game')?.appendChild(btn);
 const panel=document.createElement('section');panel.id='justicePanel';panel.innerHTML='<div class="justiceHead"><b>⚖️ Justice NOMAD</b><button class="justiceClose">✕</button></div><div class="justiceIntro">Pas de prison dans NOMAD. Une infraction peut entraîner une <b>assignation à domicile</b> pendant une durée déterminée. La personne continue à vivre chez elle ; ses sorties sont interdites pendant la mesure.</div><div id="justiceList"></div>';document.getElementById('game')?.appendChild(panel);
 
-function save(){try{localStorage.setItem(KEY,JSON.stringify({cases,history}))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({cases,history,playerHistory}))}catch(e){}}
 try{const old=JSON.parse(localStorage.getItem('NOMAD_JUSTICE_V1')||'{}')||{};Object.keys(old).forEach(n=>{if(!cases[n]&&old[n]){const x=old[n];const remain=Math.max(0,Number(x.end||0)-currentSimStamp());cases[n]={...x,endAt:Date.now()+remain*1200}});save()}catch(e){}
 function nowCase(name){return cases[name]||null}
+function recordPlayerHistory(event){try{playerHistory.unshift({...event,at:Date.now()});playerHistory=playerHistory.slice(0,100);save();window.NOMAD_PLAYER_HISTORY=playerHistory}catch(e){}}
+function player(){return (window.NOMAD_PEOPLE||[]).find(p=>p&&p.userData&&p.userData.isPlayer)||null}
 function people(){return (window.NOMAD_PEOPLE||[]).filter(p=>p&&p.userData&&p.userData.life&&!p.userData.isPlayer&&!p.userData.isHumanoid)}
 function clockMinutes(){
  const el=document.getElementById('clock');const m=String(el?.textContent||'08:00').match(/(\d{1,2}):(\d{2})/);
@@ -41,16 +44,18 @@ function homeOf(p){
 }
 function assign(p,days,reason='Infraction NOMAD'){
  const name=p.userData.life.name;
+ const isPlayer=!!p.userData.isPlayer;
  const start=currentSimStamp();
  const durationDays=Math.max(1,days);
- cases[name]={name,reason:String(reason||'Infraction NOMAD'),start,end:start+durationDays*1440,endAt:Date.now()+durationDays*SIM_DAY_MS,home:homeOf(p),violations:0,active:true};
+ cases[name]={name,reason:String(reason||'Infraction NOMAD'),player:isPlayer,start,end:start+durationDays*1440,endAt:Date.now()+durationDays*SIM_DAY_MS,startAt:Date.now(),home:homeOf(p),violations:0,active:true};
  p.userData.life.justiceStatus='Assignation à domicile';
  p.userData.life.justiceReason=String(reason||'Infraction NOMAD')+' · interdiction de sortie';
  p.userData.life.justiceUntil=cases[name].end;
- save();render();window.showPrompt&&window.showPrompt('⚖️ '+name+' : '+String(reason||'Infraction NOMAD')+' · assignation à domicile pour '+days+' jour'+(days>1?'s':''));
+ if(isPlayer)recordPlayerHistory({type:'justice',title:'⚖️ Assignation à domicile',reason:String(reason||'Infraction NOMAD'),durationDays,violations:0});save();render();window.showPrompt&&window.showPrompt('⚖️ '+name+' : '+String(reason||'Infraction NOMAD')+' · assignation à domicile pour '+days+' jour'+(days>1?'s':''));
 }
 function lift(p){
  const name=p.userData.life.name,c=cases[name];
+ if(c&&c.player)recordPlayerHistory({type:'justice_end',title:'⚖️ Fin de l’assignation à domicile',reason:c.reason,durationDays:Math.max(1,Math.round((Number(c.endAt)-Number(c.startAt||c.endAt))/SIM_DAY_MS)),violations:c.violations||0});
  if(c){history.unshift({...c,active:false,endedAt:Date.now()});history=history.slice(0,50)}
  delete cases[name];
  p.userData.life.justiceStatus='Mesure terminée';p.userData.life.justiceReason='Fin de l’assignation à domicile';p.userData.life.justiceUntil=0;
@@ -96,7 +101,8 @@ function render(){
    const p=a.find(x=>x.userData.life.name===b.dataset.lift);if(p)lift(p);
  }));
 }
-function open(){render();panel.classList.add('open')}function close(){panel.classList.remove('open')}
+function open(){render();panel.classList.add('open')}
+window.NOMAD_PLAYER_HISTORY=playerHistory;function close(){panel.classList.remove('open')}
 btn.addEventListener('click',open);panel.querySelector('.justiceClose').addEventListener('click',close);
 setInterval(()=>{enforce();if(panel.classList.contains('open'))render()},1000);
 window.NOMAD_JUSTICE={cases,assign, lift, refresh:render};
