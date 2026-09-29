@@ -24,7 +24,22 @@ function boot(){
  function refreshInteractables(){
    const scene=r.__nomadLastScene;if(!scene)return;
    const list=[];
-   scene.traverse(o=>{if(o?.userData?.nomadObject||o?.userData?.vrLabel||o?.userData?.interactionLabel)list.push(o)});
+   scene.traverse(o=>{
+     if(o?.userData?.nomadObject||o?.userData?.vrLabel||o?.userData?.interactionLabel)list.push(o);
+     if(o?.geometry?.type==='RingGeometry'){
+       const p=o.position;
+       const key=Math.round(p.x)+'|'+Math.round(p.z);
+       const labels={
+         '0|0':'Habitat','2|1':'Cuisine','-2|1':'Douche','0|-3':'Loisirs',
+         '6|-1':'Travail','4|-5':'Atelier','-6|-2':'Laboratoire','-7|4':'Assemblage',
+         '7|-5':'Déploiement','3|6':'Humanoïde','-3|6':'Tâche humanoïde','-1|6':'État humanoïde',
+         '2|6':'Utiliser meuble','5|6':'Choisir métier','7|6':'Travailler','9|6':'Statut joueur',
+         '11|6':'Parler habitant','-4|5':'Marché','8|4':'Commerce','-8|-4':'Transport',
+         '-12|-10':'Bibliothèque NOMAD','3|-10':'Ordinateur archives','0|-15':'Galerie projet NOMAD'
+       };
+       if(labels[key]){o.userData.vrLabel=labels[key];list.push(o);}
+     }
+   });
    window.NOMAD_VR_INTERACTABLES=list;
  }
  function findGrabbable(hit){
@@ -62,7 +77,13 @@ function boot(){
          const hit=target(src);
          if(b[0]?.pressed && hit){
            const label=hit.userData?.vrLabel||hit.userData?.name||hit.parent?.userData?.vrLabel;
-           if(label){status('👋 VR · '+label);window.NOMAD_VR_ACTION?.(label,hit);}
+           if(label){
+             status('👋 VR · '+label);
+             window.NOMAD_VR_ACTION?.(label,hit);
+             if(['Bibliothèque NOMAD','Ordinateur archives','Ordinateur site NOMAD','Galerie projet NOMAD','Musée NOMAD','Archives techniques'].includes(label)){
+               window.NOMAD_REAL_ARCHIVE?.open?.(label);
+             }
+           }
          }
          if(b[1]?.pressed && !grabbed){
            const g=findGrabbable(hit);
