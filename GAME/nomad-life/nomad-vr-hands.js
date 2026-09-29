@@ -1,5 +1,5 @@
 (()=>{'use strict';
-/* NOMAD VR — mains, pointeur, hand-tracking et interactions naturelles */
+/* NOMAD VR — mains, pointeur et interactions naturelles */
 function boot(){
  const r=window.NOMAD_XR_RENDERER;
  if(!r||!r.xr)return setTimeout(boot,400);
@@ -8,8 +8,7 @@ function boot(){
  window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS||[];
  const status=m=>{const p=document.getElementById('prompt');if(p)p.textContent=m};
  function makeHand(side){
-   const g=new THREE.Group();
-   const p=new THREE.Mesh(new THREE.SphereGeometry(.045,12,8),new THREE.MeshBasicMaterial({color:0x6ee7ff,transparent:true,opacity:.8}));
+   const g=new THREE.Group(),p=new THREE.Mesh(new THREE.SphereGeometry(.045,12,8),new THREE.MeshBasicMaterial({color:0x6ee7ff,transparent:true,opacity:.8}));
    const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(0,0,-2)]),new THREE.LineBasicMaterial({color:0x6ee7ff,transparent:true,opacity:.55}));
    g.add(p,line);g.userData.side=side;return g;
  }
@@ -18,7 +17,7 @@ function boot(){
    const controller=index>=0?(r.xr.getController?.(index)||null):null;
    const g=makeHand(src.handedness||'none'),scene=r.__nomadLastScene;
    if(scene)scene.add(g);if(controller)g.userData.controller=controller;
-   hands.push({src,g,controller,lastGrip:false,lastSelect:false});
+   hands.push({src,g,controller});
  }
  function refreshInteractables(){
    const scene=r.__nomadLastScene;if(!scene)return;
@@ -34,37 +33,13 @@ function boot(){
    window.NOMAD_VR_INTERACTABLES=list;
  }
  function findGrabbable(hit){let o=hit;while(o&&o.parent){if(o.userData?.nomadObject)return o;o=o.parent}return null}
- function updateHandPose(h,frame){
-   const src=h.src,space=r.xr.getReferenceSpace?.();
-   if(!space||!frame)return;
-   if(src.hand){
-     const tip=src.hand.get('index-finger-tip');
-     const wrist=src.hand.get('wrist');
-     if(tip){
-       const pose=frame.getJointPose?.(tip,space);
-       if(pose){h.g.position.set(pose.transform.position.x,pose.transform.position.y,pose.transform.position.z);h.g.quaternion.set(pose.transform.orientation.x,pose.transform.orientation.y,pose.transform.orientation.z,pose.transform.orientation.w)}
-     }
-     h.handTip=tip;
-     h.wristPose=wrist?frame.getJointPose?.(wrist,space):null;
-   }else if(h.controller){
-     h.g.position.copy(h.controller.position);h.g.quaternion.copy(h.controller.quaternion);
-   }
- }
- function target(h,frame){
+ function target(src){
+   const cam=r.__nomadLastCamera;if(!cam)return null;
    const origin=new THREE.Vector3(),dir=new THREE.Vector3();
-   if(h.src.hand&&h.handTip){
-     const space=r.xr.getReferenceSpace?.(),pose=frame.getJointPose?.(h.handTip,space);
-     if(!pose)return null;
-     origin.set(pose.transform.position.x,pose.transform.position.y,pose.transform.position.z);
-     dir.set(0,0,-1).applyQuaternion(new THREE.Quaternion(pose.transform.orientation.x,pose.transform.orientation.y,pose.transform.orientation.z,pose.transform.orientation.w)).normalize();
-   }else{
-     const src=h.src;
-     if(src.targetRaySpace)src.targetRaySpace.getWorldPosition(origin);else if(src.grip)src.grip.getWorldPosition(origin);else return null;
-     if(src.targetRaySpace)src.targetRaySpace.getWorldDirection(dir);else src.grip?.getWorldDirection?.(dir);
-     if(!dir.lengthSq())return null;
-     dir.normalize();
-   }
-   ray.set(origin,dir);refreshInteractables();
+   if(src.targetRaySpace)src.targetRaySpace.getWorldPosition(origin);else if(src.grip)src.grip.getWorldPosition(origin);else return null;
+   if(src.targetRaySpace)src.targetRaySpace.getWorldDirection(dir);else src.grip?.getWorldDirection?.(dir);
+   if(!dir.lengthSq())return null;
+   ray.set(origin,dir.normalize());refreshInteractables();
    return ray.intersectObjects(window.NOMAD_VR_INTERACTABLES||[],true)[0]?.object||null;
  }
  function labelOf(hit){return hit?.userData?.vrLabel||hit?.userData?.interactionLabel||hit?.userData?.name||hit?.parent?.userData?.vrLabel||''}
@@ -73,44 +48,32 @@ function boot(){
    lastAction=performance.now();status('👋 VR · '+label);window.NOMAD_VR_ACTION?.(label,hit);
    if(['Bibliothèque NOMAD','Ordinateur archives','Ordinateur site NOMAD','Galerie projet NOMAD','Musée NOMAD','Archives techniques'].includes(label))window.NOMAD_REAL_ARCHIVE?.open?.(label);
  }
- function handPressed(h,frame){
-   if(h.src.hand){
-     const space=r.xr.getReferenceSpace?.(),tip=h.src.hand.get('index-finger-tip'),thumb=h.src.hand.get('thumb-tip');
-     const a=tip&&frame.getJointPose?.(tip,space),b=thumb&&frame.getJointPose?.(thumb,space);
-     if(!a||!b)return false;
-     const dx=a.transform.position.x-b.transform.position.x,dy=a.transform.position.y-b.transform.position.y,dz=a.transform.position.z-b.transform.position.z;
-     return Math.sqrt(dx*dx+dy*dy+dz*dz)<0.035;
-   }
-   return !!h.src.gamepad?.buttons?.[0]?.pressed;
- }
- function gripPressed(h){return !!h.src.gamepad?.buttons?.[1]?.pressed}
  function bindSession(s){
    session=s;
    s.addEventListener('inputsourceschange',e=>{
-     e.added.forEach(src=>{if((src.gamepad||src.hand)&&!hands.some(h=>h.src===src))attach(src)});
+     e.added.forEach(src=>{if(src.gamepad&&!hands.some(h=>h.src===src))attach(src)});
      e.removed.forEach(src=>{hands=hands.filter(h=>h.src!==src);if(grabbed?.hand?.src===src)grabbed=null});
    });
-   s.inputSources?.forEach(src=>{if(src.gamepad||src.hand)attach(src)});
+   s.inputSources?.forEach(src=>{if(src.gamepad)attach(src)});
    window.NOMAD_VR_TICKERS=window.NOMAD_VR_TICKERS.filter(x=>x.id!=='hands');
    window.NOMAD_VR_TICKERS.push({id:'hands',tick:(time,frame)=>{
      if(!frame)return;
      for(const h of hands){
-       updateHandPose(h,frame);
-       const hit=target(h,frame),label=labelOf(hit),select=handPressed(h,frame),grip=gripPressed(h);
-       if(label&&select&&!h.lastSelect)fireAction(label,hit);
-       if(grip&&!h.lastGrip){
+       if(h.controller){h.g.position.copy(h.controller.position);h.g.quaternion.copy(h.controller.quaternion)}
+       const src=h.src,b=src.gamepad?.buttons||[],hit=target(src),label=labelOf(hit);
+       if(label&&b[0]?.pressed)fireAction(label,hit);
+       if(b[1]?.pressed&&!grabbed){
          const g=findGrabbable(hit);
          if(g){grabbed={obj:g,hand:h};h.g.add(g);g.position.set(0,0,-.45);g.rotation.set(0,0,0);status('✋ Objet saisi · '+(g.userData.item||'objet NOMAD'))}
-       }else if(grabbed?.hand===h&&h.lastGrip&&!grip){
+       }else if(grabbed?.hand===h&&b[1]&&!b[1].pressed){
          const obj=grabbed.obj,scene=r.__nomadLastScene;
          if(scene){const p=obj.getWorldPosition(new THREE.Vector3()),q=obj.getWorldQuaternion(new THREE.Quaternion());scene.add(obj);obj.position.set(p.x,Math.max(.2,p.y),p.z);obj.quaternion.copy(q)}
          status('📦 Objet posé');grabbed=null;
        }
-       if(label&&!select&&!grip&&performance.now()-lastAction>900)status('👉 '+label);
-       h.lastSelect=select;h.lastGrip=grip;
+       if(label&&!b[0]?.pressed&&!b[1]?.pressed&&performance.now()-lastAction>900)status('👉 '+label);
      }
    }});
-   status('🥽 VR · contrôleurs + suivi des mains actifs');
+   status('🥽 VR · pointeur, mains et contrôleurs actifs');
  }
  const original=r.xr.setSession.bind(r.xr);r.xr.setSession=async s=>{const out=await original(s);bindSession(s);return out};
 }
