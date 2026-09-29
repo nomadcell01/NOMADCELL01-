@@ -38,15 +38,15 @@ function homeOf(p){
  const h=p.userData.life.home;
  return h&&Number.isFinite(Number(h.x))&&Number.isFinite(Number(h.z))?{x:Number(h.x),z:Number(h.z)}:{x:p.position.x,z:p.position.z};
 }
-function assign(p,days){
+function assign(p,days,reason='Infraction NOMAD'){
  const name=p.userData.life.name;
  const start=currentSimStamp();
  const durationDays=Math.max(1,days);
- cases[name]={name,reason:'Infraction NOMAD',start,end:start+durationDays*1440,endAt:Date.now()+durationDays*SIM_DAY_MS,home:homeOf(p),violations:0,active:true};
+ cases[name]={name,reason:String(reason||'Infraction NOMAD'),start,end:start+durationDays*1440,endAt:Date.now()+durationDays*SIM_DAY_MS,home:homeOf(p),violations:0,active:true};
  p.userData.life.justiceStatus='Assignation à domicile';
- p.userData.life.justiceReason='Infraction · interdiction de sortie';
+ p.userData.life.justiceReason=String(reason||'Infraction NOMAD')+' · interdiction de sortie';
  p.userData.life.justiceUntil=cases[name].end;
- save();render();window.showPrompt&&window.showPrompt('⚖️ '+name+' : assignation à domicile pour '+days+' jour'+(days>1?'s':''));
+ save();render();window.showPrompt&&window.showPrompt('⚖️ '+name+' : '+String(reason||'Infraction NOMAD')+' · assignation à domicile pour '+days+' jour'+(days>1?'s':''));
 }
 function lift(p){
  const name=p.userData.life.name;delete cases[name];
@@ -80,13 +80,13 @@ function render(){
    const l=p.userData.life,name=l.name,c=cases[name],r=c?remaining(c):0;
    return '<div class="justicePerson"><b>👤 '+esc(name)+'</b><small>'+(l.job?esc(l.job):'Habitant NOMAD')+'</small>'+
    (c?'<small>⚖️ <b>Assignation à domicile</b> · '+r+' jour'+(r>1?'s':'')+' restant'+(r>1?'s':'')+' · sorties interdites · violations : '+(c.violations||0)+'</small>':'<small>✅ Aucune mesure en cours</small>')+
-   '<div class="justiceActions">'+
+   '<div class="justiceActions"><select data-reason="'+esc(name)+'"><option>Infraction NOMAD</option><option>Nuisance</option><option>Dégradation</option><option>Vol</option><option>Agression</option><option>Mise en danger</option></select></div><div class="justiceActions">'+
    '<button data-name="'+esc(name)+'" data-days="1">1 jour</button><button data-name="'+esc(name)+'" data-days="3">3 jours</button><button data-name="'+esc(name)+'" data-days="7">7 jours</button>'+
    (c?'<button class="justiceActive" data-lift="'+esc(name)+'">✓ Lever la mesure</button>':'')+
    '</div></div>';
  }).join(''):'<small>Aucun habitant concerné pour le moment.</small>';
  list.querySelectorAll('[data-days]').forEach(b=>b.addEventListener('click',()=>{
-   const p=a.find(x=>x.userData.life.name===b.dataset.name);if(p)assign(p,Number(b.dataset.days));
+   const p=a.find(x=>x.userData.life.name===b.dataset.name);const sel=list.querySelector('select[data-reason="'+CSS.escape(b.dataset.name)+'"]');if(p)assign(p,Number(b.dataset.days),sel?sel.value:'Infraction NOMAD');
  }));
  list.querySelectorAll('[data-lift]').forEach(b=>b.addEventListener('click',()=>{
    const p=a.find(x=>x.userData.life.name===b.dataset.lift);if(p)lift(p);
