@@ -74,9 +74,14 @@ function boot(){
    if(['Bibliothèque NOMAD','Ordinateur archives','Ordinateur site NOMAD','Galerie projet NOMAD','Musée NOMAD','Archives techniques'].includes(label))window.NOMAD_REAL_ARCHIVE?.open?.(label);
  }
  function handPressed(h,frame){
-   const src=h.src,b=src.gamepad?.buttons||[];
-   if(src.hand)return !!frame.getJointPose?.(src.hand.get('index-finger-tip'),r.xr.getReferenceSpace?.());
-   return !!b[0]?.pressed;
+   if(h.src.hand){
+     const space=r.xr.getReferenceSpace?.(),tip=h.src.hand.get('index-finger-tip'),thumb=h.src.hand.get('thumb-tip');
+     const a=tip&&frame.getJointPose?.(tip,space),b=thumb&&frame.getJointPose?.(thumb,space);
+     if(!a||!b)return false;
+     const dx=a.transform.position.x-b.transform.position.x,dy=a.transform.position.y-b.transform.position.y,dz=a.transform.position.z-b.transform.position.z;
+     return Math.sqrt(dx*dx+dy*dy+dz*dz)<0.035;
+   }
+   return !!h.src.gamepad?.buttons?.[0]?.pressed;
  }
  function gripPressed(h){return !!h.src.gamepad?.buttons?.[1]?.pressed}
  function bindSession(s){
