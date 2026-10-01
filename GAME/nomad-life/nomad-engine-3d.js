@@ -14,7 +14,22 @@
  [-.48,.48].forEach((px,ii)=>{const a=new T.Mesh(new T.CapsuleGeometry(.14,.68,6,10),shirt);a.position.set(px,1.57,0);a.userData.limb=ii?'armR':'armL';g.add(a)});
  [-.2,.2].forEach((px,ii)=>{const leg=new T.Mesh(new T.CapsuleGeometry(.17,.78,6,10),pants);leg.position.set(px,.55,0);leg.userData.limb=ii?'legR':'legL';g.add(leg);const sh=new T.Mesh(new T.BoxGeometry(.42,.16,.68),shoe);sh.position.set(px,.12,-.09);g.add(sh)});
  g.position.set(x,0,z);g.traverse(o=>{if(o.isMesh)o.castShadow=true});G.add(g);return g
-}function setNpcActivityBadge(p,activity){if(!p||!p.userData)return;const text=String(activity||'Vie quotidienne');let icon='🏠';if(text.startsWith('Sommeil'))icon='😴';else if(text.startsWith('Petit-déjeuner')||text.startsWith('Repas'))icon='🍽️';else if(text.startsWith('Hygiène'))icon='🚿';else if(text.startsWith('Travail'))icon='💼';else if(text.startsWith('Loisirs'))icon='🎮';else if(text.startsWith('Vie sociale'))icon='❤️';const label=icon+' '+text.split(' · ')[0];if(p.userData.activityBadge&&p.userData.activityBadge.userData.label===label)return;if(p.userData.activityBadge){p.remove(p.userData.activityBadge);p.userData.activityBadge.material.map&&p.userData.activityBadge.material.map.dispose();p.userData.activityBadge.material.dispose()}const cv=document.createElement('canvas');cv.width=512;cv.height=128;const x=cv.getContext('2d');x.clearRect(0,0,512,128);x.fillStyle='rgba(8,18,28,.9)';x.beginPath();x.roundRect(8,12,496,96,28);x.fill();x.strokeStyle='rgba(255,255,255,.25)';x.lineWidth=3;x.stroke();x.font='bold 34px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';x.fillText(label,256,62);const tx=new T.CanvasTexture(cv);tx.colorSpace=T.SRGBColorSpace;const mat=new T.SpriteMaterial({map:tx,transparent:true,depthTest:false});const sp=new T.Sprite(mat);sp.scale.set(3.8,.95,1);sp.position.set(0,3.7,0);sp.userData.label=label;p.add(sp);p.userData.activityBadge=sp}function car(x,z,col){const g=new T.Group();const body=new T.Mesh(new T.BoxGeometry(3.8,.75,1.8),M(col));body.position.y=.72;g.add(body);const cabin=new T.Mesh(new T.BoxGeometry(2.1,.7,1.55),M('#6f8f9b'));cabin.position.set(-.15,1.25,0);g.add(cabin);[-1.25,1.25].forEach(wx=>[-.88,.88].forEach(wz=>{const w=new T.Mesh(new T.CylinderGeometry(.34,.34,.22,16),M('#1e293b'));w.rotation.x=Math.PI/2;w.position.set(wx,.38,wz);g.add(w)}));const light=M('#f5e6a8');[-1.72,1.72].forEach(wx=>{const h=new T.Mesh(new T.BoxGeometry(.28,.22,.08),light);h.position.set(wx,.82,-.92);g.add(h)});g.position.set(x,0,z);g.rotation.y=Math.PI/2;g.traverse(o=>o.castShadow=true);G.add(g)}function clear(){while(G.children.length)G.remove(G.children[0])}function animatePerson(g,t,phase){
+}function setNpcActivityBadge(p,activity){if(!p||!p.userData)return;const text=String(activity||'Vie quotidienne');let icon='🏠';if(text.startsWith('Sommeil'))icon='😴';else if(text.startsWith('Petit-déjeuner')||text.startsWith('Repas'))icon='🍽️';else if(text.startsWith('Hygiène'))icon='🚿';else if(text.startsWith('Travail'))icon='💼';else if(text.startsWith('Loisirs'))icon='🎮';else if(text.startsWith('Vie sociale'))icon='❤️';const label=icon+' '+text.split(' · ')[0];if(p.userData.activityBadge&&p.userData.activityBadge.userData.label===label)return;if(p.userData.activityBadge){p.remove(p.userData.activityBadge);p.userData.activityBadge.material.map&&p.userData.activityBadge.material.map.dispose();p.userData.activityBadge.material.dispose()}const cv=document.createElement('canvas');cv.width=512;cv.height=128;const x=cv.getContext('2d');x.clearRect(0,0,512,128);x.fillStyle='rgba(8,18,28,.9)';x.beginPath();x.roundRect(8,12,496,96,28);x.fill();x.strokeStyle='rgba(255,255,255,.25)';x.lineWidth=3;x.stroke();x.font='bold 34px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#fff';x.fillText(label,256,62);const tx=new T.CanvasTexture(cv);tx.colorSpace=T.SRGBColorSpace;const mat=new T.SpriteMaterial({map:tx,transparent:true,depthTest:false});const sp=new T.Sprite(mat);sp.scale.set(3.8,.95,1);sp.position.set(0,3.7,0);sp.userData.label=label;p.add(sp);p.userData.activityBadge=sp}function car(x,z,col){const g=new T.Group();const body=new T.Mesh(new T.BoxGeometry(3.8,.75,1.8),M(col));body.position.y=.72;g.add(body);const cabin=new T.Mesh(new T.BoxGeometry(2.1,.7,1.55),M('#6f8f9b'));cabin.position.set(-.15,1.25,0);g.add(cabin);[-1.25,1.25].forEach(wx=>[-.88,.88].forEach(wz=>{const w=new T.Mesh(new T.CylinderGeometry(.34,.34,.22,16),M('#1e293b'));w.rotation.x=Math.PI/2;w.position.set(wx,.38,wz);g.add(w)}));const light=M('#f5e6a8');[-1.72,1.72].forEach(wx=>{const h=new T.Mesh(new T.BoxGeometry(.28,.22,.08),light);h.position.set(wx,.82,-.92);g.add(h)});g.position.set(x,0,z);g.rotation.y=Math.PI/2;g.traverse(o=>o.castShadow=true);G.add(g)}function clear(){while(G.children.length)G.remove(G.children[0])}function syncNpcSocial(p,t){
+ if(!p||!p.userData?.life||!String(p.userData.pose||'').includes('social'))return;
+ let partner=p.userData.socialPartner;
+ if(!partner||partner===p||!partner.userData?.life||partner.userData.pose!=='social'){
+  partner=null;let bd=8;
+  for(const q of people){if(q===p||!q.userData?.life||q.userData.pose!=='social')continue;const d=Math.hypot(q.position.x-p.position.x,q.position.z-p.position.z);if(d<bd){bd=d;partner=q}}
+  p.userData.socialPartner=partner||null;
+ }
+ if(partner){
+  const dx=partner.position.x-p.position.x,dz=partner.position.z-p.position.z;
+  p.rotation.y=Math.atan2(dx,dz);
+  if(partner.userData.socialPartner!==p)partner.userData.socialPartner=p;
+  partner.rotation.y=Math.atan2(-dx,-dz);
+ }
+}
+function animatePerson(g,t,phase){
  if(!g||g.userData?.characterStyle!=='NOMAD-SIMS-3D')return;
  const pose=g.userData.pose||'idle',walk=g.userData.walking===true;
  const armL=g.children.find(o=>o.userData.limb==='armL'),armR=g.children.find(o=>o.userData.limb==='armR'),legL=g.children.find(o=>o.userData.limb==='legL'),legR=g.children.find(o=>o.userData.limb==='legR');
@@ -70,6 +85,7 @@
   const idle=slow*.035;
   if(armL)armL.rotation.z=idle;if(armR)armR.rotation.z=-idle;
  }
+ if(pose==='social')syncNpcSocial(g,t);
  if(g.userData.life&&g.userData.routineObject&&pose!=='idle')performNpcAction(g,g.userData.life.activity,g.userData.routineObject,t);
 }
 function setNpcPoseForActivity(p,activity){
