@@ -22,19 +22,45 @@
  const head=g.children.find(o=>o.geometry&&o.geometry.type==='SphereGeometry'&&o.position.y>2.4&&!o.userData.limb);
  if(walk){
   const swing=Math.sin(t*.009+phase)*.34;
-  if(armL)armL.rotation.x=swing;if(armR)armR.rotation.x=-swing;if(legL)legL.rotation.x=-swing*.72;if(legR)legR.rotation.x=swing*.72;
+  if(armL)armL.rotation.x=swing;if(armR)armR.rotation.x=-swing;
+  if(legL)legL.rotation.x=-swing*.72;if(legR)legR.rotation.x=swing*.72;
   g.position.y=Math.abs(Math.sin(t*.018+phase))*.025;
   return;
  }
  [armL,armR,legL,legR].forEach(x=>{if(x)x.rotation.set(0,0,0)});
- if(pose==='eat'){if(armL)armL.rotation.x=-.9;if(armR)armR.rotation.x=-.9;if(head)head.rotation.x=.12}
- else if(pose==='work'){if(armL)armL.rotation.x=-.55;if(armR)armR.rotation.x=-.7;if(torso)torso.rotation.x=.08}
- else if(pose==='wash'){if(armL)armL.rotation.x=-.65;if(armR)armR.rotation.x=-.5;if(head)head.rotation.x=.18}
- else if(pose==='relax'){if(armL)armL.rotation.x=.18;if(armR)armR.rotation.x=.18;if(torso)torso.rotation.x=-.05}
- else if(pose==='sleep'){if(torso)torso.rotation.x=-.18;g.position.y=.02}
- else if(pose==='social'){if(armR)armR.rotation.y=.25}
- else {const idle=Math.sin(t*.002+phase)*.035;if(armL)armL.rotation.z=idle;if(armR)armR.rotation.z=-idle}
- if(g.userData.life&&g.userData.routineObject&&g.userData.pose&&g.userData.pose!=='idle')performNpcAction(g,g.userData.life.activity,g.userData.routineObject,t);
+ const pulse=Math.sin(t*.006+phase),slow=Math.sin(t*.002+phase);
+ if(pose==='eat'){
+  const bite=(Math.sin(t*.004+phase)+1)*.5;
+  if(armL)armL.rotation.x=-.75-bite*.35;if(armR)armR.rotation.x=-.75-(1-bite)*.35;
+  if(head)head.rotation.x=.10+.04*bite;
+ }else if(pose==='work'){
+  const type=String(g.userData.routineObject?.userData?.type||g.userData.routineObject?.userData?.name||'').toLowerCase();
+  const active=Math.sin(t*.012+phase)*.22;
+  if(armL)armL.rotation.x=-.52-active;if(armR)armR.rotation.x=-.68+active;
+  if(torso)torso.rotation.x=.08;
+ }else if(pose==='wash'){
+  const scrub=Math.sin(t*.014+phase)*.18;
+  if(armL)armL.rotation.x=-.62-scrub;if(armR)armR.rotation.x=-.52+scrub;
+  if(head)head.rotation.x=.16;
+ }else if(pose==='relax'){
+  if(armL)armL.rotation.x=.12+slow*.04;if(armR)armR.rotation.x=.12-slow*.04;
+  if(torso)torso.rotation.x=-.08;
+  g.position.y=.01+Math.abs(pulse)*.008;
+ }else if(pose==='sleep'){
+  if(armL)armL.rotation.z=.08;if(armR)armR.rotation.z=-.08;
+  if(legL)legL.rotation.z=.03;if(legR)legR.rotation.z=-.03;
+  if(torso)torso.rotation.x=-.22;
+  if(head)head.rotation.x=.28;
+  g.position.y=.015;
+ }else if(pose==='social'){
+  const wave=Math.sin(t*.007+phase)*.12;
+  if(armR)armR.rotation.z=.22+wave;if(armL)armL.rotation.z=-.08-wave;
+  if(head)head.rotation.y=Math.sin(t*.0018+phase)*.08;
+ }else{
+  const idle=slow*.035;
+  if(armL)armL.rotation.z=idle;if(armR)armR.rotation.z=-idle;
+ }
+ if(g.userData.life&&g.userData.routineObject&&pose!=='idle')performNpcAction(g,g.userData.life.activity,g.userData.routineObject,t);
 }
 function setNpcPoseForActivity(p,activity){
  if(!p||p.userData?.characterStyle!=='NOMAD-SIMS-3D')return;
