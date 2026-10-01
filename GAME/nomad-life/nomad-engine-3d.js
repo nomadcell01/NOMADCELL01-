@@ -81,6 +81,18 @@ function syncNpcSocial(p,t){
   partner.userData.socialGesture=-phase;
   p.userData.socialConversationProgress=(p.userData.socialConversationProgress||0)+.0015;
   partner.userData.socialConversationProgress=(partner.userData.socialConversationProgress||0)+.0015;
+  const bond=(Number(p.userData.socialBond||50)+Number(partner.userData.socialBond||50))/2;
+  const mood=bond>=75?'chaleureuse':bond<=35?'tendue':'neutre';
+  p.userData.conversationMood=mood;partner.userData.conversationMood=mood;
+  p.userData.socialReaction=mood==='chaleureuse'?'smile':mood==='tendue'?'reserved':'talk';
+  partner.userData.socialReaction=p.userData.socialReaction;
+  if(mood==='chaleureuse'){
+   p.userData.socialGesture=phase*.75;
+   partner.userData.socialGesture=-phase*.75;
+  }else if(mood==='tendue'){
+   p.userData.socialGesture=phase*.35;
+   partner.userData.socialGesture=-phase*.35;
+  }
  }
 }
 function animatePerson(g,t,phase){
@@ -133,8 +145,17 @@ function animatePerson(g,t,phase){
   }
  }else if(pose==='social'){
   const wave=Math.sin(t*.007+phase)*.12;
-  if(armR)armR.rotation.z=.22+wave;if(armL)armL.rotation.z=-.08-wave;
-  if(head)head.rotation.y=Math.sin(t*.0018+phase)*.08;
+  const reaction=g.userData.socialReaction||'talk';
+  if(reaction==='smile'){
+   if(armR)armR.rotation.z=.18+wave;if(armL)armL.rotation.z=-.06-wave;
+   if(head)head.rotation.y=.035+Math.sin(t*.002+phase)*.045;
+  }else if(reaction==='reserved'){
+   if(armR)armR.rotation.z=.05+wave*.35;if(armL)armL.rotation.z=-.02-wave*.25;
+   if(head)head.rotation.y=-.035+Math.sin(t*.0016+phase)*.025;
+  }else{
+   if(armR)armR.rotation.z=.22+wave;if(armL)armL.rotation.z=-.08-wave;
+   if(head)head.rotation.y=Math.sin(t*.0018+phase)*.08;
+  }
  }else{
   const idle=slow*.035;
   if(armL)armL.rotation.z=idle;if(armR)armR.rotation.z=-idle;
