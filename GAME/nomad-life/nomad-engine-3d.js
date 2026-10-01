@@ -311,6 +311,7 @@ function updateNpcMovement(now){
   }
  });
 }
+function nomadSafeCall(fn){try{fn()}catch(err){console.error('[NOMAD moteur]',err)}}
 function nomadFrame(now){
   updatePlayer();
   updateNpcLife(now);
