@@ -34,6 +34,7 @@
  else if(pose==='sleep'){if(torso)torso.rotation.x=-.18;g.position.y=.02}
  else if(pose==='social'){if(armR)armR.rotation.y=.25}
  else {const idle=Math.sin(t*.002+phase)*.035;if(armL)armL.rotation.z=idle;if(armR)armR.rotation.z=-idle}
+ if(g.userData.life&&g.userData.routineObject&&g.userData.pose&&g.userData.pose!=='idle')performNpcAction(g,g.userData.life.activity,g.userData.routineObject,t);
 }
 function setNpcPoseForActivity(p,activity){
  if(!p||p.userData?.characterStyle!=='NOMAD-SIMS-3D')return;
