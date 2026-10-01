@@ -20,21 +20,21 @@
  const armL=g.children.find(o=>o.userData.limb==='armL'),armR=g.children.find(o=>o.userData.limb==='armR'),legL=g.children.find(o=>o.userData.limb==='legL'),legR=g.children.find(o=>o.userData.limb==='legR');
  const torso=g.children.find(o=>o.geometry&&o.geometry.type==='CapsuleGeometry'&&!o.userData.limb);
  const head=g.children.find(o=>o.geometry&&o.geometry.type==='SphereGeometry'&&o.position.y>2.4&&!o.userData.limb);
+ const furniture=g.userData.routineObject, type=String(furniture?.userData?.type||furniture?.userData?.name||'').toLowerCase();
  if(walk){
   const swing=Math.sin(t*.009+phase)*.34;
   if(armL)armL.rotation.x=swing;if(armR)armR.rotation.x=-swing;
   if(legL)legL.rotation.x=-swing*.72;if(legR)legR.rotation.x=swing*.72;
-  g.position.y=Math.abs(Math.sin(t*.018+phase))*.025;
-  return;
+  g.position.y=Math.abs(Math.sin(t*.018+phase))*.025; return;
  }
  [armL,armR,legL,legR].forEach(x=>{if(x)x.rotation.set(0,0,0)});
  const pulse=Math.sin(t*.006+phase),slow=Math.sin(t*.002+phase);
  if(pose==='eat'){
   const bite=(Math.sin(t*.004+phase)+1)*.5;
   if(armL)armL.rotation.x=-.75-bite*.35;if(armR)armR.rotation.x=-.75-(1-bite)*.35;
-  if(head)head.rotation.x=.10+.04*bite;
+  if(legL)legL.rotation.x=.38;if(legR)legR.rotation.x=.38;
+  if(torso)torso.rotation.x=.12;if(head)head.rotation.x=.1+.04*bite;
  }else if(pose==='work'){
-  const type=String(g.userData.routineObject?.userData?.type||g.userData.routineObject?.userData?.name||'').toLowerCase();
   const active=Math.sin(t*.012+phase)*.22;
   if(armL)armL.rotation.x=-.52-active;if(armR)armR.rotation.x=-.68+active;
   if(torso)torso.rotation.x=.08;
@@ -43,15 +43,25 @@
   if(armL)armL.rotation.x=-.62-scrub;if(armR)armR.rotation.x=-.52+scrub;
   if(head)head.rotation.x=.16;
  }else if(pose==='relax'){
-  if(armL)armL.rotation.x=.12+slow*.04;if(armR)armR.rotation.x=.12-slow*.04;
-  if(torso)torso.rotation.x=-.08;
+  if(type.includes('chaise')||type.includes('sofa')||type.includes('fauteuil')||type.includes('banc')){
+   if(torso)torso.rotation.x=-.22;
+   if(legL)legL.rotation.x=-.42;if(legR)legR.rotation.x=-.42;
+   if(armL)armL.rotation.x=.18;if(armR)armR.rotation.x=.18;
+  }else{
+   if(armL)armL.rotation.x=.12+slow*.04;if(armR)armR.rotation.x=.12-slow*.04;
+  }
   g.position.y=.01+Math.abs(pulse)*.008;
  }else if(pose==='sleep'){
-  if(armL)armL.rotation.z=.08;if(armR)armR.rotation.z=-.08;
-  if(legL)legL.rotation.z=.03;if(legR)legR.rotation.z=-.03;
-  if(torso)torso.rotation.x=-.22;
-  if(head)head.rotation.x=.28;
-  g.position.y=.015;
+  if(type.includes('lit')||type.includes('canape')||type.includes('sofa')||type.includes('chaise')||type.includes('banc')){
+   g.position.y=.03; if(torso)torso.rotation.x=-.55;
+   if(legL)legL.rotation.x=-.7;if(legR)legR.rotation.x=-.7;
+   if(armL)armL.rotation.x=-.25;if(armR)armR.rotation.x=-.25;
+   if(head)head.rotation.x=.42;
+  }else{
+   if(armL)armL.rotation.z=.08;if(armR)armR.rotation.z=-.08;
+   if(legL)legL.rotation.z=.03;if(legR)legR.rotation.z=-.03;
+   if(torso)torso.rotation.x=-.22;if(head)head.rotation.x=.28;
+  }
  }else if(pose==='social'){
   const wave=Math.sin(t*.007+phase)*.12;
   if(armR)armR.rotation.z=.22+wave;if(armL)armL.rotation.z=-.08-wave;
