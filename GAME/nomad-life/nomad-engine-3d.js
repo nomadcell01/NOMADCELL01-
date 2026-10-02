@@ -2,8 +2,7 @@ import * as THREE from './vendor/three.module.min.js';
 (()=>{'use strict';
 const canvas=document.getElementById('world'), prompt=document.getElementById('prompt');
 if(!canvas){return;}
-if(!window.THREE){if(prompt)prompt.textContent='Moteur 3D : Three.js non chargé';return;}
-const T=window.THREE;
+const T=THREE;
 let renderer,scene,camera,world='TERRE',player,people=[],objects=[],yaw=0,pitch=.55,distance=18;
 let targetYaw=0,targetPitch=.55,drag=false,lastX=0,lastY=0,moveX=0,moveY=0,simMinutes=8*60,simDay=1;
 const needs={energy:100,hunger:100,hygiene:100,fun:100};
