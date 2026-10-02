@@ -37,9 +37,9 @@ window.addEventListener("error",function(e){
   if(p)p.textContent="Erreur moteur: "+(e.message||"chargement");
 });
 </script>
-<script type="module" src="./nomad-engine-3d.js?v=20261002-8"></script>
+<script type="module" src="./nomad-engine-3d.js?v=20261002-14"></script>
 <script src="nomad-player-history.js?v=20260929-1"></script><script src="nomad-real-archive.js?v=20260929-1"></script><script src="nomad-real-project-story.js?v=20260929-1"></script><script src="nomad-npc-mood.js?v=20260928-2"></script>
 <!-- T.H.E.O. temporairement désactivé : syntaxe à réparer --><!-- Justice temporairement désactivé : syntaxe à réparer -->
-<script>(function(){const intro=document.getElementById("intro"),game=document.getElementById("game"),start=document.getElementById("startGame");function startNomad(){intro.classList.add("hidden");game.style.display="block"}start.addEventListener("click",startNomad)})();</script>
+<script>(function(){const intro=document.getElementById("intro"),game=document.getElementById("game"),start=document.getElementById("startGame");function startNomad(){intro.classList.add("hidden");game.style.display="block";requestAnimationFrame(function(){if(window.NOMAD_RESIZE)window.NOMAD_RESIZE()})}start.addEventListener("click",startNomad)})();</script>
 </body>
 </html>
