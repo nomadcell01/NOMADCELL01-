@@ -31,8 +31,40 @@
   <section id="buyPanel" class="drawer"><div class="panelHead"><div><b>🛋️ NOMAD MARKET</b><small>1 🪙 = 1 € de référence · unité virtuelle</small></div><button id="closeBuy">✕</button></div><div class="catalog"><button data-item="chair" data-price="5">🪑<b>Chaise</b><small>🪙 5 · réf. 5 €</small></button><button data-item="table" data-price="10">▱<b>Table</b><small>🪙 10 · réf. 10 €</small></button><button data-item="sofa" data-price="100">🛋️<b>Canapé</b><small>🪙 100 · réf. 100 €</small></button><button data-item="sink" data-price="150">🚰<b>Évier</b><small>🪙 150 · réf. 150 €</small></button><button data-item="shower" data-price="200">🚿<b>Douche</b><small>🪙 200 · réf. 200 €</small></button><button data-item="tv" data-price="250">📺<b>TV</b><small>🪙 250 · réf. 250 €</small></button></div></section>
   <div class="virtualMoneyNote">🪙 Les NOMAD PIÈCES sont une unité de valeur virtuelle. Elles ne constituent pas de l’argent réel.</div><div class="marketFooter">🪙 <b>1 NOMAD PIÈCE = 1 € de référence</b><br><small>Unité virtuelle uniquement · aucun paiement réel.</small></div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.min.js"></script><script>window.addEventListener("error",function(e){var p=document.getElementById("prompt");if(p)p.textContent="Erreur moteur: "+(e.message||"chargement");});</script>
-<script src="nomad-engine-3d.js?v=20261002-3"></script><!-- VR chargé séparément après validation du moteur 3D -->
+<script>
+window.addEventListener("error",function(e){
+  var p=document.getElementById("prompt");
+  if(p)p.textContent="Erreur moteur: "+(e.message||"chargement");
+});
+(function(){
+  var sources=[
+    "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.min.js",
+    "https://unpkg.com/three@0.179.1/build/three.min.js"
+  ];
+  var i=0;
+  function loadEngine(){
+    var s=document.createElement("script");
+    s.src="nomad-engine-3d.js?v=20261002-4";
+    s.onload=function(){window.NOMAD_ENGINE_LOADED=true;};
+    s.onerror=function(){var p=document.getElementById("prompt");if(p)p.textContent="Erreur : moteur 3D NOMAD introuvable";};
+    document.body.appendChild(s);
+  }
+  function loadThree(){
+    if(window.THREE){loadEngine();return;}
+    if(i>=sources.length){
+      var p=document.getElementById("prompt");
+      if(p)p.textContent="Erreur : Three.js ne peut pas être chargé sur cet appareil";
+      return;
+    }
+    var s=document.createElement("script");
+    s.src=sources[i++];
+    s.onload=function(){if(window.THREE)loadEngine();else loadThree();};
+    s.onerror=loadThree;
+    document.head.appendChild(s);
+  }
+  loadThree();
+})();
+</script>
 <script src="nomad-player-history.js?v=20260929-1"></script><script src="nomad-real-archive.js?v=20260929-1"></script><script src="nomad-real-project-story.js?v=20260929-1"></script><script src="nomad-npc-mood.js?v=20260928-2"></script>
 <!-- T.H.E.O. temporairement désactivé : syntaxe à réparer --><!-- Justice temporairement désactivé : syntaxe à réparer -->
 <script>(function(){const intro=document.getElementById("intro"),game=document.getElementById("game"),start=document.getElementById("startGame");function startNomad(){intro.classList.add("hidden");game.style.display="block"}start.addEventListener("click",startNomad)})();</script>
