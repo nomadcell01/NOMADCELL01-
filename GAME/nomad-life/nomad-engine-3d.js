@@ -1,3 +1,4 @@
+import * as THREE from './vendor/three.module.min.js';
 (()=>{'use strict';
 const canvas=document.getElementById('world'), prompt=document.getElementById('prompt');
 if(!canvas){return;}
