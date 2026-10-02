@@ -39,12 +39,14 @@ window.addEventListener("error",function(e){
 (function(){
   var sources=[
     "https://cdn.jsdelivr.net/npm/three@0.179.1/build/three.min.js",
-    "https://unpkg.com/three@0.179.1/build/three.min.js"
+    "https://unpkg.com/three@0.179.1/build/three.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/three.js/r179/three.min.js",
+    "https://raw.githubusercontent.com/mrdoob/three.js/r179/build/three.min.js"
   ];
   var i=0;
   function loadEngine(){
     var s=document.createElement("script");
-    s.src="nomad-engine-3d.js?v=20261002-4";
+    s.src="nomad-engine-3d.js?v=20261002-5";
     s.onload=function(){window.NOMAD_ENGINE_LOADED=true;};
     s.onerror=function(){var p=document.getElementById("prompt");if(p)p.textContent="Erreur : moteur 3D NOMAD introuvable";};
     document.body.appendChild(s);
@@ -53,7 +55,7 @@ window.addEventListener("error",function(e){
     if(window.THREE){loadEngine();return;}
     if(i>=sources.length){
       var p=document.getElementById("prompt");
-      if(p)p.textContent="Erreur : Three.js ne peut pas être chargé sur cet appareil";
+      if(p)p.textContent="Erreur : aucune source Three.js accessible";
       return;
     }
     var s=document.createElement("script");
