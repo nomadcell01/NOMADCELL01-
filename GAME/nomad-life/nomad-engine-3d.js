@@ -27,6 +27,7 @@ function person(x,z,c,name,isPlayer=false){
   g.traverse(o=>{o.castShadow=true;});
   scene.add(g);people.push(g);return g;
 }
+function hubMat(c,roughness=.82,metalness=0){return new T.MeshStandardMaterial({color:c,roughness,metalness});}
 function hubBox(x,y,z,w,h,d,c,opts={}){
   const m=new T.Mesh(new T.BoxGeometry(w,h,d),hubMat(c,opts.roughness??.82,opts.metalness??0));
   m.position.set(x,y+h/2,z);
