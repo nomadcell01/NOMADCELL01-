@@ -164,6 +164,12 @@ function tree(x,z,scale=1){
   const crown=new T.Mesh(new T.SphereGeometry(1.15*scale,14,10),mat('#3f8653'));crown.position.y=2.05*scale;crown.castShadow=true;g.add(crown);
   g.position.set(x,0,z);scene.add(g);objects.push(g);
 }
+function clearWorld(){
+  for(const o of objects){ if(o && o.parent) o.parent.remove(o); }
+  objects.length=0;
+  people.length=0;
+  player=null;
+}
 function build(){
   clearWorld();
   if(world==='HUB'){
