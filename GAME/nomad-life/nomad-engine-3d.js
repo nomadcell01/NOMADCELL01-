@@ -145,6 +145,25 @@ function buildHubUnderground(){
   for(const p of [[-25,-16],[-10,-16],[5,-16],[20,-16],[-25,-3],[-10,-3],[5,-3],[20,-3]])hubLabel(p[0],p[1],rooms.find(r=>r[0]===p[0]&&r[1]===p[1])?.[4]||'ZONE');
   say('⬇️ Sous-sol HUB — structures fixes, zone jouable');
 }
+function house(x,z,c){
+  const g=new T.Group();
+  const h=3.2+((Math.abs(x)+Math.abs(z))%3)*0.55;
+  const w=6.5+((Math.abs(x*3)+Math.abs(z))%2)*1.8;
+  const d=6.2+((Math.abs(z*2)+Math.abs(x))%2)*1.4;
+  const facade=mat(c), trim=mat('#e7e2d8'), glass=mat('#6d9eaa'), roof=mat('#4b4f52');
+  const body=new T.Mesh(new T.BoxGeometry(w,h,d),facade);body.position.y=h/2;body.castShadow=true;body.receiveShadow=true;g.add(body);
+  const roofM=new T.Mesh(new T.ConeGeometry(Math.max(w,d)*.72,1.6,4),roof);roofM.position.y=h+.8;roofM.rotation.y=Math.PI/4;roofM.castShadow=true;g.add(roofM);
+  for(const sx of [-1,1]){const win=new T.Mesh(new T.BoxGeometry(.08,1.15,1.7),glass);win.position.set(sx*(w/2+.01),h*.58,0);g.add(win);}
+  for(const sz of [-1,1]){const win=new T.Mesh(new T.BoxGeometry(1.7,1.15,.08),glass);win.position.set(0,h*.58,sz*(d/2+.01));g.add(win);}
+  const door=new T.Mesh(new T.BoxGeometry(1.05,2.1,.12),trim);door.position.set(0,1.05,d/2+.07);g.add(door);
+  const base=new T.Mesh(new T.BoxGeometry(w+.35,.12,d+.35),trim);base.position.y=.06;base.receiveShadow=true;g.add(base);
+  g.position.set(x,0,z);scene.add(g);objects.push(g);
+}
+function tree(x,z,scale=1){
+  const g=new T.Group();const trunk=new T.Mesh(new T.CylinderGeometry(.18*scale,.24*scale,1.5*scale,10),mat('#604a37'));trunk.position.y=.75*scale;trunk.castShadow=true;g.add(trunk);
+  const crown=new T.Mesh(new T.SphereGeometry(1.15*scale,14,10),mat('#3f8653'));crown.position.y=2.05*scale;crown.castShadow=true;g.add(crown);
+  g.position.set(x,0,z);scene.add(g);objects.push(g);
+}
 function build(){
   clearWorld();
   if(world==='HUB'){
