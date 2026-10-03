@@ -3,7 +3,7 @@ import * as THREE from './vendor/three.module.min.js';
 const canvas=document.getElementById('world'), prompt=document.getElementById('prompt');
 if(!canvas){return;}
 const T=THREE;
-let renderer,scene,camera,world='TERRE',player,people=[],objects=[],yaw=0,pitch=.55,distance=12,hubUnderground=false;
+let renderer,scene,camera,world='HUB',player,people=[],objects=[],yaw=0,pitch=.55,distance=12,hubUnderground=false;
 let targetYaw=0,targetPitch=.38,drag=false,lastX=0,lastY=0,moveX=0,moveY=0,simMinutes=8*60,simDay=1;
 const needs={energy:100,hunger:100,hygiene:100,fun:100};
 const worlds=['TERRE','BEACH','MER','MONTAGNE','LUNE','MARS','ESPACE','HUB'];
