@@ -15,7 +15,150 @@ function person(x,z,c,name,isPlayer=false){const g=new T.Group();const body=new 
 function house(x,z,c){meshBox(x,0,z,8,4,6,c);meshBox(x,0,z-3.08,1.2,2.2,.18,'#604536');meshBox(x-2.3,2.0,z-3.08,1.5,1.3,.18,'#78b8d0');meshBox(x+2.3,2.0,z-3.08,1.5,1.3,.18,'#78b8d0');const roof=new T.Mesh(new T.ConeGeometry(5.7,2.2,4),mat('#8f5145'));roof.rotation.y=Math.PI/4;roof.position.set(x,5,z);roof.castShadow=true;scene.add(roof);objects.push(roof);}
 function tree(x,z,s=1){meshBox(x,0,z,.55,2.5*s,.55,'#705039');const t=new T.Mesh(new T.SphereGeometry(1.8*s,12,8),mat('#5f9c5b'));t.position.set(x,2.8*s,z);t.castShadow=true;scene.add(t);objects.push(t);}
 function clearWorld(){for(const o of objects)scene.remove(o);objects=[];for(const p of people)scene.remove(p);people=[];}
-function build(){clearWorld();const col=colors[world]||colors.TERRE;scene.background=new T.Color(col[0]);say('🏠 Chargement de la ville NOMAD…');scene.fog=new T.Fog(col[0],45,120);meshBox(0,-.1,0,90,.1,90,col[1]);meshBox(0,0,0,3,.08,55,'#6f7472');meshBox(-18,0,0,3,.08,55,'#6f7472');meshBox(18,0,0,3,.08,55,'#6f7472');house(0,2,world==='MARS'?'#9b5b49':world==='LUNE'?'#9699a0':'#dfc39d');house(11,7,'#c5d8bf');house(-13,12,'#d5b39d');if(world!=='ESPACE'&&world!=='LUNE')[[25,-15],[-25,-13],[-24,16],[26,18],[-23,5],[24,4]].forEach(p=>tree(p[0],p[1]));if(world==='BEACH'||world==='MER')meshBox(0,-.02,31,90,.05,28,'#59b3cf');if(world==='MONTAGNE')for(let i=0;i<8;i++){const m=new T.Mesh(new T.ConeGeometry(3,7,7),mat('#777e80'));m.position.set((i%4-1.5)*18,3.5,(Math.floor(i/4)-.5)*28);m.castShadow=true;scene.add(m);objects.push(m);}if(world==='LUNE'||world==='MARS'||world==='ESPACE'){for(let i=0;i<12;i++){const r=1+Math.random()*2;const m=new T.Mesh(new T.SphereGeometry(r,8,6),mat(world==='ESPACE'?'#334155':'#6b625e'));m.position.set((Math.random()-.5)*70,r*.5,(Math.random()-.5)*70);m.castShadow=true;scene.add(m);objects.push(m);}}player=person(0,-10,'#527f93','Joueur NOMAD',true);person(5,-2,'#9b6758','Lina');person(-5,-5,'#6f8c66','Milo');window.NOMAD_PEOPLE=people;say('🌍 NOMAD '+world+' — prêt à vivre');}
+
+function hubMat(c,rough=.82,metal=0){
+  return new T.MeshStandardMaterial({color:c,roughness:rough,metalness:metal});
+}
+function hubBox(x,y,z,w,h,d,c,opts={}){
+  const m=new T.Mesh(new T.BoxGeometry(w,h,d),hubMat(c,opts.roughness??.82,opts.metalness??0));
+  m.position.set(x,y+h/2,z);
+  m.castShadow=true;m.receiveShadow=true;scene.add(m);objects.push(m);
+  return m;
+}
+function hubRoom(x,z,w,d,label,c='#d6d0c5',floor='#8a6a4b'){
+  hubBox(x,0,z,w,.12,d,floor);
+  hubBox(x-.5*w,0,z,.12,2.8,d,c);hubBox(x+.5*w,0,z,.12,2.8,d,c);
+  hubBox(x,0,z+.5*d,w,.12,2.8,c);
+  const sign=hubBox(x,2.25,z-.5*d-.03,Math.min(w*.65,3.0),.34,.05,'#183342');
+  sign.userData.label=label;
+}
+function hubDoor(x,z){
+  hubBox(x,0,z,.95,2.25,.10,'#5c3f2e');
+}
+function hubGlass(x,z,w,h=2.2){
+  hubBox(x,0,z,w,h,.05,'#73b9c9',{roughness:.15});
+}
+function hubTable(x,z,w=1.2,d=.7){
+  hubBox(x,.72,z,w,.08,d,'#6b4a32');
+  for(const dx of [-w*.42,w*.42]) for(const dz of [-d*.42,d*.42]) hubBox(x+dx,0.12,z+dz,.06,.72,.06,'#252b2d',{metalness:.65});
+}
+function hubBed(x,z,w=1.6,d=2.0){
+  hubBox(x,.32,z,w,.30,d,'#d7d1c7');
+  hubBox(x,.62,z+d*.42,w,.65,.12,'#76563f');
+  hubBox(x,.68,z-.15,w*.82,.12,d*.68,'#f0ece3');
+}
+function hubSofa(x,z,w=1.8){
+  hubBox(x,.38,z,w,.45,.72,'#555b61');
+  hubBox(x,.78,z+.28,w,.55,.18,'#555b61');
+  hubBox(x,.65,z-.35,.18,.65,.72,'#555b61');hubBox(x+w*.5-.09,.65,z-.35,.18,.65,.72,'#555b61');
+}
+function hubPlant(x,z){
+  hubBox(x,.25,z,.34,.5,.34,'#303a36');
+  const p=new T.Mesh(new T.SphereGeometry(.42,12,8),hubMat('#3f8653',.9));
+  p.position.set(x,.85,z);p.castShadow=true;scene.add(p);objects.push(p);
+}
+function hubLight(x,z){
+  const l=new T.PointLight('#ffd9a1',18,8);l.position.set(x,2.7,z);scene.add(l);objects.push(l);
+}
+function hubLabel(x,z,text){
+  const c=document.createElement('canvas');c.width=512;c.height=96;const q=c.getContext('2d');
+  q.fillStyle='#10222d';q.fillRect(0,0,c.width,c.height);q.fillStyle='#ffffff';q.font='bold 34px sans-serif';q.textAlign='center';q.fillText(text,256,58);
+  const tex=new T.CanvasTexture(c), m=new T.MeshBasicMaterial({map:tex,transparent:true});const p=new T.Mesh(new T.PlaneGeometry(3.0,.56),m);p.position.set(x,2.7,z);p.rotation.x=-Math.PI/2;scene.add(p);objects.push(p);
+}
+function buildHubSurface(){
+  const steel='#3c4a51',glass='#78b8c4',stone='#d7d2c7',wood='#78543a',dark='#20282d';
+  // landscaped site / roads
+  hubBox(0,-.12,0,86,.12,74,'#79a96c');
+  hubBox(0,0,31,86,.08,6,'#454d50');hubBox(-31,0,0,6,.08,62,'#454d50');hubBox(31,0,0,6,.08,62,'#454d50');
+  // central HUB footprint, open circulation
+  hubBox(0,0,0,38,.18,28,stone);
+  hubBox(0,0,-13,34,.18,2.0,wood);
+  hubBox(0,0,13,34,.18,2.0,wood);
+  // exterior wings
+  hubRoom(-12,-5,9,12,'CHAMBRES + SDB','#d9d2c6',wood);
+  hubRoom(12,-5,9,12,'APPARTEMENTS PERSONNEL','#cbd4d0',wood);
+  hubRoom(-12,7,9,9,'DIRECTION / AVOCAT','#d6cec1',wood);
+  hubRoom(12,7,9,9,'TV / RADIO','#202b34',dark);
+  // central public zone
+  hubRoom(0,-5,11,9,'LOUNGE / ACCUEIL','#d9d3c8',wood);
+  hubRoom(0,7,11,9,'RESTAURANT','#d2c5b0',wood);
+  // service / lab / garage
+  hubRoom(-19,7,5,9,'LAB ROBOTIQUE','#bfcbd0',steel);
+  hubRoom(19,7,5,9,'GARAGE','#b9bec0',steel);
+  // pro kitchen behind restaurant
+  hubRoom(0,13.2,11,3.5,'CUISINE PROFESSIONNELLE','#c6c0b5',steel);
+  // safety + technical
+  hubRoom(-19,-6,5,7,'PC SÉCURITÉ','#26333b',dark);
+  hubRoom(19,-6,5,7,'LOCAUX TECHNIQUES','#9ea8aa',steel);
+  // doors and glass
+  hubDoor(0,-9.55);hubDoor(-7.5,-9.55);hubDoor(7.5,-9.55);
+  hubGlass(-19.01,-1.5,4.8,2.2);hubGlass(19.01,-1.5,4.8,2.2);hubGlass(-2.8,13.15,5,2.2);hubGlass(2.8,13.15,5,2.2);
+  // central atrium / tower
+  hubBox(0,0,0,7,.25,7,glass,{roughness:.2,metalness:.25});
+  hubBox(0,.25,0,5,4.8,5,glass,{roughness:.18,metalness:.2});
+  hubBox(0,0,0,1.2,5.5,1.2,steel,{metalness:.65});
+  // exterior pool + terrace + DJ
+  hubBox(0,0,-23,20,.18,9,'#59b8cf');
+  hubBox(-11,0,-23,3,.2,3,wood);hubBox(-11,.2,-23,2.4,.7,2.2,dark);
+  hubBox(11,0,-23,4,.2,3,wood);hubBox(11,.2,-23,3.2,.7,2.2,dark);
+  // furnishings
+  hubSofa(-3,-5,2.0);hubSofa(3,-5,2.0);hubTable(0,-4.4,1.0,.55);
+  for(const p of [[-13,-5],[-11,-8],[-10,7],[10,7],[13,-5],[16,7],[-16,7],[0,5]])hubPlant(p[0],p[1]);
+  for(const p of [[-12,-5],[12,-5],[-12,7],[12,7],[-19,7],[19,7],[0,-5],[0,7]])hubLight(p[0],p[1]);
+  for(const x of [-15,-11,11,15]){hubBed(x,-5,1.55,2.1);}
+  for(const x of [-2.5,0,2.5])hubTable(x,7,1.4,.7);
+  hubLabel(0,-10.8,'NOMADCELL01 HUB');
+  // entry path + parking / helipad
+  hubBox(0,0,-30,12,.08,4,'#454d50');hubBox(-27,0,-27,8,.08,8,'#525a5d');
+  hubLabel(-27,-27,'H');
+}
+function buildHubUnderground(){
+  const floor='#454b4e',wall='#727b7e',steel='#20282d',cyan='#2c8aa0';
+  hubBox(0,-.12,0,82,.12,62,'#343a3d');
+  // fixed underground grid
+  const rooms=[
+    [-25,-16,12,9,'GARAGE / TRANSPORT'],
+    [-10,-16,12,9,'STOCKAGE ÉNERGÉTIQUE'],
+    [5,-16,12,9,'RÉSEAU EAU / PURIFICATION'],
+    [20,-16,12,9,'ATELIER ROBOTIQUE'],
+    [-25,-3,12,9,'FABRICATION'],
+    [-10,-3,12,9,'ENTREPÔT'],
+    [5,-3,12,9,'LOCAL TECHNIQUE'],
+    [20,-3,12,9,'SÉCURITÉ / CONTRÔLE'],
+    [-18,10,12,9,'SPORT / DÉTENTE'],
+    [-3,10,12,9,'CHAMBRES / REPOS'],
+    [12,10,12,9,'ESPACE DÉTENTE']
+  ];
+  for(const r of rooms)hubRoom(r[0],r[1],r[2],r[3],r[4],wall,steel);
+  hubBox(0,0,0,7,.2,7,cyan);
+  hubBox(0,.2,0,3.5,3.8,3.5,steel,{metalness:.5});
+  for(const x of [-27,-18,-9,0,9,18,27]){hubLight(x,-25);hubLight(x,16);}
+  for(const p of [[-25,-16],[-10,-16],[5,-16],[20,-16],[-25,-3],[-10,-3],[5,-3],[20,-3]])hubLabel(p[0],p[1],rooms.find(r=>r[0]===p[0]&&r[1]===p[1])?.[4]||'ZONE');
+  say('⬇️ Sous-sol HUB — structures fixes, zone jouable');
+}
+function build(){
+  clearWorld();
+  if(world==='HUB'){
+    buildHubSurface();
+    player=person(0,-17,'#527f93','Joueur NOMAD',true);
+    person(-4,-4,'#9b6758','Lina');person(5,-4,'#6f8c66','Milo');person(-7,8,'#806b9a','Aya');
+    window.NOMAD_PEOPLE=people;
+    say('◎ NOMADCELL01 HUB — surface prête à vivre · U = sous-sol');
+    return;
+  }
+  const col=colors[world]||colors.TERRE;
+  scene.background=new T.Color(col[0]);say('🏠 Chargement de la ville NOMAD…');
+  scene.fog=new T.Fog(col[0],45,120);
+  meshBox(0,-.1,0,90,.1,90,col[1]);
+  meshBox(0,0,0,3,.08,55,'#6f7472');meshBox(-18,0,0,3,.08,55,'#6f7472');meshBox(18,0,0,3,.08,55,'#6f7472');
+  house(0,2,world==='MARS'?'#9b5b49':world==='LUNE'?'#9699a0':'#dfc39d');
+  house(11,7,'#c5d8bf');house(-13,12,'#d5b39d');
+  if(world!=='ESPACE'&&world!=='LUNE')[[25,-15],[-25,-13],[-24,16],[26,18],[-23,5],[24,4]].forEach(p=>tree(p[0],p[1]));
+  if(world==='BEACH'||world==='MER')meshBox(0,-.02,31,90,.05,28,'#59b3cf');
+  if(world==='MONTAGNE')for(let i=0;i<8;i++){const m=new T.Mesh(new T.ConeGeometry(3,7,7),mat('#777e80'));m.position.set((i%4-1.5)*18,3.5,(Math.floor(i/4)-.5)*28);m.castShadow=true;scene.add(m);objects.push(m);}
+  if(world==='LUNE'||world==='MARS'||world==='ESPACE')for(let i=0;i<12;i++){const r=1+Math.random()*2;const m=new T.Mesh(new T.SphereGeometry(r,8,6),mat(world==='ESPACE'?'#334155':'#6b625e'));m.position.set((Math.random()-.5)*70,r*.5,(Math.random()-.5)*70);m.castShadow=true;scene.add(m);objects.push(m);}
+  player=person(0,-10,'#527f93','Joueur NOMAD',true);person(5,-2,'#9b6758','Lina');person(-5,-5,'#6f8c66','Milo');window.NOMAD_PEOPLE=people;say('🌍 NOMAD '+world+' — prêt à vivre');
+}
 function nextWorld(){worlds[(worlds.indexOf(world)+1)%worlds.length];world=worlds[(worlds.indexOf(world)+1)%worlds.length];build();say('🚌 Transport NOMAD → '+world);}
 function init(){try{renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.shadowMap.enabled=true;scene=new T.Scene();camera=new T.PerspectiveCamera(55,1,.1,250);scene.add(camera);scene.add(new T.HemisphereLight(0xffffff,0x445566,2.2));const light=new T.DirectionalLight(0xffffff,2.4);light.position.set(25,40,15);light.castShadow=true;scene.add(light);build();resize();bind();loop();}catch(e){say('Erreur moteur: '+(e&&e.message?e.message:String(e)));console.error(e);}}
 function resize(){if(!renderer||!camera)return;const w=canvas.clientWidth||window.innerWidth,h=canvas.clientHeight||window.innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
