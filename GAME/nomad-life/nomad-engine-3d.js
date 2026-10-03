@@ -11,13 +11,21 @@ const colors={TERRE:['#9bd4ee','#79a95d'],BEACH:['#8ed8ee','#e8c47b'],MER:['#55a
 function say(s){if(prompt)prompt.textContent=s;}
 function mat(c){return new T.MeshStandardMaterial({color:c,roughness:.82});}
 function meshBox(x,y,z,w,h,d,c){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat(c));m.position.set(x,y+h/2,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);objects.push(m);return m;}
-function person(x,z,c,name,isPlayer=false){const g=new T.Group();const body=new T.Mesh(new T.CapsuleGeometry(.48,.85,6,12),mat(c));body.position.y=1.35;g.add(body);const head=new T.Mesh(new T.SphereGeometry(.38,16,12),mat('#d2a07b'));head.position.y=2.35;g.add(head);g.position.set(x,0,z);g.userData={name:name||'Habitant',isPlayer,life:{activity:'Vie quotidienne',mood:'Neutre',needs:{energy:100,hunger:100}}};g.traverse(o=>{o.castShadow=true;});scene.add(g);people.push(g);return g;}
-function house(x,z,c){meshBox(x,0,z,8,4,6,c);meshBox(x,0,z-3.08,1.2,2.2,.18,'#604536');meshBox(x-2.3,2.0,z-3.08,1.5,1.3,.18,'#78b8d0');meshBox(x+2.3,2.0,z-3.08,1.5,1.3,.18,'#78b8d0');const roof=new T.Mesh(new T.ConeGeometry(5.7,2.2,4),mat('#8f5145'));roof.rotation.y=Math.PI/4;roof.position.set(x,5,z);roof.castShadow=true;scene.add(roof);objects.push(roof);}
-function tree(x,z,s=1){meshBox(x,0,z,.55,2.5*s,.55,'#705039');const t=new T.Mesh(new T.SphereGeometry(1.8*s,12,8),mat('#5f9c5b'));t.position.set(x,2.8*s,z);t.castShadow=true;scene.add(t);objects.push(t);}
-function clearWorld(){for(const o of objects)scene.remove(o);objects=[];for(const p of people)scene.remove(p);people=[];}
-
-function hubMat(c,rough=.82,metal=0){
-  return new T.MeshStandardMaterial({color:c,roughness:rough,metalness:metal});
+function person(x,z,c,name,isPlayer=false){
+  const g=new T.Group();
+  const skin=mat('#d2a07b'), cloth=mat(c), dark=mat('#25282b');
+  const torso=new T.Mesh(new T.CapsuleGeometry(.34,.72,8,16),cloth); torso.position.y=1.05; g.add(torso);
+  const pelvis=new T.Mesh(new T.BoxGeometry(.48,.28,.30),cloth); pelvis.position.y=.68; g.add(pelvis);
+  const head=new T.Mesh(new T.SphereGeometry(.29,20,16),skin); head.position.y=1.82; g.add(head);
+  const hair=new T.Mesh(new T.SphereGeometry(.305,20,10,0,Math.PI*2,0,Math.PI*.48),dark); hair.position.y=1.91; g.add(hair);
+  for(const sx of [-1,1]){
+    const arm=new T.Mesh(new T.CapsuleGeometry(.11,.58,6,10),cloth); arm.position.set(sx*.43,1.08,0); arm.rotation.z=sx*.08; g.add(arm);
+    const leg=new T.Mesh(new T.CapsuleGeometry(.13,.68,6,10),dark); leg.position.set(sx*.14,.28,0); g.add(leg);
+  }
+  g.position.set(x,0,z);
+  g.userData={name:name||'Habitant',isPlayer,life:{activity:'Vie quotidienne',mood:'Neutre',needs:{energy:100,hunger:100}}};
+  g.traverse(o=>{o.castShadow=true;});
+  scene.add(g);people.push(g);return g;
 }
 function hubBox(x,y,z,w,h,d,c,opts={}){
   const m=new T.Mesh(new T.BoxGeometry(w,h,d),hubMat(c,opts.roughness??.82,opts.metalness??0));
@@ -150,15 +158,21 @@ function build(){
   const col=colors[world]||colors.TERRE;
   scene.background=new T.Color(col[0]);say('🏠 Chargement de la ville NOMAD…');
   scene.fog=new T.Fog(col[0],45,120);
-  meshBox(0,-.1,0,90,.1,90,col[1]);
-  meshBox(0,0,0,3,.08,55,'#6f7472');meshBox(-18,0,0,3,.08,55,'#6f7472');meshBox(18,0,0,3,.08,55,'#6f7472');
-  house(0,2,world==='MARS'?'#9b5b49':world==='LUNE'?'#9699a0':'#dfc39d');
-  house(11,7,'#c5d8bf');house(-13,12,'#d5b39d');
-  if(world!=='ESPACE'&&world!=='LUNE')[[25,-15],[-25,-13],[-24,16],[26,18],[-23,5],[24,4]].forEach(p=>tree(p[0],p[1]));
+  meshBox(0,-.1,0,110,.1,110,col[1]);
+  meshBox(0,0,0,4,.08,75,'#4b5153');meshBox(-24,0,0,3,.08,75,'#4b5153');meshBox(24,0,0,3,.08,75,'#4b5153');
+  meshBox(0,.01,-37,54,.05,4,'#777b7b');meshBox(0,.01,37,54,.05,4,'#777b7b');
+  // Ville réaliste : immeubles variés, façades, vitrages et espaces publics — aucun bloc cubique.
+  house(-10,-10,world==='MARS'?'#9b5b49':world==='LUNE'?'#9699a0':'#d2b9a1');
+  house(12,-3,'#b7c9c0');house(-13,16,'#c8b49e');house(10,18,'#aebdca');
+  house(0,28,'#d0c7b8');
+  for(const p of [[-28,-25],[-28,-8],[-28,10],[28,-25],[28,-8],[28,10],[-8,-28],[10,-28]]) tree(p[0],p[1],1.05);
+  if(world!=='ESPACE'&&world!=='LUNE'){
+    for(const p of [[-35,-32],[-35,-15],[-35,3],[-35,22],[35,-32],[35,-15],[35,3],[35,22]]) tree(p[0],p[1],1.15);
+  }
   if(world==='BEACH'||world==='MER')meshBox(0,-.02,31,90,.05,28,'#59b3cf');
   if(world==='MONTAGNE')for(let i=0;i<8;i++){const m=new T.Mesh(new T.ConeGeometry(3,7,7),mat('#777e80'));m.position.set((i%4-1.5)*18,3.5,(Math.floor(i/4)-.5)*28);m.castShadow=true;scene.add(m);objects.push(m);}
   if(world==='LUNE'||world==='MARS'||world==='ESPACE')for(let i=0;i<12;i++){const r=1+Math.random()*2;const m=new T.Mesh(new T.SphereGeometry(r,8,6),mat(world==='ESPACE'?'#334155':'#6b625e'));m.position.set((Math.random()-.5)*70,r*.5,(Math.random()-.5)*70);m.castShadow=true;scene.add(m);objects.push(m);}
-  player=person(0,-10,'#527f93','Joueur NOMAD',true);person(5,-2,'#9b6758','Lina');person(-5,-5,'#6f8c66','Milo');window.NOMAD_PEOPLE=people;say('🌍 NOMAD '+world+' — prêt à vivre');
+  player=person(0,-12,'#527f93','Joueur NOMAD',true);person(6,-6,'#9b6758','Lina');person(-7,-3,'#6f8c66','Milo');person(14,10,'#806b9a','Aya');window.NOMAD_PEOPLE=people;say('🌍 NOMAD '+world+' — prêt à vivre');
 }
 function toggleHubLevel(){if(world!=='HUB'){say('◎ Va d’abord dans le HUB.');return;}hubUnderground=!hubUnderground;build();say(hubUnderground?'⬇️ HUB sous-sol — structures fixes, jouable':'⬆️ HUB surface — intérieur et extérieur');}
 function nextWorld(){worlds[(worlds.indexOf(world)+1)%worlds.length];world=worlds[(worlds.indexOf(world)+1)%worlds.length];hubUnderground=false;build();say('🚌 Transport NOMAD → '+world);}
