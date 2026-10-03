@@ -3,7 +3,7 @@ import * as THREE from './vendor/three.module.min.js';
 const canvas=document.getElementById('world'), prompt=document.getElementById('prompt');
 if(!canvas){return;}
 const T=THREE;
-let renderer,scene,camera,world='TERRE',player,people=[],objects=[],yaw=0,pitch=.55,distance=12;
+let renderer,scene,camera,world='TERRE',player,people=[],objects=[],yaw=0,pitch=.55,distance=12,hubUnderground=false;
 let targetYaw=0,targetPitch=.38,drag=false,lastX=0,lastY=0,moveX=0,moveY=0,simMinutes=8*60,simDay=1;
 const needs={energy:100,hunger:100,hygiene:100,fun:100};
 const worlds=['TERRE','BEACH','MER','MONTAGNE','LUNE','MARS','ESPACE','HUB'];
@@ -139,11 +139,12 @@ function buildHubUnderground(){
 function build(){
   clearWorld();
   if(world==='HUB'){
-    buildHubSurface();
-    player=person(0,-17,'#527f93','Joueur NOMAD',true);
+    if(hubUnderground){ buildHubUnderground(); player=person(0,-11,'#527f93','Joueur NOMAD',true); }
+    else { buildHubSurface(); player=person(0,-17,'#527f93','Joueur NOMAD',true); }
     person(-4,-4,'#9b6758','Lina');person(5,-4,'#6f8c66','Milo');person(-7,8,'#806b9a','Aya');
     window.NOMAD_PEOPLE=people;
-    say('◎ NOMADCELL01 HUB — surface prête à vivre · U = sous-sol');
+    if(!hubUnderground){ say('◎ NOMADCELL01 HUB — surface prête à vivre · U = sous-sol'); }
+    return;
     return;
   }
   const col=colors[world]||colors.TERRE;
@@ -159,10 +160,11 @@ function build(){
   if(world==='LUNE'||world==='MARS'||world==='ESPACE')for(let i=0;i<12;i++){const r=1+Math.random()*2;const m=new T.Mesh(new T.SphereGeometry(r,8,6),mat(world==='ESPACE'?'#334155':'#6b625e'));m.position.set((Math.random()-.5)*70,r*.5,(Math.random()-.5)*70);m.castShadow=true;scene.add(m);objects.push(m);}
   player=person(0,-10,'#527f93','Joueur NOMAD',true);person(5,-2,'#9b6758','Lina');person(-5,-5,'#6f8c66','Milo');window.NOMAD_PEOPLE=people;say('🌍 NOMAD '+world+' — prêt à vivre');
 }
-function nextWorld(){worlds[(worlds.indexOf(world)+1)%worlds.length];world=worlds[(worlds.indexOf(world)+1)%worlds.length];build();say('🚌 Transport NOMAD → '+world);}
+function toggleHubLevel(){if(world!=='HUB'){say('◎ Va d’abord dans le HUB.');return;}hubUnderground=!hubUnderground;build();say(hubUnderground?'⬇️ HUB sous-sol — structures fixes, jouable':'⬆️ HUB surface — intérieur et extérieur');}
+function nextWorld(){worlds[(worlds.indexOf(world)+1)%worlds.length];world=worlds[(worlds.indexOf(world)+1)%worlds.length];hubUnderground=false;build();say('🚌 Transport NOMAD → '+world);}
 function init(){try{renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.shadowMap.enabled=true;scene=new T.Scene();camera=new T.PerspectiveCamera(55,1,.1,250);scene.add(camera);scene.add(new T.HemisphereLight(0xffffff,0x445566,2.2));const light=new T.DirectionalLight(0xffffff,2.4);light.position.set(25,40,15);light.castShadow=true;scene.add(light);build();resize();bind();loop();}catch(e){say('Erreur moteur: '+(e&&e.message?e.message:String(e)));console.error(e);}}
 function resize(){if(!renderer||!camera)return;const w=canvas.clientWidth||window.innerWidth,h=canvas.clientHeight||window.innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
-function bind(){window.addEventListener('resize',resize);canvas.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture&&canvas.setPointerCapture(e.pointerId);});canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointermove',e=>{if(!drag)return;targetYaw-=((e.clientX-lastX)||0)*.006;targetPitch-=((e.clientY-lastY)||0)*.004;targetPitch=Math.max(.15,Math.min(1.25,targetPitch));lastX=e.clientX;lastY=e.clientY;});canvas.addEventListener('wheel',e=>{distance=Math.max(6,Math.min(32,distance+e.deltaY*.02));});window.addEventListener('keydown',e=>{if(e.key==='w'||e.key==='ArrowUp')moveY=1;if(e.key==='s'||e.key==='ArrowDown')moveY=-1;if(e.key==='a'||e.key==='ArrowLeft')moveX=-1;if(e.key==='d'||e.key==='ArrowRight')moveX=1;if(e.key===' ')say('⏸️ Mode tranquillité');if(e.key==='n'||e.key==='N')nextWorld();});window.addEventListener('keyup',e=>{if(['w','s','a','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){moveX=0;moveY=0;}});}
+function bind(){window.addEventListener('resize',resize);canvas.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture&&canvas.setPointerCapture(e.pointerId);});canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointermove',e=>{if(!drag)return;targetYaw-=((e.clientX-lastX)||0)*.006;targetPitch-=((e.clientY-lastY)||0)*.004;targetPitch=Math.max(.15,Math.min(1.25,targetPitch));lastX=e.clientX;lastY=e.clientY;});canvas.addEventListener('wheel',e=>{distance=Math.max(6,Math.min(32,distance+e.deltaY*.02));});window.addEventListener('keydown',e=>{if(e.key==='w'||e.key==='ArrowUp')moveY=1;if(e.key==='s'||e.key==='ArrowDown')moveY=-1;if(e.key==='a'||e.key==='ArrowLeft')moveX=-1;if(e.key==='d'||e.key==='ArrowRight')moveX=1;if(e.key===' ')say('⏸️ Mode tranquillité');if(e.key==='n'||e.key==='N')nextWorld();if(e.key==='u'||e.key==='U')toggleHubLevel();});window.addEventListener('keyup',e=>{if(['w','s','a','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){moveX=0;moveY=0;}});}
 function update(dt){yaw+=(targetYaw-yaw)*.12;pitch+=(targetPitch-pitch)*.12;if(player){const speed=.055*dt;const f=new T.Vector3(Math.sin(yaw),0,Math.cos(yaw)),r=new T.Vector3(Math.cos(yaw),0,-Math.sin(yaw));player.position.addScaledVector(f,moveY*speed);player.position.addScaledVector(r,moveX*speed);const camTarget=player.position.clone();camera.position.copy(camTarget).add(new T.Vector3(Math.sin(yaw)*distance,Math.sin(pitch)*distance,Math.cos(yaw)*distance));camera.lookAt(camTarget.x,camTarget.y+1.3,camTarget.z);}for(let i=1;i<people.length;i++){const p=people[i],a=performance.now()*.0002+i*2;p.position.x+=Math.cos(a)*.012*dt;p.position.z+=Math.sin(a)*.012*dt;p.userData.life.activity=Math.sin(a)>0?'Vie sociale':'Vie quotidienne';}simMinutes+=dt/1200;if(simMinutes>=1440){simMinutes-=1440;simDay++;}const hh=String(Math.floor(simMinutes/60)).padStart(2,'0'),mm=String(Math.floor(simMinutes%60)).padStart(2,'0');const clock=document.getElementById('clock');if(clock)clock.textContent=hh+':'+mm;}
 function loop(){requestAnimationFrame(loop);update(1);renderer.render(scene,camera);}
 window.NOMAD_RESIZE=resize;
