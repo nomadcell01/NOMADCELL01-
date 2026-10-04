@@ -1,4 +1,4 @@
-"""Administration explicite des permissions de T.H.E.O."""
+"""Administration explicite des permissions et des verrous de T.H.E.O."""
 
 from .admin_auth import AdminAuthenticator
 from .admin_confirmation import AdminConfirmation
@@ -19,9 +19,51 @@ class AdminCommands:
         if self.security_log:
             self.security_log.record(event, self.authenticator.current_admin() if self.authenticator else None, detail)
 
+    def _require_admin(self) -> bool:
+        if self.authenticator and not self.authenticator.is_authenticated():
+            self._log("admin_denied", "control: unauthenticated")
+            return False
+        return True
+
     def handle(self, command: str) -> str:
         parts = command.strip().split(maxsplit=1)
         name = parts[0] if parts else ""
+
+        if name == "/quiet-on":
+            if not self._require_admin():
+                return "Administrateur non authentifié ou session expirée."
+            self.permissions.set_quiet_mode(True)
+            self._log("quiet_mode_on")
+            return "Mode tranquillité activé. Actions sensibles verrouillées."
+
+        if name == "/quiet-off":
+            if not self._require_admin():
+                return "Administrateur non authentifié ou session expirée."
+            self.permissions.set_quiet_mode(False)
+            self._log("quiet_mode_off")
+            return "Mode tranquillité désactivé. Le verrou physique reste actif."
+
+        if name == "/physical-unlock":
+            if not self._require_admin():
+                return "Administrateur non authentifié ou session expirée."
+            if self.permissions.quiet_mode():
+                self._log("physical_unlock_denied", "quiet_mode")
+                return "Déverrouillage refusé: désactivez d'abord le mode tranquillité."
+            self.permissions.set_physical_unlock(True)
+            self._log("physical_unlock")
+            return "Verrou physique logique déverrouillé."
+
+        if name == "/physical-lock":
+            if not self._require_admin():
+                return "Administrateur non authentifié ou session expirée."
+            self.permissions.set_physical_unlock(False)
+            self._log("physical_lock")
+            return "Verrou physique logique activé."
+
+        if name == "/safety-status":
+            quiet = "ON" if self.permissions.quiet_mode() else "OFF"
+            physical = "UNLOCKED" if self.permissions.physical_unlock() else "LOCKED"
+            return f"Mode tranquillité: {quiet} | Verrou physique: {physical}"
 
         if name == "/confirm":
             if self.authenticator and not self.authenticator.is_authenticated():
