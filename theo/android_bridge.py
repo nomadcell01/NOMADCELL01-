@@ -17,6 +17,7 @@ class AndroidBridge:
         "notify": "termux-notification",
         "vibrate": "termux-vibrate",
         "speak": "termux-tts-speak",
+        "clipboard_set": "termux-clipboard-set",
     }
 
     def __init__(self, runner: Callable[..., str] | None = None) -> None:
@@ -71,6 +72,14 @@ class AndroidBridge:
         if not text:
             return "Texte vocal invalide."
         return self._runner("speak", text)
+
+    def clipboard_set(self, text: str) -> str:
+        if not isinstance(text, str):
+            return "Texte presse-papiers invalide."
+        text = text.strip()[:10000]
+        if not text:
+            return "Texte presse-papiers invalide."
+        return self._runner("clipboard_set", text)
 
     def _json_status(self, command: str, error_message: str) -> dict[str, Any]:
         raw = self.run_safe(command)
