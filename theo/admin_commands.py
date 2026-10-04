@@ -4,6 +4,14 @@ from .permissions import PermissionGate
 
 
 class AdminCommands:
+    SENSITIVE = {
+        "memory.sensitive.write",
+        "phone.call",
+        "phone.sms",
+        "phone.contacts.write",
+        "files.write",
+    }
+
     def __init__(self, permissions: PermissionGate):
         self.permissions = permissions
 
@@ -14,7 +22,10 @@ class AdminCommands:
         if name == "/grant":
             if len(parts) < 2:
                 return "Usage: /grant <permission>"
-            self.permissions.grant(parts[1])
+            permission = parts[1]
+            if permission in self.SENSITIVE:
+                return "Permission sensible: confirmation administrateur requise."
+            self.permissions.grant(permission)
             return "Permission accordée."
 
         if name == "/revoke":
