@@ -1,11 +1,12 @@
 """Commandes mémoire de T.H.E.O."""
 
-from .memory_store import TheoMemory
+from .memory_guard import MemoryGuard
 
 
 class MemoryCommands:
-    def __init__(self, memory: TheoMemory):
-        self.memory = memory
+    def __init__(self, guard: MemoryGuard):
+        self.guard = guard
+        self.memory = guard.memory
 
     def handle(self, command: str) -> str:
         parts = command.strip().split(maxsplit=2)
@@ -14,8 +15,7 @@ class MemoryCommands:
         if name == "/remember":
             if len(parts) < 3:
                 return "Usage: /remember <clé> <valeur>"
-            self.memory.set(parts[1], parts[2])
-            return "Mémoire enregistrée."
+            return self.guard.remember(parts[1], parts[2])
 
         if name == "/memory":
             if len(parts) == 1:
@@ -26,7 +26,6 @@ class MemoryCommands:
         if name == "/forget":
             if len(parts) < 2:
                 return "Usage: /forget <clé>"
-            self.memory.forget(parts[1])
-            return "Mémoire supprimée."
+            return self.guard.forget(parts[1])
 
         return "Commande inconnue."
