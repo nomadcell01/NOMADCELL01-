@@ -31,6 +31,8 @@ class AndroidBridge:
         "bluetooth_disable": "termux-bluetooth-disable",
         "wifi_enable": "termux-wifi-enable",
         "wifi_disable": "termux-wifi-disable",
+        "torch_on": "termux-torch",
+        "torch_off": "termux-torch",
     }
 
     def __init__(self, runner: Callable[..., str] | None = None) -> None:
@@ -130,6 +132,11 @@ class AndroidBridge:
 
     def wifi_set(self, enabled: bool) -> str:
         return self._toggle("wifi_enable", enabled)
+
+    def torch_set(self, enabled: bool) -> str:
+        if not isinstance(enabled, bool):
+            return "État lampe invalide."
+        return self._runner("torch_on" if enabled else "torch_off", "-q")
 
     def _json_status(self, command: str, error_message: str) -> dict[str, Any]:
         raw = self.run_safe(command)
