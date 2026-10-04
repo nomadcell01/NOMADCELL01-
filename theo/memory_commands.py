@@ -6,7 +6,6 @@ from .memory_guard import MemoryGuard
 class MemoryCommands:
     def __init__(self, guard: MemoryGuard):
         self.guard = guard
-        self.memory = guard.memory
 
     def handle(self, command: str) -> str:
         parts = command.strip().split(maxsplit=2)
@@ -20,8 +19,10 @@ class MemoryCommands:
         if name == "/memory":
             if len(parts) == 1:
                 return "Aucune clé demandée."
-            value = self.memory.get(parts[1])
-            return "Mémoire vide." if value is None else str(value)
+            allowed, value = self.guard.read(parts[1])
+            if not allowed:
+                return "Autorisation mémoire sensible requise."
+            return "Mémoire vide." if value is None else value
 
         if name == "/forget":
             if len(parts) < 2:
