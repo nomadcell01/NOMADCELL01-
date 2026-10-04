@@ -106,8 +106,11 @@ def main() -> None:
             else:
                 print(android.run_safe("battery"))
             continue
+        if command == "/storage":
+            print(android.storage_status(str(storage_root())))
+            continue
         if command == "/help":
-            print("/battery | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/battery | /storage | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
