@@ -139,8 +139,15 @@ def main() -> None:
             except ValueError:
                 print("Usage: /vibrate [durée_ms]")
             continue
+        if command.startswith("/speak "):
+            if not permissions.check("actuator.write"):
+                print("Actionneur verrouillé: authentification, confirmation et déverrouillage requis.")
+                continue
+            text = command.split(" ", 1)[1]
+            print(android.speak(text))
+            continue
         if command == "/help":
-            print("/battery | /device | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/battery | /device | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
