@@ -18,6 +18,7 @@ class AndroidBridge:
         "bluetooth": "termux-bluetooth-info",
         "wifi": "termux-wifi-connectioninfo",
         "wifi_scan": "termux-wifi-scaninfo",
+        "calendar": "termux-calendar-list",
     }
 
     ACTUATOR_COMMANDS = {
@@ -153,12 +154,12 @@ class AndroidBridge:
         except json.JSONDecodeError:
             return {"ok": False, "error": error_message}
 
-        if not isinstance(data, dict) and command not in {"contacts", "wifi_scan"}:
+        if not isinstance(data, dict) and command not in {"contacts", "wifi_scan", "calendar"}:
             return {"ok": False, "error": "Réponse Android inattendue."}
         if command == "contacts" and not isinstance(data, list):
             return {"ok": False, "error": "Réponse contacts inattendue."}
-        if command == "wifi_scan" and not isinstance(data, list):
-            return {"ok": False, "error": "Réponse Wi-Fi inattendue."}
+        if command in {"wifi_scan", "calendar"} and not isinstance(data, list):
+            return {"ok": False, "error": "Réponse calendrier/Wi-Fi inattendue."}
         return {"ok": True, "data": data}
 
     def battery_status(self) -> dict[str, Any]:
@@ -213,6 +214,16 @@ class AndroidBridge:
             if contact:
                 contacts.append(contact)
         return {"ok": True, "data": contacts}
+
+    def calendar(self) -> dict[str, Any]:
+        result = self._json_status("calendar", "Réponse calendrier invalide.")
+        if not result.get("ok"):
+            return result
+        events = []
+        for item in result["data"]:
+            if isinstance(item, dict):
+                events.append(item)
+        return {"ok": True, "data": events}
 
     def bluetooth_info(self) -> dict[str, Any]:
         result = self._json_status("bluetooth", "Réponse Bluetooth invalide.")
