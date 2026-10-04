@@ -30,3 +30,21 @@ def test_unknown_command_is_rejected(tmp_path: Path):
     commands = TheoCommands(FileManager(tmp_path))
 
     assert commands.handle("/delete note.txt") == "Commande inconnue."
+
+
+def test_empty_command_is_handled(tmp_path: Path):
+    commands = TheoCommands(FileManager(tmp_path))
+
+    assert commands.handle("") == "Commande vide."
+
+
+def test_non_string_command_is_rejected(tmp_path: Path):
+    commands = TheoCommands(FileManager(tmp_path))
+
+    assert commands.handle(None) == "Commande invalide."
+
+
+def test_read_whitespace_only_argument_is_rejected(tmp_path: Path):
+    commands = TheoCommands(FileManager(tmp_path))
+
+    assert commands.handle("/read   ") == "Usage: /read <fichier>"
