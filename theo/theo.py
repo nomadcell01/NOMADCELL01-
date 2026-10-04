@@ -12,6 +12,7 @@ from .memory_commands import MemoryCommands
 from .memory_guard import MemoryGuard
 from .memory_store import TheoMemory
 from .permissions import PermissionGate
+from .security_log import SecurityLog
 
 DEFAULT_STORAGE = Path("~/storage/shared").expanduser()
 
@@ -34,16 +35,17 @@ def admin_secrets() -> dict[str, str]:
 
 def build_services():
     root = storage_root()
+    security_log = SecurityLog(root / ".theo" / "security.log")
     authenticator = AdminAuthenticator(admin_secrets())
     permissions = PermissionGate()
     files = TheoCommands(FileManager(root))
     memory = MemoryCommands(MemoryGuard(TheoMemory(root / ".theo" / "memory.json"), permissions))
-    admin = AdminCommands(permissions, authenticator=authenticator)
-    return files, memory, admin, authenticator
+    admin = AdminCommands(permissions, authenticator=authenticator, security_log=security_log)
+    return files, memory, admin, authenticator, security_log
 
 
 def main() -> None:
-    files, memory, admin, authenticator = build_services()
+    files, memory, admin, authenticator, security_log = build_services()
     print("T.H.E.O. Avel — NOMADCELL01")
     print("Tape /help. /quit pour quitter.")
 
@@ -52,9 +54,11 @@ def main() -> None:
             command = input("T.H.E.O.> ").strip()
         except (EOFError, KeyboardInterrupt):
             print()
+            security_log.record("session_closed", authenticator.current_admin())
             break
 
         if command in {"/quit", "/exit"}:
+            security_log.record("session_closed", authenticator.current_admin())
             break
         if command == "/admin-login":
             try:
@@ -63,20 +67,29 @@ def main() -> None:
                 print("\\nConnexion annulée.")
                 continue
             if authenticator.authenticate(secret):
-                print(f"Administrateur {authenticator.current_admin()} authentifié.")
+                admin_id = authenticator.current_admin()
+                security_log.record("admin_login", admin_id)
+                print(f"Administrateur {admin_id} authentifié.")
             else:
+                security_log.record("admin_login_failed")
                 print("Authentification refusée.")
             continue
         if command == "/admin-logout":
+            admin_id = authenticator.current_admin()
             authenticator.logout()
+            security_log.record("admin_logout", admin_id)
             print("Session administrateur fermée.")
             continue
         if command == "/admin-status":
             current = authenticator.current_admin()
             print(f"Administrateur connecté: {current}." if current else "Aucun administrateur connecté.")
             continue
+        if command == "/security-log":
+            for entry in security_log.recent():
+                print(entry)
+            continue
         if command == "/help":
-            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /admin-login | /admin-logout | /admin-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke")):
             print(admin.handle(command))
