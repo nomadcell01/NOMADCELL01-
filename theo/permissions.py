@@ -1,5 +1,7 @@
 """Permission gate for T.H.E.O. phone actions."""
 
+from collections.abc import Callable
+
 from .admin_confirmation import AdminConfirmation
 
 
@@ -15,9 +17,14 @@ class PermissionGate:
         "actuator.write",
     }
 
-    def __init__(self, confirmation: AdminConfirmation | None = None) -> None:
+    def __init__(
+        self,
+        confirmation: AdminConfirmation | None = None,
+        auth_checker: Callable[[], bool] | None = None,
+    ) -> None:
         self._granted: set[str] = set()
         self.confirmation = confirmation or AdminConfirmation()
+        self._auth_checker = auth_checker
         self._quiet_mode = True
         self._physical_unlock = False
 
@@ -25,6 +32,9 @@ class PermissionGate:
         if permission in self.READ_ONLY:
             return True
         if permission in self.SENSITIVE:
+            if self._auth_checker is not None and not self._auth_checker():
+                self.lock_all()
+                return False
             return (
                 not self._quiet_mode
                 and self._physical_unlock
