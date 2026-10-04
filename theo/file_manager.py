@@ -1,11 +1,14 @@
 """Accès sécurisé aux fichiers du stockage autorisé de T.H.E.O."""
 
 from pathlib import Path
+import os
+import tempfile
 
 
 class FileManager:
     TEXT_EXTENSIONS = {".txt", ".md", ".json", ".py", ".csv", ".log"}
     MAX_READ_CHARS = 200_000
+    MAX_WRITE_CHARS = 200_000
 
     def __init__(self, root: str | Path):
         self.root = Path(root).expanduser().resolve()
@@ -45,3 +48,43 @@ class FileManager:
         if target.suffix.lower() not in self.TEXT_EXTENSIONS:
             raise PermissionError("Lecture de ce type de fichier refusée.")
         return target.read_text(encoding="utf-8")[:max_chars]
+
+    def write_text(
+        self,
+        relative: str | Path,
+        content: str,
+        overwrite: bool = False,
+    ) -> str:
+        if not isinstance(content, str):
+            raise TypeError("Contenu fichier invalide.")
+        if len(content) > self.MAX_WRITE_CHARS:
+            raise ValueError("Contenu fichier trop volumineux.")
+        if not isinstance(overwrite, bool):
+            raise TypeError("Option écrasement invalide.")
+
+        target = self._safe_path(relative)
+        if target.suffix.lower() not in self.TEXT_EXTENSIONS:
+            raise PermissionError("Écriture de ce type de fichier refusée.")
+        if target.exists() and not overwrite:
+            raise FileExistsError(str(relative))
+
+        target.parent.mkdir(parents=True, exist_ok=True)
+        fd, temp_name = tempfile.mkstemp(
+            prefix=".theo-write-",
+            dir=str(target.parent),
+            text=True,
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                handle.write(content)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(temp_name, target)
+        except Exception:
+            try:
+                os.unlink(temp_name)
+            except FileNotFoundError:
+                pass
+            raise
+
+        return str(target.relative_to(self.root))
