@@ -22,13 +22,20 @@ class TheoMemory:
             self._data = {}
 
     def _save(self) -> None:
-        """Persiste la mémoire locale dans le fichier prévu à cet effet."""
-        temporary = self.path.with_suffix(self.path.suffix + ".tmp")
-        temporary.write_text(
-            json.dumps(self._data, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        temporary.replace(self.path)
+        """Écrit atomiquement la mémoire locale pour éviter un fichier partiellement écrit."""
+        temporary = self.path.with_name(self.path.name + ".tmp")
+        try:
+            temporary.write_text(
+                json.dumps(self._data, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            temporary.replace(self.path)
+        except OSError:
+            try:
+                temporary.unlink(missing_ok=True)
+            except OSError:
+                pass
+            raise
 
     def get(self, key: str, default: Any = None) -> Any:
         return self._data.get(key, default)
