@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 import json
+import re
 import shutil
 import subprocess
 from typing import Any
@@ -18,6 +19,8 @@ class AndroidBridge:
         "vibrate": "termux-vibrate",
         "speak": "termux-tts-speak",
         "clipboard_set": "termux-clipboard-set",
+        "call": "termux-telephony-call",
+        "sms": "termux-sms-send",
     }
 
     def __init__(self, runner: Callable[..., str] | None = None) -> None:
@@ -80,6 +83,32 @@ class AndroidBridge:
         if not text:
             return "Texte presse-papiers invalide."
         return self._runner("clipboard_set", text)
+
+    @staticmethod
+    def _phone_number(value: str) -> str | None:
+        if not isinstance(value, str):
+            return None
+        value = value.strip()
+        if not re.fullmatch(r"[+0-9][0-9 .()-]{5,24}", value):
+            return None
+        return value
+
+    def call(self, number: str) -> str:
+        number = self._phone_number(number)
+        if number is None:
+            return "Numéro de téléphone invalide."
+        return self._runner("call", number)
+
+    def sms(self, number: str, message: str) -> str:
+        number = self._phone_number(number)
+        if number is None:
+            return "Numéro de téléphone invalide."
+        if not isinstance(message, str):
+            return "Message SMS invalide."
+        message = message.strip()[:2000]
+        if not message:
+            return "Message SMS invalide."
+        return self._runner("sms", "--number", number, "--message", message)
 
     def _json_status(self, command: str, error_message: str) -> dict[str, Any]:
         raw = self.run_safe(command)
