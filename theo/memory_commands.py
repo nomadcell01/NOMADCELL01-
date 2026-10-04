@@ -24,6 +24,10 @@ class MemoryCommands:
                 return "Autorisation mémoire sensible requise."
             return "Mémoire vide." if value is None else value
 
+        if name == "/memory-keys":
+            keys = self.guard.list_keys()
+            return "Aucune mémoire enregistrée." if not keys else "\n".join(keys)
+
         if name == "/forget":
             if len(parts) < 2:
                 return "Usage: /forget <clé>"
