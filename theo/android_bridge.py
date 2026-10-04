@@ -8,14 +8,22 @@ from typing import Any
 
 
 class AndroidBridge:
+    SAFE_COMMANDS = {
+        "battery": "termux-battery-status",
+        "device": "termux-device-info",
+    }
+
     def __init__(self, runner: Callable[..., str] | None = None) -> None:
         self._runner = runner or self._run_termux
 
-    @staticmethod
-    def _run_termux(*args: str) -> str:
+    @classmethod
+    def _run_termux(cls, command: str = "battery") -> str:
+        executable = cls.SAFE_COMMANDS.get(command)
+        if executable is None:
+            return "Commande refusée."
         try:
             result = subprocess.run(
-                ["termux-battery-status", *args],
+                [executable],
                 capture_output=True,
                 text=True,
                 check=False,
@@ -30,13 +38,12 @@ class AndroidBridge:
         return output or "Aucune réponse Android."
 
     def run_safe(self, command: str) -> str:
-        if command != "battery":
+        if command not in self.SAFE_COMMANDS:
             return "Commande refusée."
-        return self._runner()
+        return self._runner(command)
 
-    def battery_status(self) -> dict[str, Any]:
-        """Retourne un état batterie normalisé sans exposer de réponse brute."""
-        raw = self.run_safe("battery")
+    def _json_status(self, command: str, error_message: str) -> dict[str, Any]:
+        raw = self.run_safe(command)
         if raw.startswith((
             "Termux:API indisponible.",
             "Commande Android expirée.",
@@ -48,17 +55,31 @@ class AndroidBridge:
         try:
             data = json.loads(raw)
         except json.JSONDecodeError:
-            return {"ok": False, "error": "Réponse batterie invalide."}
+            return {"ok": False, "error": error_message}
 
         if not isinstance(data, dict):
-            return {"ok": False, "error": "Réponse batterie inattendue."}
+            return {"ok": False, "error": "Réponse Android inattendue."}
+        return {"ok": True, "data": data}
 
+    def battery_status(self) -> dict[str, Any]:
+        """Retourne un état batterie normalisé sans exposer de réponse brute."""
+        result = self._json_status("battery", "Réponse batterie invalide.")
+        if not result.get("ok"):
+            return result
+
+        data = result["data"]
         normalized: dict[str, Any] = {"ok": True}
         for key in ("percentage", "plugged", "status", "health", "temperature", "current"):
             if key in data:
                 normalized[key] = data[key]
-
         return normalized
+
+    def device_info(self) -> dict[str, Any]:
+        """Retourne uniquement les informations d'appareil fournies par Termux:API."""
+        result = self._json_status("device", "Réponse appareil invalide.")
+        if not result.get("ok"):
+            return result
+        return {"ok": True, "data": result["data"]}
 
     @staticmethod
     def storage_status(path: str) -> dict[str, Any]:
