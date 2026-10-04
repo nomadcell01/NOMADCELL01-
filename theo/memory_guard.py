@@ -36,6 +36,17 @@ class MemoryGuard:
         self._log("memory_read", key)
         return True, None if value is None else str(value)
 
+    def list_keys(self) -> list[str]:
+        """Liste seulement les clés que l'appelant est autorisé à voir."""
+        visible = []
+        for key in self.memory.keys():
+            if self._sensitive(key) and not self.permissions.check("memory.sensitive.read"):
+                self._log("memory_key_denied", key)
+                continue
+            visible.append(key)
+        self._log("memory_keys_listed", "*")
+        return visible
+
     def forget(self, key: str) -> str:
         if self._sensitive(key) and not self.permissions.check("memory.sensitive.write"):
             self._log("memory_delete_denied", key)
