@@ -16,6 +16,7 @@ class AndroidBridge:
     ACTUATOR_COMMANDS = {
         "notify": "termux-notification",
         "vibrate": "termux-vibrate",
+        "speak": "termux-tts-speak",
     }
 
     def __init__(self, runner: Callable[..., str] | None = None) -> None:
@@ -62,6 +63,14 @@ class AndroidBridge:
         if duration_ms < 1 or duration_ms > 5000:
             return "Durée vibration invalide."
         return self._runner("vibrate", "-d", str(duration_ms))
+
+    def speak(self, text: str) -> str:
+        if not isinstance(text, str):
+            return "Texte vocal invalide."
+        text = text.strip()[:1000]
+        if not text:
+            return "Texte vocal invalide."
+        return self._runner("speak", text)
 
     def _json_status(self, command: str, error_message: str) -> dict[str, Any]:
         raw = self.run_safe(command)
