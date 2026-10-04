@@ -104,7 +104,7 @@ def main() -> None:
             if not permissions.check("battery.read"):
                 print("Lecture batterie refusée.")
             else:
-                print(android.run_safe("battery"))
+                print(android.battery_status())
             continue
         if command == "/storage":
             print(android.storage_status(str(storage_root())))
