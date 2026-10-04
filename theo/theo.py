@@ -3,10 +3,13 @@
 import os
 from pathlib import Path
 
+from .admin_commands import AdminCommands
 from .commands import TheoCommands
 from .file_manager import FileManager
 from .memory_commands import MemoryCommands
+from .memory_guard import MemoryGuard
 from .memory_store import TheoMemory
+from .permissions import PermissionGate
 
 DEFAULT_STORAGE = Path("~/storage/shared").expanduser()
 
@@ -16,15 +19,17 @@ def storage_root() -> Path:
     return Path(configured).expanduser() if configured else DEFAULT_STORAGE
 
 
-def build_services() -> tuple[TheoCommands, MemoryCommands]:
+def build_services() -> tuple[TheoCommands, MemoryCommands, AdminCommands]:
     root = storage_root()
+    permissions = PermissionGate()
     files = TheoCommands(FileManager(root))
-    memory = MemoryCommands(TheoMemory(root / ".theo" / "memory.json"))
-    return files, memory
+    memory = MemoryCommands(MemoryGuard(TheoMemory(root / ".theo" / "memory.json"), permissions))
+    admin = AdminCommands(permissions)
+    return files, memory, admin
 
 
 def main() -> None:
-    files, memory = build_services()
+    files, memory, admin = build_services()
     print("T.H.E.O. Avel — NOMADCELL01")
     print("Tape /help. /quit pour quitter.")
 
@@ -39,10 +44,12 @@ def main() -> None:
             break
 
         if command == "/help":
-            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /quit")
+            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /grant <permission> | /revoke <permission> | /quit")
             continue
 
-        if command.startswith(("/remember", "/memory", "/forget")):
+        if command.startswith(("/grant", "/revoke")):
+            print(admin.handle(command))
+        elif command.startswith(("/remember", "/memory", "/forget")):
             print(memory.handle(command))
         else:
             print(files.handle(command))
