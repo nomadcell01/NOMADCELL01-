@@ -112,8 +112,26 @@ def main() -> None:
         if command == "/storage":
             print(android.storage_status(str(storage_root())))
             continue
+        if command.startswith("/notify "):
+            _, payload = command.split(" ", 1)
+            if "|" not in payload:
+                print("Usage: /notify <titre> | <message>")
+            else:
+                title, content = payload.split("|", 1)
+                print(android.notify(title, content))
+            continue
+        if command == "/vibrate":
+            print(android.vibrate())
+            continue
+        if command.startswith("/vibrate "):
+            try:
+                duration = int(command.split(maxsplit=1)[1])
+                print(android.vibrate(duration))
+            except ValueError:
+                print("Usage: /vibrate [durée_ms]")
+            continue
         if command == "/help":
-            print("/battery | /device | /storage | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/battery | /device | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
