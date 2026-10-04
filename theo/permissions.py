@@ -6,6 +6,7 @@ from .admin_confirmation import AdminConfirmation
 class PermissionGate:
     READ_ONLY = {"files.read", "status.read", "battery.read"}
     SENSITIVE = {
+        "memory.sensitive.read",
         "memory.sensitive.write",
         "phone.call",
         "phone.sms",
