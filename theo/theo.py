@@ -89,9 +89,9 @@ def main() -> None:
                 print(entry)
             continue
         if command == "/help":
-            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
-        if command.startswith(("/confirm", "/grant", "/revoke")):
+        if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
         elif command.startswith(("/remember", "/memory", "/forget")):
             print(memory.handle(command))
