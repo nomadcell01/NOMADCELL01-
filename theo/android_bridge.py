@@ -13,6 +13,7 @@ class AndroidBridge:
         "battery": "termux-battery-status",
         "device": "termux-device-info",
         "telephony": "termux-telephony-deviceinfo",
+        "location": "termux-location",
     }
 
     ACTUATOR_COMMANDS = {
@@ -152,6 +153,20 @@ class AndroidBridge:
         if not result.get("ok"):
             return result
         return {"ok": True, "data": result["data"]}
+
+    def location(self, provider: str = "network") -> dict[str, Any]:
+        if provider not in {"network", "gps", "passive"}:
+            return {"ok": False, "error": "Fournisseur de localisation invalide."}
+        raw = self._runner("location", "-p", provider)
+        if raw.startswith(("Termux:API indisponible.", "Commande Android expirée.", "Commande refusée.")):
+            return {"ok": False, "error": raw}
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError:
+            return {"ok": False, "error": "Réponse localisation invalide."}
+        if not isinstance(data, dict):
+            return {"ok": False, "error": "Réponse localisation inattendue."}
+        return {"ok": True, "data": data}
 
     @staticmethod
     def storage_status(path: str) -> dict[str, Any]:
