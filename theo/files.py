@@ -22,6 +22,15 @@ class SafeFiles:
 
         raise PermissionError("Chemin hors des dossiers autorisés.")
 
+    def list_entries(self, raw: str, limit: int = 100) -> list[str]:
+        directory = self.resolve(raw)
+        if not directory.is_dir():
+            raise NotADirectoryError(raw)
+        entries = []
+        for p in sorted(directory.iterdir(), key=lambda item: item.name.lower()):
+            entries.append(p.name + "/" if p.is_dir() else p.name)
+        return entries[:limit]
+
     def list_text(self, raw: str, limit: int = 50) -> list[str]:
         directory = self.resolve(raw)
         if not directory.is_dir():
