@@ -27,6 +27,10 @@ class AndroidBridge:
         "clipboard_set": "termux-clipboard-set",
         "call": "termux-telephony-call",
         "sms": "termux-sms-send",
+        "bluetooth_enable": "termux-bluetooth-enable",
+        "bluetooth_disable": "termux-bluetooth-disable",
+        "wifi_enable": "termux-wifi-enable",
+        "wifi_disable": "termux-wifi-disable",
     }
 
     def __init__(self, runner: Callable[..., str] | None = None) -> None:
@@ -115,6 +119,17 @@ class AndroidBridge:
         if not message:
             return "Message SMS invalide."
         return self._runner("sms", "--number", number, "--message", message)
+
+    def _toggle(self, action: str, enabled: bool) -> str:
+        if not isinstance(enabled, bool):
+            return "État invalide."
+        return self._runner(action if enabled else action.replace("_enable", "_disable"))
+
+    def bluetooth_set(self, enabled: bool) -> str:
+        return self._toggle("bluetooth_enable", enabled)
+
+    def wifi_set(self, enabled: bool) -> str:
+        return self._toggle("wifi_enable", enabled)
 
     def _json_status(self, command: str, error_message: str) -> dict[str, Any]:
         raw = self.run_safe(command)
