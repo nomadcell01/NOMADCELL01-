@@ -119,6 +119,12 @@ def main() -> None:
             provider = command.split(" ", 1)[1].strip()
             print(android.location(provider))
             continue
+        if command == "/contacts":
+            if not permissions.check("phone.contacts.read"):
+                print("Contacts verrouillés: authentification, confirmation et déverrouillage requis.")
+                continue
+            print(android.contacts())
+            continue
         if command == "/storage":
             print(android.storage_status(str(storage_root())))
             continue
@@ -185,7 +191,7 @@ def main() -> None:
             print(files.handle(command))
             continue
         if command == "/help":
-            print("/battery | /device | /telephony | /location [network|gps|passive] | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /clipboard <texte> | /call <numéro> | /sms <numéro> | <message> | /write <fichier> | <contenu> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/battery | /device | /telephony | /location [network|gps|passive] | /contacts | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /clipboard <texte> | /call <numéro> | /sms <numéro> | <message> | /write <fichier> | <contenu> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
