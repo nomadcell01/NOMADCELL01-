@@ -2,6 +2,7 @@
 
 from collections.abc import Callable
 import json
+import shutil
 import subprocess
 from typing import Any
 
@@ -53,3 +54,19 @@ class AndroidBridge:
             return {"ok": False, "error": "Réponse batterie inattendue."}
 
         return {"ok": True, "data": data}
+
+    @staticmethod
+    def storage_status(path: str) -> dict[str, Any]:
+        """Retourne l'espace disque d'un chemin autorisé sans exécuter de commande shell."""
+        try:
+            total, used, free = shutil.disk_usage(path)
+        except OSError:
+            return {"ok": False, "error": "Stockage inaccessible."}
+
+        return {
+            "ok": True,
+            "path": path,
+            "total_bytes": total,
+            "used_bytes": used,
+            "free_bytes": free,
+        }
