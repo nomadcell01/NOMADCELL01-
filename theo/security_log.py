@@ -1,4 +1,4 @@
-"""Journal de sécurité local de T.H.E.O."""
+"""Journal de sécurité local append-only de T.H.E.O."""
 
 import json
 from datetime import datetime, timezone
@@ -20,7 +20,7 @@ class SecurityLog:
         if detail:
             entry["detail"] = detail
         with self.path.open("a", encoding="utf-8") as handle:
-            handle.write(json.dumps(entry, ensure_ascii=False) + "\n")
+            handle.write(json.dumps(entry, ensure_ascii=False) + "\\n")
 
     def recent(self, limit: int = 50) -> list[dict]:
         if limit <= 0 or not self.path.exists():
@@ -33,3 +33,9 @@ class SecurityLog:
             except json.JSONDecodeError:
                 continue
         return result
+
+    def clear(self) -> None:
+        raise PermissionError("Le journal de sécurité est append-only et ne peut pas être effacé par T.H.E.O.")
+
+    def overwrite(self, *_args, **_kwargs) -> None:
+        raise PermissionError("Le journal de sécurité est append-only et ne peut pas être écrasé par T.H.E.O.")
