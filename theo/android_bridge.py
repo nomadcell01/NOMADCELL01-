@@ -15,6 +15,9 @@ class AndroidBridge:
         "telephony": "termux-telephony-deviceinfo",
         "location": "termux-location",
         "contacts": "termux-contact-list",
+        "bluetooth": "termux-bluetooth-info",
+        "wifi": "termux-wifi-connectioninfo",
+        "wifi_scan": "termux-wifi-scaninfo",
     }
 
     ACTUATOR_COMMANDS = {
@@ -128,10 +131,12 @@ class AndroidBridge:
         except json.JSONDecodeError:
             return {"ok": False, "error": error_message}
 
-        if not isinstance(data, dict) and command != "contacts":
+        if not isinstance(data, dict) and command not in {"contacts", "wifi_scan"}:
             return {"ok": False, "error": "Réponse Android inattendue."}
         if command == "contacts" and not isinstance(data, list):
             return {"ok": False, "error": "Réponse contacts inattendue."}
+        if command == "wifi_scan" and not isinstance(data, list):
+            return {"ok": False, "error": "Réponse Wi-Fi inattendue."}
         return {"ok": True, "data": data}
 
     def battery_status(self) -> dict[str, Any]:
@@ -186,6 +191,34 @@ class AndroidBridge:
             if contact:
                 contacts.append(contact)
         return {"ok": True, "data": contacts}
+
+    def bluetooth_info(self) -> dict[str, Any]:
+        result = self._json_status("bluetooth", "Réponse Bluetooth invalide.")
+        if not result.get("ok"):
+            return result
+        return {"ok": True, "data": result["data"]}
+
+    def wifi_info(self) -> dict[str, Any]:
+        result = self._json_status("wifi", "Réponse Wi-Fi invalide.")
+        if not result.get("ok"):
+            return result
+        return {"ok": True, "data": result["data"]}
+
+    def wifi_scan(self) -> dict[str, Any]:
+        result = self._json_status("wifi_scan", "Réponse scan Wi-Fi invalide.")
+        if not result.get("ok"):
+            return result
+        networks = []
+        for item in result["data"]:
+            if not isinstance(item, dict):
+                continue
+            network = {}
+            for key in ("ssid", "bssid", "frequency_mhz", "level", "capabilities"):
+                if key in item:
+                    network[key] = item[key]
+            if network:
+                networks.append(network)
+        return {"ok": True, "data": networks}
 
     @staticmethod
     def storage_status(path: str) -> dict[str, Any]:
