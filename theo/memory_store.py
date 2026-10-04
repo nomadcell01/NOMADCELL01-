@@ -47,3 +47,7 @@ class TheoMemory:
     def forget(self, key: str) -> None:
         self._data.pop(key, None)
         self._save()
+
+    def keys(self) -> list[str]:
+        """Retourne les clés sans exposer directement le dictionnaire interne."""
+        return sorted(self._data)
