@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .admin_auth import AdminAuthenticator
 from .admin_commands import AdminCommands
+from .android_bridge import AndroidBridge
 from .commands import TheoCommands
 from .file_manager import FileManager
 from .memory_commands import MemoryCommands
@@ -49,11 +50,12 @@ def build_services():
         )
     )
     admin = AdminCommands(permissions, authenticator=authenticator, security_log=security_log)
-    return files, memory, admin, authenticator, security_log, permissions
+    android = AndroidBridge()
+    return files, memory, admin, authenticator, security_log, permissions, android
 
 
 def main() -> None:
-    files, memory, admin, authenticator, security_log, permissions = build_services()
+    files, memory, admin, authenticator, security_log, permissions, android = build_services()
     print("T.H.E.O. Avel — NOMADCELL01")
     print("Tape /help. /quit pour quitter.")
 
@@ -98,8 +100,14 @@ def main() -> None:
             for entry in security_log.recent():
                 print(entry)
             continue
+        if command == "/battery":
+            if not permissions.check("battery.read"):
+                print("Lecture batterie refusée.")
+            else:
+                print(android.run_safe("battery"))
+            continue
         if command == "/help":
-            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/battery | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
