@@ -51,3 +51,8 @@ class PermissionGate:
 
     def physical_unlock(self) -> bool:
         return self._physical_unlock
+
+    def lock_all(self) -> None:
+        """Verrouille immédiatement toutes les actions sensibles."""
+        self._quiet_mode = True
+        self._physical_unlock = False
