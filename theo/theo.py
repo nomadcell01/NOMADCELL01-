@@ -38,7 +38,7 @@ def build_services():
     root = storage_root()
     security_log = SecurityLog(root / ".theo" / "security.log")
     authenticator = AdminAuthenticator(admin_secrets())
-    permissions = PermissionGate()
+    permissions = PermissionGate(auth_checker=authenticator.is_authenticated)
     permissions.lock_all()
     security_log.record("safety_lock_startup")
     files = TheoCommands(FileManager(root))
