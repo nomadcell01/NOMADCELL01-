@@ -11,12 +11,20 @@ class MemoryGuard:
         self.memory = memory
         self.permissions = permissions
 
+    def _sensitive(self, key: str) -> bool:
+        return key.startswith(self.SENSITIVE_PREFIXES)
+
     def remember(self, key: str, value: str) -> str:
-        sensitive = key.startswith(self.SENSITIVE_PREFIXES)
-        if sensitive and not self.permissions.check("memory.sensitive.write"):
+        if self._sensitive(key) and not self.permissions.check("memory.sensitive.write"):
             return "Autorisation mémoire sensible requise."
         self.memory.set(key, value)
         return "Mémoire enregistrée."
+
+    def read(self, key: str) -> tuple[bool, str | None]:
+        if self._sensitive(key) and not self.permissions.check("memory.sensitive.read"):
+            return False, None
+        value = self.memory.get(key)
+        return True, None if value is None else str(value)
 
     def forget(self, key: str) -> str:
         self.memory.forget(key)
