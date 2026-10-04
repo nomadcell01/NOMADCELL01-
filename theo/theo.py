@@ -113,6 +113,9 @@ def main() -> None:
             print(android.storage_status(str(storage_root())))
             continue
         if command.startswith("/notify "):
+            if not permissions.check("actuator.write"):
+                print("Actionneur verrouillé: authentification, confirmation et déverrouillage requis.")
+                continue
             _, payload = command.split(" ", 1)
             if "|" not in payload:
                 print("Usage: /notify <titre> | <message>")
@@ -121,9 +124,15 @@ def main() -> None:
                 print(android.notify(title, content))
             continue
         if command == "/vibrate":
-            print(android.vibrate())
+            if not permissions.check("actuator.write"):
+                print("Actionneur verrouillé: authentification, confirmation et déverrouillage requis.")
+            else:
+                print(android.vibrate())
             continue
         if command.startswith("/vibrate "):
+            if not permissions.check("actuator.write"):
+                print("Actionneur verrouillé: authentification, confirmation et déverrouillage requis.")
+                continue
             try:
                 duration = int(command.split(maxsplit=1)[1])
                 print(android.vibrate(duration))
