@@ -22,7 +22,7 @@ class Theo:
         if command == "/help":
             return True, "Commandes: /help /status /memory /remember <texte> /files <dossier> /read <fichier> /battery /notify <titre> | <message> /clipboard /quit"
         if command == "/status":
-            return True, f"T.H.E.O. actif — mémoire: {len(self.memory.recent(100000))} entrée(s)."
+            return True, f"T.H.E.O. actif — mémoire: {len(self.memory.recent(100000))} entrée(s) — stockage: {self.config.shared_storage}"
         if command == "/memory":
             items = self.memory.recent()
             return True, "\n".join(f"- {x}" for x in items) if items else "Mémoire vide."
