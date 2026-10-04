@@ -143,15 +143,30 @@ def main() -> None:
             if not permissions.check("actuator.write"):
                 print("Actionneur verrouillé: authentification, confirmation et déverrouillage requis.")
                 continue
-            text = command.split(" ", 1)[1]
-            print(android.speak(text))
+            print(android.speak(command.split(" ", 1)[1]))
             continue
         if command.startswith("/clipboard "):
             if not permissions.check("actuator.write"):
                 print("Presse-papiers verrouillé: authentification, confirmation et déverrouillage requis.")
                 continue
-            text = command.split(" ", 1)[1]
-            print(android.clipboard_set(text))
+            print(android.clipboard_set(command.split(" ", 1)[1]))
+            continue
+        if command.startswith("/call "):
+            if not permissions.check("phone.call"):
+                print("Appel verrouillé: authentification, confirmation et déverrouillage requis.")
+                continue
+            print(android.call(command.split(" ", 1)[1]))
+            continue
+        if command.startswith("/sms "):
+            if not permissions.check("phone.sms"):
+                print("SMS verrouillé: authentification, confirmation et déverrouillage requis.")
+                continue
+            payload = command.split(" ", 1)[1]
+            if "|" not in payload:
+                print("Usage: /sms <numéro> | <message>")
+            else:
+                number, message = payload.split("|", 1)
+                print(android.sms(number, message))
             continue
         if command.startswith("/write "):
             if not permissions.check("files.write"):
@@ -160,7 +175,7 @@ def main() -> None:
             print(files.handle(command))
             continue
         if command == "/help":
-            print("/battery | /device | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /clipboard <texte> | /write <fichier> | <contenu> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/battery | /device | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /clipboard <texte> | /call <numéro> | /sms <numéro> | <message> | /write <fichier> | <contenu> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
