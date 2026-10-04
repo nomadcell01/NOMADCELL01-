@@ -16,9 +16,19 @@ class TheoMemory:
         if not self.path.exists():
             return
         try:
-            self._data = json.loads(self.path.read_text(encoding="utf-8"))
+            loaded = json.loads(self.path.read_text(encoding="utf-8"))
+            self._data = loaded if isinstance(loaded, dict) else {}
         except (OSError, json.JSONDecodeError):
             self._data = {}
+
+    def _save(self) -> None:
+        """Persiste la mémoire locale dans le fichier prévu à cet effet."""
+        temporary = self.path.with_suffix(self.path.suffix + ".tmp")
+        temporary.write_text(
+            json.dumps(self._data, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        temporary.replace(self.path)
 
     def get(self, key: str, default: Any = None) -> Any:
         return self._data.get(key, default)
