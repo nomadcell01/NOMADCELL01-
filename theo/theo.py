@@ -109,6 +109,9 @@ def main() -> None:
         if command == "/device":
             print(android.device_info())
             continue
+        if command == "/telephony":
+            print(android.telephony_info())
+            continue
         if command == "/storage":
             print(android.storage_status(str(storage_root())))
             continue
@@ -175,7 +178,7 @@ def main() -> None:
             print(files.handle(command))
             continue
         if command == "/help":
-            print("/battery | /device | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /clipboard <texte> | /call <numéro> | /sms <numéro> | <message> | /write <fichier> | <contenu> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/battery | /device | /telephony | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /clipboard <texte> | /call <numéro> | /sms <numéro> | <message> | /write <fichier> | <contenu> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
