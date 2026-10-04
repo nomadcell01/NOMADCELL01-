@@ -21,12 +21,20 @@ def storage_root() -> Path:
     return Path(configured).expanduser() if configured else DEFAULT_STORAGE
 
 
+def admin_secrets() -> dict[str, str]:
+    result = {}
+    for admin_id in ("admin1", "admin2"):
+        secret = os.environ.get(f"THEO_{admin_id.upper()}_SECRET")
+        if secret:
+            result[admin_id] = secret
+    if not result:
+        raise RuntimeError("Configure THEO_ADMIN1_SECRET ou THEO_ADMIN2_SECRET avant de lancer T.H.E.O.")
+    return result
+
+
 def build_services():
     root = storage_root()
-    secret = os.environ.get("THEO_ADMIN_SECRET")
-    if not secret:
-        raise RuntimeError("THEO_ADMIN_SECRET doit être configuré avant de lancer T.H.E.O.")
-    authenticator = AdminAuthenticator(secret)
+    authenticator = AdminAuthenticator(admin_secrets())
     permissions = PermissionGate()
     files = TheoCommands(FileManager(root))
     memory = MemoryCommands(MemoryGuard(TheoMemory(root / ".theo" / "memory.json"), permissions))
@@ -52,16 +60,23 @@ def main() -> None:
             try:
                 secret = getpass.getpass("Secret administrateur: ")
             except (EOFError, KeyboardInterrupt):
-                print("\nConnexion annulée.")
+                print("\\nConnexion annulée.")
                 continue
-            print("Administrateur authentifié." if authenticator.authenticate(secret) else "Authentification refusée.")
+            if authenticator.authenticate(secret):
+                print(f"Administrateur {authenticator.current_admin()} authentifié.")
+            else:
+                print("Authentification refusée.")
             continue
         if command == "/admin-logout":
             authenticator.logout()
             print("Session administrateur fermée.")
             continue
+        if command == "/admin-status":
+            current = authenticator.current_admin()
+            print(f"Administrateur connecté: {current}." if current else "Aucun administrateur connecté.")
+            continue
         if command == "/help":
-            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /admin-login | /admin-logout | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /admin-login | /admin-logout | /admin-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke")):
             print(admin.handle(command))
