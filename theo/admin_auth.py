@@ -6,15 +6,33 @@ import time
 
 
 class AdminAuthenticator:
-    def __init__(self, secrets: dict[str, str] | str, session_timeout: int = 900, clock=time.monotonic):
+    def __init__(
+        self,
+        secrets: dict[str, str] | str,
+        session_timeout: int = 900,
+        clock=time.monotonic,
+    ):
         if isinstance(secrets, str):
             secrets = {"admin1": secrets}
-        if not secrets or any(not value for value in secrets.values()):
-            raise ValueError("Secret administrateur obligatoire.")
+        if (
+            not isinstance(secrets, dict)
+            or not secrets
+            or any(
+                not isinstance(admin_id, str)
+                or not admin_id.strip()
+                or not isinstance(secret, str)
+                or not secret
+                for admin_id, secret in secrets.items()
+            )
+        ):
+            raise ValueError("Secrets administrateur invalides.")
+        if len(secrets) > 2:
+            raise ValueError("T.H.E.O. autorise au maximum deux administrateurs.")
         if session_timeout <= 0:
             raise ValueError("Durée de session invalide.")
+
         self._secret_hashes = {
-            admin_id: hashlib.sha256(secret.encode("utf-8")).digest()
+            admin_id.strip(): hashlib.sha256(secret.encode("utf-8")).digest()
             for admin_id, secret in secrets.items()
         }
         self._session_timeout = session_timeout
@@ -23,12 +41,17 @@ class AdminAuthenticator:
         self._last_activity: float | None = None
 
     def authenticate(self, secret: str) -> bool:
+        if not isinstance(secret, str) or not secret:
+            self.logout()
+            return False
+
         candidate = hashlib.sha256(secret.encode("utf-8")).digest()
         for admin_id, stored_hash in self._secret_hashes.items():
             if hmac.compare_digest(candidate, stored_hash):
                 self._authenticated_admin = admin_id
                 self._last_activity = self._clock()
                 return True
+
         self.logout()
         return False
 
