@@ -19,13 +19,14 @@ class AdminCommands:
 
         if name == "/confirm":
             if self.authenticator and not self.authenticator.is_authenticated():
-                return "Administrateur non authentifié."
+                return "Administrateur non authentifié ou session expirée."
             if len(parts) < 2:
                 return "Usage: /confirm <permission>"
             permission = parts[1]
             if permission not in self.SENSITIVE:
                 return "Permission non sensible: aucune confirmation requise."
             self.confirmation.confirm(permission)
+            self.authenticator and self.authenticator.touch()
             return "Permission sensible confirmée. Utilisez /grant <permission>."
 
         if name == "/grant":
@@ -34,9 +35,10 @@ class AdminCommands:
             permission = parts[1]
             if permission in self.SENSITIVE:
                 if self.authenticator and not self.authenticator.is_authenticated():
-                    return "Administrateur non authentifié."
+                    return "Administrateur non authentifié ou session expirée."
                 if not self.confirmation.is_confirmed(permission):
                     return "Permission sensible: confirmation administrateur requise."
+                self.authenticator and self.authenticator.touch()
             self.permissions.grant(permission)
             return "Permission accordée."
 
@@ -47,6 +49,8 @@ class AdminCommands:
             self.permissions.revoke(permission)
             if permission in self.SENSITIVE:
                 self.confirmation.revoke(permission)
+            if self.authenticator:
+                self.authenticator.touch()
             return "Permission révoquée."
 
         return "Commande inconnue."
