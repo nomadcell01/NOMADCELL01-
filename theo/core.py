@@ -20,7 +20,7 @@ class Theo:
         if not command:
             return True, ""
         if command == "/help":
-            return True, "Commandes: /help /status /memory /remember <texte> /files <dossier> /read <fichier> /battery /notify <titre> | <message> /clipboard /quit"
+            return True, "Commandes: /help /status /memory /remember <texte> /ls <dossier> /files <dossier> /read <fichier> /battery /notify <titre> | <message> /clipboard /quit"
         if command == "/status":
             return True, f"T.H.E.O. actif — mémoire: {len(self.memory.recent(100000))} entrée(s) — stockage: {self.config.shared_storage}"
         if command == "/memory":
@@ -30,6 +30,11 @@ class Theo:
             value = command[10:].strip()
             self.memory.remember(value)
             return True, "Mémoire enregistrée."
+        if command.startswith("/ls "):
+            try:
+                return True, "\n".join(self.files.list_entries(command[4:].strip())) or "Dossier vide."
+            except (PermissionError, FileNotFoundError, NotADirectoryError) as exc:
+                return True, f"Accès refusé: {exc}"
         if command.startswith("/files "):
             try:
                 return True, "\n".join(self.files.list_text(command[7:].strip())) or "Aucun fichier texte trouvé."
