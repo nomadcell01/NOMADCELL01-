@@ -44,10 +44,10 @@ def main() -> None:
             break
 
         if command == "/help":
-            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /grant <permission> | /revoke <permission> | /quit")
+            print("/files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /forget <clé> | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
 
-        if command.startswith(("/grant", "/revoke")):
+        if command.startswith(("/confirm", "/grant", "/revoke")):
             print(admin.handle(command))
         elif command.startswith(("/remember", "/memory", "/forget")):
             print(memory.handle(command))
