@@ -12,6 +12,7 @@ class PermissionGate:
         "memory.sensitive.write",
         "phone.call",
         "phone.sms",
+        "phone.contacts.read",
         "phone.contacts.write",
         "files.write",
         "actuator.write",
