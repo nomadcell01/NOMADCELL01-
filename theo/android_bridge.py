@@ -12,6 +12,7 @@ class AndroidBridge:
     SAFE_COMMANDS = {
         "battery": "termux-battery-status",
         "device": "termux-device-info",
+        "telephony": "termux-telephony-deviceinfo",
     }
 
     ACTUATOR_COMMANDS = {
@@ -142,6 +143,12 @@ class AndroidBridge:
 
     def device_info(self) -> dict[str, Any]:
         result = self._json_status("device", "Réponse appareil invalide.")
+        if not result.get("ok"):
+            return result
+        return {"ok": True, "data": result["data"]}
+
+    def telephony_info(self) -> dict[str, Any]:
+        result = self._json_status("telephony", "Réponse téléphonie invalide.")
         if not result.get("ok"):
             return result
         return {"ok": True, "data": result["data"]}
