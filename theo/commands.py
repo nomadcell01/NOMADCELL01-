@@ -4,7 +4,7 @@ from .file_manager import FileManager
 
 
 class TheoCommands:
-    COMMANDS = {"/ls", "/files", "/read"}
+    COMMANDS = {"/ls", "/files", "/read", "/write"}
 
     def __init__(self, files: FileManager):
         self.files = files
@@ -24,7 +24,15 @@ class TheoCommands:
                 if len(parts) < 2 or not argument:
                     return "Usage: /read <fichier>"
                 return self.files.read_text(argument)
-        except (PermissionError, FileNotFoundError, NotADirectoryError, TypeError, ValueError) as exc:
+            if name == "/write":
+                if len(parts) < 2 or "|" not in argument:
+                    return "Usage: /write <fichier> | <contenu>"
+                relative, content = argument.split("|", 1)
+                relative = relative.strip()
+                if not relative:
+                    return "Usage: /write <fichier> | <contenu>"
+                return self.files.write_text(relative, content, overwrite=False)
+        except (PermissionError, FileNotFoundError, FileExistsError, NotADirectoryError, TypeError, ValueError) as exc:
             return f"Accès refusé ou fichier invalide: {exc}"
 
         if name:
