@@ -38,14 +38,16 @@ def build_services():
     security_log = SecurityLog(root / ".theo" / "security.log")
     authenticator = AdminAuthenticator(admin_secrets())
     permissions = PermissionGate()
+    permissions.lock_all()
+    security_log.record("safety_lock_startup")
     files = TheoCommands(FileManager(root))
     memory = MemoryCommands(MemoryGuard(TheoMemory(root / ".theo" / "memory.json"), permissions))
     admin = AdminCommands(permissions, authenticator=authenticator, security_log=security_log)
-    return files, memory, admin, authenticator, security_log
+    return files, memory, admin, authenticator, security_log, permissions
 
 
 def main() -> None:
-    files, memory, admin, authenticator, security_log = build_services()
+    files, memory, admin, authenticator, security_log, permissions = build_services()
     print("T.H.E.O. Avel — NOMADCELL01")
     print("Tape /help. /quit pour quitter.")
 
@@ -64,7 +66,7 @@ def main() -> None:
             try:
                 secret = getpass.getpass("Secret administrateur: ")
             except (EOFError, KeyboardInterrupt):
-                print("\\nConnexion annulée.")
+                print("\nConnexion annulée.")
                 continue
             if authenticator.authenticate(secret):
                 admin_id = authenticator.current_admin()
@@ -77,8 +79,10 @@ def main() -> None:
         if command == "/admin-logout":
             admin_id = authenticator.current_admin()
             authenticator.logout()
+            permissions.lock_all()
             security_log.record("admin_logout", admin_id)
-            print("Session administrateur fermée.")
+            security_log.record("safety_lock_logout")
+            print("Session administrateur fermée. Actions sensibles verrouillées.")
             continue
         if command == "/admin-status":
             current = authenticator.current_admin()
