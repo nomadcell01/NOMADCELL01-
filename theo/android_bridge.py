@@ -14,6 +14,7 @@ class AndroidBridge:
         "device": "termux-device-info",
         "telephony": "termux-telephony-deviceinfo",
         "location": "termux-location",
+        "contacts": "termux-contact-list",
     }
 
     ACTUATOR_COMMANDS = {
@@ -127,8 +128,10 @@ class AndroidBridge:
         except json.JSONDecodeError:
             return {"ok": False, "error": error_message}
 
-        if not isinstance(data, dict):
+        if not isinstance(data, dict) and command != "contacts":
             return {"ok": False, "error": "Réponse Android inattendue."}
+        if command == "contacts" and not isinstance(data, list):
+            return {"ok": False, "error": "Réponse contacts inattendue."}
         return {"ok": True, "data": data}
 
     def battery_status(self) -> dict[str, Any]:
@@ -167,6 +170,22 @@ class AndroidBridge:
         if not isinstance(data, dict):
             return {"ok": False, "error": "Réponse localisation inattendue."}
         return {"ok": True, "data": data}
+
+    def contacts(self) -> dict[str, Any]:
+        result = self._json_status("contacts", "Réponse contacts invalide.")
+        if not result.get("ok"):
+            return result
+        contacts = []
+        for item in result["data"]:
+            if not isinstance(item, dict):
+                continue
+            contact = {}
+            for key in ("name", "number", "type"):
+                if key in item:
+                    contact[key] = item[key]
+            if contact:
+                contacts.append(contact)
+        return {"ok": True, "data": contacts}
 
     @staticmethod
     def storage_status(path: str) -> dict[str, Any]:
