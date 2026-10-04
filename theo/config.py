@@ -10,12 +10,14 @@ class TheoConfig:
     data_dir: Path
     memory_file: Path
     allowed_roots: tuple[Path, ...]
+    shared_storage: Path
 
     @classmethod
     def default(cls) -> "TheoConfig":
         home = Path.home() / "theo"
         data = home / "data"
-        return cls(home, data, data / "memory.json", (home, Path.home() / "storage" / "shared"))
+        shared = Path.home() / "storage" / "shared"
+        return cls(home, data, data / "memory.json", (home, shared), shared)
 
     def ensure(self) -> None:
         self.home.mkdir(parents=True, exist_ok=True)
