@@ -5,11 +5,14 @@ from pathlib import Path
 
 class FileManager:
     TEXT_EXTENSIONS = {".txt", ".md", ".json", ".py", ".csv", ".log"}
+    MAX_READ_CHARS = 200_000
 
     def __init__(self, root: str | Path):
         self.root = Path(root).expanduser().resolve()
 
     def _safe_path(self, relative: str | Path) -> Path:
+        if not isinstance(relative, (str, Path)):
+            raise TypeError("Chemin fichier invalide.")
         target = (self.root / relative).resolve()
         if target != self.root and self.root not in target.parents:
             raise PermissionError("Accès fichier refusé.")
@@ -25,7 +28,17 @@ class FileManager:
             if p.is_file()
         )
 
-    def read_text(self, relative: str | Path, max_chars: int = 200_000) -> str:
+    def read_text(
+        self,
+        relative: str | Path,
+        max_chars: int = MAX_READ_CHARS,
+    ) -> str:
+        if not isinstance(max_chars, int) or isinstance(max_chars, bool):
+            raise TypeError("Limite de lecture invalide.")
+        if max_chars <= 0:
+            raise ValueError("Limite de lecture invalide.")
+        max_chars = min(max_chars, self.MAX_READ_CHARS)
+
         target = self._safe_path(relative)
         if not target.is_file():
             raise FileNotFoundError(str(relative))
