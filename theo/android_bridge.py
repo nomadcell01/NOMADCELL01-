@@ -35,7 +35,7 @@ class AndroidBridge:
         return self._runner()
 
     def battery_status(self) -> dict[str, Any]:
-        """Retourne uniquement un objet JSON batterie valide ou un état d'erreur."""
+        """Retourne un état batterie normalisé sans exposer de réponse brute."""
         raw = self.run_safe("battery")
         if raw.startswith((
             "Termux:API indisponible.",
@@ -53,7 +53,12 @@ class AndroidBridge:
         if not isinstance(data, dict):
             return {"ok": False, "error": "Réponse batterie inattendue."}
 
-        return {"ok": True, "data": data}
+        normalized: dict[str, Any] = {"ok": True}
+        for key in ("percentage", "plugged", "status", "health", "temperature", "current"):
+            if key in data:
+                normalized[key] = data[key]
+
+        return normalized
 
     @staticmethod
     def storage_status(path: str) -> dict[str, Any]:
