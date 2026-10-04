@@ -134,6 +134,18 @@ def main() -> None:
         if command == "/wifi-scan":
             print(android.wifi_scan())
             continue
+        if command in {"/bluetooth-on", "/bluetooth-off"}:
+            if not permissions.check("actuator.write"):
+                print("Bluetooth verrouillé: authentification, confirmation et déverrouillage requis.")
+                continue
+            print(android.bluetooth_set(command == "/bluetooth-on"))
+            continue
+        if command in {"/wifi-on", "/wifi-off"}:
+            if not permissions.check("actuator.write"):
+                print("Wi-Fi verrouillé: authentification, confirmation et déverrouillage requis.")
+                continue
+            print(android.wifi_set(command == "/wifi-on"))
+            continue
         if command == "/storage":
             print(android.storage_status(str(storage_root())))
             continue
@@ -200,7 +212,7 @@ def main() -> None:
             print(files.handle(command))
             continue
         if command == "/help":
-            print("/battery | /device | /telephony | /location [network|gps|passive] | /contacts | /bluetooth | /wifi | /wifi-scan | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /clipboard <texte> | /call <numéro> | /sms <numéro> | <message> | /write <fichier> | <contenu> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
+            print("/battery | /device | /telephony | /location [network|gps|passive] | /contacts | /bluetooth | /wifi | /wifi-scan | /bluetooth-on | /bluetooth-off | /wifi-on | /wifi-off | /storage | /notify <titre> | <message> | /vibrate [durée_ms] | /speak <texte> | /clipboard <texte> | /call <numéro> | /sms <numéro> | <message> | /write <fichier> | <contenu> | /files | /ls [dossier] | /read <fichier> | /remember <clé> <valeur> | /memory <clé> | /memory-keys | /forget <clé> | /admin-login | /admin-logout | /admin-status | /security-log | /quiet-on | /quiet-off | /physical-unlock | /physical-lock | /safety-status | /confirm <permission> | /grant <permission> | /revoke <permission> | /quit")
             continue
         if command.startswith(("/confirm", "/grant", "/revoke", "/quiet-", "/physical-", "/safety-status")):
             print(admin.handle(command))
