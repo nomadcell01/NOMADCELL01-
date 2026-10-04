@@ -41,7 +41,13 @@ def build_services():
     permissions.lock_all()
     security_log.record("safety_lock_startup")
     files = TheoCommands(FileManager(root))
-    memory = MemoryCommands(MemoryGuard(TheoMemory(root / ".theo" / "memory.json"), permissions))
+    memory = MemoryCommands(
+        MemoryGuard(
+            TheoMemory(root / ".theo" / "memory.json"),
+            permissions,
+            security_log,
+        )
+    )
     admin = AdminCommands(permissions, authenticator=authenticator, security_log=security_log)
     return files, memory, admin, authenticator, security_log, permissions
 
