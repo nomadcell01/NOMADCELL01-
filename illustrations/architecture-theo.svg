@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 480" role="img" aria-labelledby="titre desc">
+<title id="titre">Architecture de principe NOMADCELL01</title><desc id="desc">Schéma conceptuel : l'humain garde l'autorité finale, T.H.E.O. coordonne des modules spécialisés, avec des protections de sécurité indépendantes.</desc>
+<defs><linearGradient id="fond" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071d30"/><stop offset="1" stop-color="#0d4659"/></linearGradient><linearGradient id="carte" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#153c54"/><stop offset="1" stop-color="#09283d"/></linearGradient></defs>
+<rect width="1100" height="480" rx="24" fill="url(#fond)"/>
+<text x="550" y="40" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" font-weight="700" fill="#fff">UNE INTELLIGENCE COORDINATRICE, DES PROTECTIONS INDÉPENDANTES</text>
+<text x="550" y="65" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" fill="#a9d9e3">Schéma d'architecture visée · principe de conception, non système déjà déployé</text>
+<g stroke="#61e5d6" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M550 146V177"/><path d="M540 166l10 11 10-11"/>
+ <path d="M550 275V309"/><path d="M540 298l10 11 10-11"/>
+ <path d="M160 350H940"/><path d="M160 350V375M355 350V375M550 350V375M745 350V375M940 350V375"/>
+</g>
+<g>
+ <rect x="340" y="88" width="420" height="58" rx="14" fill="#f1fbf9" stroke="#61e5d6" stroke-width="2"/>
+ <circle cx="374" cy="117" r="15" fill="#d5e8eb"/><circle cx="374" cy="110" r="5" fill="#0d5268"/><path d="M363 126q11-17 22 0" fill="#0d5268"/>
+ <text x="405" y="112" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#0a2c43">AUTORITÉ HUMAINE FINALE</text><text x="405" y="131" font-family="Arial,sans-serif" font-size="13" fill="#315a6b">Décisions, limites et validation</text>
+ <rect x="350" y="177" width="400" height="98" rx="18" fill="url(#carte)" stroke="#4edfd1" stroke-width="2"/>
+ <circle cx="395" cy="225" r="25" fill="#0a687b" stroke="#70f4e4" stroke-width="2"/><circle cx="395" cy="225" r="12" fill="none" stroke="#d9ffff" stroke-width="2"/><path d="M395 205v40M375 225h40" stroke="#d9ffff" stroke-width="2"/>
+ <text x="440" y="212" font-family="Arial,sans-serif" font-size="21" font-weight="700" fill="#fff">T.H.E.O. Avel</text><text x="440" y="235" font-family="Arial,sans-serif" font-size="15" fill="#c0f6f1">Coordination · analyse · mémoire</text><text x="440" y="255" font-family="Arial,sans-serif" font-size="13" fill="#8fd4e1">Oriente les modules, sans remplacer l'humain</text>
+ <rect x="30" y="309" width="1040" height="42" rx="12" fill="#592d3b" stroke="#ffb2a8" stroke-width="2"/>
+ <text x="550" y="336" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" fill="#fff">COUCHE DE SÉCURITÉ INDÉPENDANTE · ARRÊTS PHYSIQUES · LIMITES D'ACTION</text>
+</g>
+<g font-family="Arial,sans-serif" text-anchor="middle">
+ <g><rect x="25" y="375" width="175" height="75" rx="12" fill="#143c4d" stroke="#74d9cd"/><text x="112" y="403" font-size="15" font-weight="700" fill="#fff">HABITAT</text><text x="112" y="425" font-size="13" fill="#b8e6e8">Énergie · eau</text><text x="112" y="441" font-size="13" fill="#b8e6e8">climat intérieur</text></g>
+ <g><rect x="220" y="375" width="175" height="75" rx="12" fill="#143c4d" stroke="#74d9cd"/><text x="307" y="403" font-size="15" font-weight="700" fill="#fff">ROBOTIQUE</text><text x="307" y="425" font-size="13" fill="#b8e6e8">Humanoïdes</text><text x="307" y="441" font-size="13" fill="#b8e6e8">capteurs · actionneurs</text></g>
+ <g><rect x="415" y="375" width="175" height="75" rx="12" fill="#143c4d" stroke="#74d9cd"/><text x="502" y="403" font-size="15" font-weight="700" fill="#fff">RESSOURCES</text><text x="502" y="425" font-size="13" fill="#b8e6e8">Réemploi · matières</text><text x="502" y="441" font-size="13" fill="#b8e6e8">circularité</text></g>
+ <g><rect x="610" y="375" width="175" height="75" rx="12" fill="#143c4d" stroke="#74d9cd"/><text x="697" y="403" font-size="15" font-weight="700" fill="#fff">ENVIRONNEMENT</text><text x="697" y="425" font-size="13" fill="#b8e6e8">Jardins · météo</text><text x="697" y="441" font-size="13" fill="#b8e6e8">qualité de l'eau</text></g>
+ <g><rect x="805" y="375" width="270" height="75" rx="12" fill="#143c4d" stroke="#74d9cd"/><text x="940" y="403" font-size="15" font-weight="700" fill="#fff">OUTILS NUMÉRIQUES</text><text x="940" y="425" font-size="13" fill="#b8e6e8">Simulation NOMAD Life</text><text x="940" y="441" font-size="13" fill="#b8e6e8">documentation · suivi</text></g>
+</g>
+</svg>
