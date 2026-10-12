@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Journal de bord transparent de NOMADCELL01 : recherches, décisions, chantiers, besoins et avancées réelles.">
+  <meta name="theme-color" content="#06101a">
+  <title>Journal de bord — NOMADCELL01</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .journal-hero{padding:90px 7vw 55px;background:linear-gradient(135deg,rgba(8,42,53,.94),rgba(3,8,11,.96))}
+    .journal-hero h1{font-size:clamp(2.3rem,6vw,4.6rem);line-height:1.05;max-width:900px}
+    .journal-hero p{max-width:850px}
+    .journal-wrap{max-width:1150px;margin:auto;padding:48px 6vw}
+    .journal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:18px}
+    .journal-card,.status-panel{border:1px solid var(--line);background:rgba(7,21,27,.78);border-radius:18px;padding:24px}
+    .journal-card h3{margin:.4rem 0}
+    .status{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.78rem;color:var(--cyan);letter-spacing:.03em}
+    .journal-date{color:var(--muted);font-size:.9rem}
+    .journal-list li{margin:.55rem 0}
+    .partner-list a{color:var(--cyan);text-decoration:underline;text-underline-offset:3px}
+    .honesty{border-left:3px solid var(--green);padding:16px 20px;background:rgba(120,230,176,.07);border-radius:0 12px 12px 0}
+    .back-link{display:inline-block;margin-top:18px}
+    @media(max-width:700px){.journal-hero{padding-top:55px}.journal-wrap{padding-top:30px}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html"><span class="logo-mark">△</span> NOMADCELL01</a>
+    <nav aria-label="Navigation principale">
+      <a href="index.html">Accueil</a>
+      <a href="#identite">Qui sommes-nous</a>
+      <a href="#chantiers">Chantiers</a>
+      <a href="#journal">Journal</a>
+      <a href="#barcelone">Barcelone</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="journal-hero">
+      <p class="eyebrow">TRANSPARENCE · RECHERCHE · ÉVOLUTION</p>
+      <h1>Le travail réel derrière <span>NOMADCELL01</span></h1>
+      <p class="hero-lead">Un projet en construction, plusieurs chantiers menés en parallèle et une volonté : documenter le chemin parcouru aussi honnêtement que l'ambition finale.</p>
+      <p class="journal-date">État de référence préparé le 12 octobre 2026 · Cette page sera actualisée lorsque de nouvelles informations auront été vérifiées.</p>
+      <a class="button primary" href="#journal">Suivre le journal de bord</a>
+      <a class="button glass" href="index.html">Retour au site principal</a>
+    </section>
+
+    <section id="identite" class="journal-wrap">
+      <p class="eyebrow">01 · QUI PORTE LE PROJET ?</p>
+      <h2>Deux entités différentes pour un même cœur de projet.</h2>
+      <div class="journal-grid">
+        <article class="journal-card"><span class="status">Porteur humain</span><h3>Un particulier</h3><p>Laurent Tcheng est à l'origine de la vision de NOMADCELL01. Il fixe les objectifs, choisit les orientations et conserve l'autorité finale sur les décisions.</p></article>
+        <article class="journal-card"><span class="status">Assistant IA</span><h3>ChatGPT · T.H.E.O. Avel</h3><p>Une intelligence artificielle qui accompagne les recherches, l'organisation des connaissances, la réflexion, la rédaction et la préparation des étapes de conception. L'IA n'est pas une personne physique ni une entité juridique indépendante.</p></article>
+      </div>
+      <div class="honesty" style="margin-top:20px"><strong>Notre réalité actuelle :</strong> le projet est porté par ces deux entités. Nous ne prétendons pas disposer déjà d'une équipe d'ingénieurs, d'un laboratoire équipé, d'un terrain expérimental ou d'un financement industriel.</div>
+    </section>
+
+    <section class="journal-wrap" style="padding-top:0">
+      <p class="eyebrow">02 · LES CONDITIONS DE TRAVAIL</p>
+      <h2>Conçu et orchestré depuis un téléphone portable.</h2>
+      <div class="status-panel">
+        <p><strong>Tout ce travail est réalisé depuis un téléphone portable, sans utilisation de PC ni de tablette, avec des moyens financiers extrêmement limités.</strong></p>
+        <p>Cette contrainte fait partie intégrante de l'histoire du projet. Elle influe sur les outils accessibles, les possibilités de test et la vitesse de développement. Nous privilégions les ressources gratuites et n'engageons aucune dépense ni aucun abonnement sans décision explicite.</p>
+      </div>
+    </section>
+
+    <section id="chantiers" class="journal-wrap">
+      <p class="eyebrow">03 · PLUSIEURS CHANTIERS EN PARALLÈLE</p>
+      <h2>Un écosystème, pas un objet isolé.</h2>
+      <p>Ces axes avancent en parallèle et sont reliés entre eux. Leur présence sur cette page décrit le périmètre du projet, pas la prétention que tout est déjà construit.</p>
+      <div class="journal-grid">
+        <article class="journal-card"><span class="status">Conception / recherches</span><h3>Habitat et autonomie</h3><p>Cellules modulaires, habitat durable, énergie, eau, assainissement, jardins, serres et gestion des ressources.</p></article>
+        <article class="journal-card"><span class="status">Conception / recherches</span><h3>Humanoïdes et robotique NOMAD</h3><p>Modularité, réparabilité, capteurs, actionneurs, sécurité, prototypes et possibilités de fabrication.</p></article>
+        <article class="journal-card"><span class="status">Développement progressif</span><h3>T.H.E.O. Avel</h3><p>Assistant sur téléphone, mémoire de projet, coordination, commandes utiles et principes de sécurité. Les fonctions sont suivies selon leur état réel.</p></article>
+        <article class="journal-card"><span class="status">Développement numérique</span><h3>NOMAD Life</h3><p>Simulation de vie et d'habitat en 3D pour explorer les environnements, les usages et les idées de conception.</p></article>
+        <article class="journal-card"><span class="status">Projet à préparer</span><h3>Centre expérimental à Barcelone</h3><p>Objectif visé : un terrain de 2 000 à 3 000 m² pour construire, tester et améliorer habitats, robotique et systèmes autonomes.</p></article>
+        <article class="journal-card"><span class="status">Principe directeur</span><h3>Écologie et économie circulaire</h3><p>Prévoir les matériaux avant fabrication, réduire les chutes, réemployer les pièces et recycler ce qui ne peut plus être réutilisé.</p></article>
+        <article class="journal-card"><span class="status">Recherche / idées</span><h3>NOMAD TERRE · BEACH · MER</h3><p>Développement progressif d'un écosystème de vie, avec une priorité actuelle donnée aux pistes terrestres et côtières avant les phases marines.</p></article>
+        <article class="journal-card"><span class="status">Dimension solidaire</span><h3>Technologie au service des personnes</h3><p>Étudier à terme des solutions utiles au quotidien, y compris la mise à disposition solidaire d'humanoïdes pour des personnes isolées, sous réserve de faisabilité et de moyens.</p></article>
+      </div>
+    </section>
+
+    <section class="journal-wrap" style="padding-top:0">
+      <p class="eyebrow">04 · NOS RÈGLES DE TRANSPARENCE</p>
+      <h2>Ne pas confondre une idée avec une réalisation.</h2>
+      <div class="journal-grid">
+        <article class="journal-card"><h3>Statuts explicites</h3><ul class="journal-list"><li><strong>IDÉE</strong> : une piste à explorer.</li><li><strong>RECHERCHE</strong> : informations en cours de collecte ou d'analyse.</li><li><strong>À TESTER</strong> : une solution à vérifier.</li><li><strong>VALIDÉ</strong> : décision ou principe confirmé dans le projet.</li><li><strong>RÉALISÉ</strong> : travail effectivement exécuté, avec une trace lorsque possible.</li></ul></article>
+        <article class="journal-card"><h3>Ce que nous publierons</h3><ul class="journal-list"><li>Les recherches et ressources utiles.</li><li>Les décisions, changements et raisons.</li><li>Les essais, résultats et difficultés réels.</li><li>Les prochaines étapes et les besoins.</li><li>La date de la dernière vérification.</li></ul></article>
+        <article class="journal-card"><h3>Ce que nous ne prétendrons pas</h3><ul class="journal-list"><li>Qu'un prototype existe s'il n'a pas été construit.</li><li>Qu'un essai a réussi s'il n'a pas été effectué.</li><li>Qu'un financement ou un partenariat est acquis avant confirmation.</li><li>Que le site se met à jour tout seul : les entrées seront publiées après préparation et vérification.</li></ul></article>
+      </div>
+      <p class="note">La transparence n'implique pas la publication de données personnelles, de mots de passe ou de détails de sécurité et de conception qui doivent rester confidentiels.</p>
+    </section>
+
+    <section id="journal" class="journal-wrap">
+      <p class="eyebrow">05 · JOURNAL DE BORD</p>
+      <h2>Les étapes documentées</h2>
+      <article class="journal-card">
+        <p class="journal-date">12 octobre 2026 · Entrée de référence</p>
+        <h3>Organisation du suivi public de NOMADCELL01</h3>
+        <p><strong>Travail documenté :</strong> structuration d'un suivi transparent des chantiers, rappel de la situation actuelle du projet et préparation de la recherche d'un partenaire pour le centre expérimental de Barcelone.</p>
+        <p><strong>Décision :</strong> le site doit présenter toutes les composantes du projet, les recherches complémentaires, les statuts réels et les besoins, tout en précisant que le travail est mené depuis un téléphone, sans PC ni tablette et avec des moyens financiers très limités.</p>
+        <p><strong>État :</strong> page de suivi préparatoire. Cette entrée ne prétend pas qu'un terrain, un financement ou des prototypes matériels sont déjà disponibles.</p>
+      </article>
+      <p class="note" style="margin-top:18px">Les prochaines entrées seront ajoutées au fil des recherches et des avancées vérifiées. La date indiquée correspond à la dernière mise à jour publiée, pas à une actualisation automatique en direct.</p>
+    </section>
+
+    <section id="barcelone" class="journal-wrap">
+      <p class="eyebrow">06 · CENTRE EXPÉRIMENTAL</p>
+      <h2>Objectif : Barcelone, Espagne</h2>
+      <p>Le projet vise un terrain de 2 000 à 3 000 m² pour un centre réel d'apprentissage et d'expérimentation : habitats modulaires, construction, robotique, humanoïdes, T.H.E.O., énergie, eau, matériaux et essais écologiques.</p>
+      <p>Nous recherchons un partenaire susceptible d'apporter le terrain, le financement intégral de la première phase et des moyens techniques. Il s'agit d'un besoin recherché, pas d'un financement déjà obtenu.</p>
+      <div class="journal-grid partner-list">
+        <article class="journal-card"><span class="status">Contact prioritaire</span><h3>DFactory Barcelona</h3><p>Écosystème industriel et technologique, piste pour les mises en relation.</p><a href="https://dfactorybcn.com/en/" target="_blank" rel="noopener noreferrer">Site officiel →</a></article>
+        <article class="journal-card"><span class="status">Piste technique</span><h3>Eurecat</h3><p>Centre technologique, piste de collaboration et d'accompagnement.</p><a href="https://eurecat.org/en/" target="_blank" rel="noopener noreferrer">Site officiel →</a></article>
+        <article class="journal-card"><span class="status">Piste scientifique</span><h3>IRI — Institut de Robòtica i Informàtica Industrial</h3><p>Recherche en robotique et informatique industrielle.</p><a href="https://www.iri.upc.edu/" target="_blank" rel="noopener noreferrer">Site officiel →</a></article>
+      </div>
+      <p class="note">Ces trois structures sont des pistes de contact. Aucun partenariat n'est confirmé et aucun courrier n'est déclaré envoyé à ce stade.</p>
+    </section>
+
+    <section id="contact" class="journal-wrap">
+      <p class="eyebrow">07 · CONTACT</p>
+      <h2>Échanger sur NOMADCELL01</h2>
+      <p>Site principal : <a href="index.html">NOMADCELL01</a></p>
+      <p>Courriel : <a class="email" href="mailto:nomadcell01@gmail.com">nomadcell01@gmail.com</a></p>
+      <p class="note">Devise du projet : « La technologie au service du quotidien et du vivant. »</p>
+      <a class="button primary back-link" href="index.html">Retour au site principal</a>
+    </section>
+  </main>
+
+  <footer><strong>NOMADCELL01</strong><span>Journal de bord · Projet en cours de conception et de recherche</span><span>La technologie au service du quotidien et du vivant.</span></footer>
+</body>
+</html>
