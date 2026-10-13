@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="NOMADCELL01 — étude de conception de la paroi solaire hybride : électricité, récupération de chaleur et préchauffage de l'eau.">
+<meta name="theme-color" content="#06101a">
+<title>Paroi solaire hybride | NOMADCELL01</title>
+<style>
+:root{color-scheme:dark;--bg:#06101a;--panel:#0d1d2b;--line:#294354;--text:#edf5f8;--muted:#b5c6d0;--accent:#8fe0c0;--sun:#ffd58a}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#06101a,#102838 65%,#06101a);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}a{color:var(--accent)}header,main,footer{width:min(1040px,calc(100% - 32px));margin:auto}header{padding:24px 0;border-bottom:1px solid var(--line)}header a{text-decoration:none;font-weight:700}main{padding:36px 0 64px}.eyebrow{text-transform:uppercase;letter-spacing:.13em;color:var(--accent);font-size:.78rem;font-weight:700}h1{font-size:clamp(2.1rem,7vw,4.3rem);line-height:1.08;letter-spacing:-.04em;margin:.35em 0}h2{line-height:1.2;font-size:clamp(1.5rem,4vw,2.2rem)}h3{margin:.2em 0 .5em}p{color:var(--muted)}.lead{font-size:1.15rem;max-width:780px}.status{display:inline-block;border:1px solid #6b947e;border-radius:999px;padding:5px 12px;color:#baf2d3;font-size:.85rem}.hero,.panel{background:rgba(13,29,43,.88);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,36px);margin:22px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}.num{color:var(--sun);font-weight:800;font-size:.85rem}.diagram{display:grid;gap:10px;margin-top:20px}.step{padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#102637}.arrow{text-align:center;color:var(--sun);font-size:1.4rem;line-height:1}.tag{font-size:.78rem;border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--accent)}ul{padding-left:1.25rem;color:var(--muted)}li{margin:.5em 0}.caution{border-left:3px solid var(--sun);padding:8px 0 8px 16px}footer{padding:24px 0 40px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}.button{display:inline-block;margin-top:12px;border:1px solid var(--line);padding:10px 15px;border-radius:10px;text-decoration:none}
+</style>
+</head>
+<body>
+<header><a href="index.html">△ NOMADCELL01</a> · <a href="index.html#idees">BIG BOÎTE À IDÉES</a></header>
+<main>
+<section class="hero">
+<p class="eyebrow">ÉNERGIE · HABITAT · LABORATOIRE</p>
+<h1>La paroi solaire hybride NOMAD</h1>
+<p class="lead">Une paroi intégrée qui vise à produire de l'électricité, récupérer la chaleur solaire pour le chauffage et contribuer au préchauffage de l'eau chaude sanitaire, sans multiplier inutilement les équipements.</p>
+<p><span class="status">ORIENTATION DE CONCEPTION VALIDÉE</span></p>
+<p><strong>Statut :</strong> le principe est retenu pour étude. Les performances, la faisabilité technique et les coûts restent à démontrer par des calculs, des devis et un prototype.</p>
+</section>
+<section class="panel">
+<h2>1. Architecture envisagée</h2>
+<div class="grid">
+<article class="card"><span class="num">COUCHE 01</span><h3>Photovoltaïque affleurant</h3><p>Modules standardisés, intégrés dans un cadre et remplaçables individuellement. Ils produisent l'électricité et peuvent remplacer une partie du revêtement extérieur.</p></article>
+<article class="card"><span class="num">COUCHE 02</span><h3>Canal de récupération thermique</h3><p>Un passage d'air derrière les modules capte une partie de la chaleur. La circulation est pilotée par sondes et ventilateur selon la température et les besoins réels.</p></article>
+<article class="card"><span class="num">COUCHE 03</span><h3>Échangeur air-eau</h3><p>Une partie de la chaleur de l'air peut préchauffer l'eau d'un ballon par échange indirect. Un appoint reste prévu pour assurer la température d'eau nécessaire.</p></article>
+<article class="card"><span class="num">COUCHE 04</span><h3>Enveloppe indépendante</h3><p>Isolation, étanchéité et structure restent fonctionnelles si le module solaire est déposé. Les raccords doivent être accessibles et réparables.</p></article>
+</div>
+<div class="diagram" aria-label="Principe de circulation de l'énergie">
+<div class="step">☀️ Soleil → module photovoltaïque</div><div class="arrow">↓</div>
+<div class="step">⚡ Électricité vers les usages de l'habitat</div><div class="arrow">↓</div>
+<div class="step">♨️ Chaleur récupérée dans le canal d'air</div><div class="arrow">↓</div>
+<div class="step">🏠 Chauffage via échangeur et/ou préchauffage de l'eau dans un ballon</div>
+</div>
+<p class="caution">L'air du canal technique ne doit pas être envoyé directement dans les pièces ni dans l'eau sanitaire. Un échangeur adapté sépare les circuits. La conception finale devra traiter humidité, condensation, corrosion, feu, étanchéité et sécurité électrique.</p>
+</section>
+<section class="panel">
+<h2>2. Objectifs de conception</h2>
+<ul><li>Maximiser la chaleur effectivement utile pour le chauffage et le préchauffage de l'eau, sans sacrifier la production électrique.</li><li>Favoriser les modules disponibles en série, les dimensions répétitives et les fixations accessibles.</li><li>Éviter les doublons de revêtement, supports et montage lorsque l'intégration le permet réellement.</li><li>Permettre le remplacement d'un module sans démonter toute la paroi.</li><li>Adapter ultérieurement les protections et matériaux aux environnements Terre, Beach et Mer.</li></ul>
+</section>
+<section class="panel">
+<h2>3. Objectif économique à vérifier</h2>
+<p><strong>Cible de recherche :</strong> étudier si le coût total peut atteindre un tiers de celui d'une solution de référence comparable, pour des services énergétiques équivalents. Cette économie n'est pas démontrée à ce stade.</p>
+<p>La comparaison devra inclure modules, structure, pose, ventilation, échangeur, stockage, commandes, entretien et remplacements. Il faudra mesurer séparément l'électricité produite, la chaleur utile récupérée et l'énergie consommée par les ventilateurs ou pompes.</p>
+<div class="grid">
+<article class="card"><h3>Référence A</h3><p>Paroi conventionnelle avec photovoltaïque et système thermique séparé.</p></article>
+<article class="card"><h3>Prototype B</h3><p>Paroi NOMAD photovoltaïque avec récupération de chaleur par air et échangeur air-eau.</p></article>
+<article class="card"><h3>Comparaison C</h3><p>Système photovoltaïque-thermique à liquide, pour comparer gains et complexité.</p></article>
+</div>
+</section>
+<section class="panel">
+<h2>4. Étapes avant toute intégration</h2>
+<ol><li>Fixer les dimensions de la cellule et la surface solaire disponible.</li><li>Estimer les besoins de chauffage et d'eau chaude ainsi que les conditions d'ensoleillement.</li><li>Chiffrer les trois architectures avec des devis comparables.</li><li>Construire un petit prototype instrumenté et mesurer l'électricité, les températures, la chaleur transférée et la consommation auxiliaire.</li><li>Vérifier étanchéité, sécurité électrique, feu, résistance mécanique et maintenance avant de passer à l'habitat.</li></ol>
+</section>
+<section class="panel">
+<h2>Décision NOMADCELL01</h2>
+<p>Le principe de la paroi solaire hybride est validé comme orientation de travail. Le prototype à récupération de chaleur par air est la première piste à étudier. Le facteur de réduction des coûts, l'autonomie annuelle et les performances restent des objectifs à vérifier, non des résultats acquis.</p>
+<a class="button" href="index.html">← Retour au site NOMADCELL01</a>
+</section>
+</main>
+<footer>NOMADCELL01 · « La technologie au service du quotidien et du vivant » · Document de conception préliminaire.</footer>
+</body>
+</html>
