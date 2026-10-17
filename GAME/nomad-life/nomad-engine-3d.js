@@ -225,11 +225,11 @@ function bindPanels(){
  if($('simBtn'))$('simBtn').onclick=()=>open('avatarPanel');
  if($('closeAvatar'))$('closeAvatar').onclick=()=>close('avatarPanel');
  if($('saveAvatar'))$('saveAvatar').onclick=()=>{const input=$('avatarName'),name=(input&&input.value.trim())||'Mon Nomade';const el=$('simName');if(el)el.textContent=name;if(player)player.userData.name=name;close('avatarPanel');setPrompt('👤 Avatar enregistré : '+name+'.');};
- if($('inventoryBtn'))$('inventoryBtn').onclick=()=>{showInventory();open('inventoryPanel');};
+ if($('inventoryBtn'))$('inventoryBtn').onclick=()=>open('buyPanel');
  if($('closeInventory'))$('closeInventory').onclick=()=>close('inventoryPanel');
  if($('closeBuy'))$('closeBuy').onclick=()=>close('buyPanel');
- if($('inventoryBtn'))$('inventoryBtn').ondblclick=()=>open('buyPanel');
- const market=$('buyPanel');if(market){const head=market.querySelector('.panelHead b');if(head){const buyButton=document.createElement('button');buyButton.textContent='🛒 Boutique';buyButton.style.marginRight='auto';buyButton.onclick=()=>open('buyPanel');}}
+ 
+ const market=$('buyPanel');if(market){const head=market.querySelector('.panelHead b');if(head){const inventoryButton=document.createElement('button');inventoryButton.textContent='📦 Inventaire';inventoryButton.style.marginRight='auto';inventoryButton.onclick=()=>{close('buyPanel');showInventory();open('inventoryPanel');};market.querySelector('.panelHead').appendChild(inventoryButton);}}
  document.querySelectorAll('[data-item][data-price]').forEach(b=>b.addEventListener('click',()=>{const price=Number(b.dataset.price||0),item=b.dataset.item||'objet';if(virtualMoney<price){setPrompt('🪙 Pas assez de NOMAD PIÈCES virtuelles.');return;}virtualMoney-=price;inventory.push(item);showMoney();showInventory();setPrompt('🛋️ '+item+' ajouté à ton inventaire.');}));
  if($('homeBtn'))$('homeBtn').onclick=()=>{if(player)player.position.set(0,0,world==='HUB'?(hubUnderground?-11:-17):-12);setPrompt('🏠 Retour à ton point de départ.');};
  showMoney();showInventory();
