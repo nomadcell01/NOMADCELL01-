@@ -3,7 +3,7 @@ import * as THREE from './vendor/three.module.min.js';
 const canvas=document.getElementById('world'), prompt=document.getElementById('prompt');
 if(!canvas){return;}
 const T=THREE;
-let renderer,scene,camera,world='HUB',player,people=[],objects=[],yaw=0,pitch=.55,distance=12,hubUnderground=false;
+let renderer,scene,camera,world='HUB',player,people=[],objects=[],yaw=0,pitch=.55,distance=12,hubUnderground=false,buildMode=false,buildTool='room',virtualMoney=1000,inventory=[];
 let targetYaw=0,targetPitch=.38,drag=false,lastX=0,lastY=0,moveX=0,moveY=0,simMinutes=8*60,simDay=1;
 const needs={energy:100,hunger:100,hygiene:100,fun:100};
 const worlds=['TERRE','BEACH','MER','MONTAGNE','LUNE','MARS','ESPACE','HUB'];
@@ -204,7 +204,51 @@ function toggleHubLevel(){if(world!=='HUB'){say('◎ Va d’abord dans le HUB.')
 function nextWorld(){worlds[(worlds.indexOf(world)+1)%worlds.length];world=worlds[(worlds.indexOf(world)+1)%worlds.length];hubUnderground=false;build();say('🚌 Transport NOMAD → '+world);}
 function init(){try{renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.outputColorSpace=T.SRGBColorSpace;renderer.shadowMap.enabled=true;scene=new T.Scene();camera=new T.PerspectiveCamera(55,1,.1,250);scene.add(camera);scene.add(new T.HemisphereLight(0xffffff,0x445566,2.2));const light=new T.DirectionalLight(0xffffff,2.4);light.position.set(25,40,15);light.castShadow=true;scene.add(light);build();resize();bind();loop();}catch(e){say('Erreur moteur: '+(e&&e.message?e.message:String(e)));console.error(e);}}
 function resize(){if(!renderer||!camera)return;const w=canvas.clientWidth||window.innerWidth,h=canvas.clientHeight||window.innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
-function bind(){window.addEventListener('resize',resize);canvas.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture&&canvas.setPointerCapture(e.pointerId);});canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointermove',e=>{if(!drag)return;targetYaw-=((e.clientX-lastX)||0)*.006;targetPitch-=((e.clientY-lastY)||0)*.004;targetPitch=Math.max(.15,Math.min(1.25,targetPitch));lastX=e.clientX;lastY=e.clientY;});canvas.addEventListener('wheel',e=>{distance=Math.max(6,Math.min(32,distance+e.deltaY*.02));});window.addEventListener('keydown',e=>{if(e.key==='w'||e.key==='ArrowUp')moveY=1;if(e.key==='s'||e.key==='ArrowDown')moveY=-1;if(e.key==='a'||e.key==='ArrowLeft')moveX=-1;if(e.key==='d'||e.key==='ArrowRight')moveX=1;if(e.key===' ')say('⏸️ Mode tranquillité');if(e.key==='n'||e.key==='N')nextWorld();if(e.key==='u'||e.key==='U')toggleHubLevel();});window.addEventListener('keyup',e=>{if(['w','s','a','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){moveX=0;moveY=0;}});}
+function bindPanels(){
+ const $=id=>document.getElementById(id);
+ const open=id=>$(id)&&$(id).classList.add('open');
+ const close=id=>$(id)&&$(id).classList.remove('open');
+ const setPrompt=say;
+ const showMoney=()=>{const el=$('money');if(el)el.textContent='🪙 '+virtualMoney.toLocaleString('fr-FR');};
+ const showInventory=()=>{const el=$('inventoryList');if(el)el.innerHTML=inventory.length?inventory.map((x,i)=>'<div style="padding:8px;border-bottom:1px solid #ffffff22">'+(i+1)+'. '+x+'</div>').join(''):'<small>Ton inventaire est vide.</small>';};
+ const setWorld=w=>{if(!worlds.includes(w))return;world=w;hubUnderground=false;build();close('worldPanel');setPrompt('🌍 Monde chargé : '+world+'. Explore librement.');};
+ if($('worldBtn'))$('worldBtn').onclick=()=>open('worldPanel');
+ if($('closeWorld'))$('closeWorld').onclick=()=>close('worldPanel');
+ document.querySelectorAll('[data-world]').forEach(b=>b.addEventListener('click',()=>setWorld(b.dataset.world)));
+ if($('buildBtn'))$('buildBtn').onclick=()=>{buildMode=true;open('buildPanel');setPrompt('🏗️ Construction activée : touche le terrain pour placer un élément.');};
+ if($('buildModeBtn'))$('buildModeBtn').onclick=()=>{buildMode=!buildMode;if(buildMode)open('buildPanel');else close('buildPanel');setPrompt(buildMode?'🏗️ Mode construction activé.':'🏠 Mode vie activé.');};
+ if($('closeBuild'))$('closeBuild').onclick=()=>{buildMode=false;close('buildPanel');setPrompt('🏠 Mode vie activé.');};
+ document.querySelectorAll('.buildTool').forEach(b=>b.addEventListener('click',()=>{buildTool=b.dataset.tool||'room';document.querySelectorAll('.buildTool').forEach(x=>x.classList.toggle('active',x===b));setPrompt('Outil sélectionné : '+buildTool+'. Touche le terrain pour le placer.');}));
+ if($('plan2dBtn'))$('plan2dBtn').onclick=()=>{document.querySelectorAll('.buildView button').forEach(x=>x.classList.toggle('active',x.id==='plan2dBtn'));setPrompt('📐 Le plan 2D sera ajouté dans une prochaine mise à jour ; la pose 3D est disponible.');};
+ if($('view3dBtn'))$('view3dBtn').onclick=()=>{document.querySelectorAll('.buildView button').forEach(x=>x.classList.toggle('active',x.id==='view3dBtn'));setPrompt('🏠 Vue 3D active : touche le terrain pour construire.');};
+ if($('workBtn'))$('workBtn').onclick=()=>{virtualMoney+=50;simMinutes=Math.min(23*60,simMinutes+120);showMoney();setPrompt('💼 Journée de travail terminée : +50 NOMAD PIÈCES virtuelles.');};
+ if($('simBtn'))$('simBtn').onclick=()=>open('avatarPanel');
+ if($('closeAvatar'))$('closeAvatar').onclick=()=>close('avatarPanel');
+ if($('saveAvatar'))$('saveAvatar').onclick=()=>{const input=$('avatarName'),name=(input&&input.value.trim())||'Mon Nomade';const el=$('simName');if(el)el.textContent=name;if(player)player.userData.name=name;close('avatarPanel');setPrompt('👤 Avatar enregistré : '+name+'.');};
+ if($('inventoryBtn'))$('inventoryBtn').onclick=()=>{showInventory();open('inventoryPanel');};
+ if($('closeInventory'))$('closeInventory').onclick=()=>close('inventoryPanel');
+ if($('closeBuy'))$('closeBuy').onclick=()=>close('buyPanel');
+ if($('inventoryBtn'))$('inventoryBtn').ondblclick=()=>open('buyPanel');
+ const market=$('buyPanel');if(market){const head=market.querySelector('.panelHead b');if(head){const buyButton=document.createElement('button');buyButton.textContent='🛒 Boutique';buyButton.style.marginRight='auto';buyButton.onclick=()=>open('buyPanel');}}
+ document.querySelectorAll('[data-item][data-price]').forEach(b=>b.addEventListener('click',()=>{const price=Number(b.dataset.price||0),item=b.dataset.item||'objet';if(virtualMoney<price){setPrompt('🪙 Pas assez de NOMAD PIÈCES virtuelles.');return;}virtualMoney-=price;inventory.push(item);showMoney();showInventory();setPrompt('🛋️ '+item+' ajouté à ton inventaire.');}));
+ if($('homeBtn'))$('homeBtn').onclick=()=>{if(player)player.position.set(0,0,world==='HUB'?(hubUnderground?-11:-17):-12);setPrompt('🏠 Retour à ton point de départ.');};
+ showMoney();showInventory();
+}
+function placeBuildItem(event){
+ if(!buildMode||!camera||!scene)return false;
+ const rect=canvas.getBoundingClientRect(),mouse=new T.Vector2(((event.clientX-rect.left)/rect.width)*2-1,-((event.clientY-rect.top)/rect.height)*2+1);
+ const raycaster=new T.Raycaster();raycaster.setFromCamera(mouse,camera);
+ const plane=new T.Plane(new T.Vector3(0,1,0),0),point=new T.Vector3();
+ if(!raycaster.ray.intersectPlane(plane,point))return false;
+ const x=Math.round(point.x*2)/2,z=Math.round(point.z*2)/2;
+ const palette={room:[4,.15,4,'#b9b0a0'],floor:[4,.15,4,'#b9b0a0'],wall:[4,2.6,.18,'#d9d4c8'],door:[1,2.2,.18,'#8d6345'],window:[2,1.4,.12,'#75a9b5'],roof:[4,.2,4,'#7b4e45']};
+ const d=palette[buildTool]||palette.room;
+ const item=meshBox(x,buildTool==='wall'?1.3:buildTool==='door'?1.1:buildTool==='window'?1.4:buildTool==='roof'?2.8:0,z,d[0],d[1],d[2],d[3]);
+ item.userData.nomadBuild={tool:buildTool,x,z};
+ setPrompt('🏗️ '+buildTool+' placé dans le monde 3D. Tu peux continuer à construire.');
+ return true;
+}
+function bind(){window.addEventListener('resize',resize);bindPanels();canvas.addEventListener('pointerdown',e=>{if(placeBuildItem(e)){drag=false;return;}drag=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture&&canvas.setPointerCapture(e.pointerId);});canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointermove',e=>{if(!drag)return;targetYaw-=((e.clientX-lastX)||0)*.006;targetPitch-=((e.clientY-lastY)||0)*.004;targetPitch=Math.max(.15,Math.min(1.25,targetPitch));lastX=e.clientX;lastY=e.clientY;});canvas.addEventListener('wheel',e=>{distance=Math.max(6,Math.min(32,distance+e.deltaY*.02));});window.addEventListener('keydown',e=>{if(e.key==='w'||e.key==='ArrowUp')moveY=1;if(e.key==='s'||e.key==='ArrowDown')moveY=-1;if(e.key==='a'||e.key==='ArrowLeft')moveX=-1;if(e.key==='d'||e.key==='ArrowRight')moveX=1;if(e.key===' ')say('⏸️ Mode tranquillité');if(e.key==='n'||e.key==='N')nextWorld();if(e.key==='u'||e.key==='U')toggleHubLevel();});window.addEventListener('keyup',e=>{if(['w','s','a','d','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){moveX=0;moveY=0;}});}
 function update(dt){yaw+=(targetYaw-yaw)*.12;pitch+=(targetPitch-pitch)*.12;if(player){const speed=.055*dt;const f=new T.Vector3(Math.sin(yaw),0,Math.cos(yaw)),r=new T.Vector3(Math.cos(yaw),0,-Math.sin(yaw));player.position.addScaledVector(f,moveY*speed);player.position.addScaledVector(r,moveX*speed);const camTarget=player.position.clone();camera.position.copy(camTarget).add(new T.Vector3(Math.sin(yaw)*distance,Math.sin(pitch)*distance,Math.cos(yaw)*distance));camera.lookAt(camTarget.x,camTarget.y+1.3,camTarget.z);}for(let i=1;i<people.length;i++){const p=people[i],a=performance.now()*.0002+i*2;p.position.x+=Math.cos(a)*.012*dt;p.position.z+=Math.sin(a)*.012*dt;p.userData.life.activity=Math.sin(a)>0?'Vie sociale':'Vie quotidienne';}simMinutes+=dt/1200;if(simMinutes>=1440){simMinutes-=1440;simDay++;}const hh=String(Math.floor(simMinutes/60)).padStart(2,'0'),mm=String(Math.floor(simMinutes%60)).padStart(2,'0');const clock=document.getElementById('clock');if(clock)clock.textContent=hh+':'+mm;}
 function loop(){requestAnimationFrame(loop);update(1);renderer.render(scene,camera);}
 window.NOMAD_RESIZE=resize;
